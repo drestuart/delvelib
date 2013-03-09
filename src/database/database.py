@@ -133,8 +133,14 @@ class Database(object):
         dataDict[targetColumnName] = obj
         
 
+if not os.path.exists(DATA_DIR):
+    os.mkdir(DATA_DIR)
+    
 staticDBFile = os.path.join(DATA_DIR, "data.db")
 static = Database(staticDBFile)
+
+if not os.path.exists(SAVE_DIR):
+    os.mkdir(SAVE_DIR)
 
 saveDBFile = os.path.join(SAVE_DIR, "save.db")
 saveDB = Database(saveDBFile, echo=False)  # Test saving db
