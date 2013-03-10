@@ -1,47 +1,82 @@
-###############################################################
-#
-# OLD STUFF
-#
-###############################################################
+from Import import *
+from sqlalchemy.orm import relationship
+from sqlalchemy.schema import Column, ForeignKey
+from sqlalchemy.types import String, Integer, Boolean
+import database as db
 
+libtcod = importLibtcod()
 
-# External imports
-import libtcodpy as libtcod
+#from DungeonFeatureClass import *
+#from InventoryClass import *
 
-# Internal imports
-from DungeonFeatureClass import *
-from InventoryClass import *
-from GetSetClass import *
-from CoordinatesClass import *
-from colors import *
+Base = db.saveDB.getDeclarativeBase()
 
 # The Tile class
 
-class Tile(GetSet):
-    #a tile of the map and its properties
-    def __init__(self, x = 0, y = 0, blockMove = False, blockSight = False, baseSymbol = '.', 
-                 baseColor = colorLightGround, baseBackground = libtcod.BKGND_NONE, 
-                 feature = None, baseDescription = "floor"):
+class Tile(Base):
+    # a tile of the map and its properties
+    
+    __tablename__ = "tiles"
+    __table_args__ = {'extend_existing': True}
+    
+    def __init__(self, **kwargs):
         
-        self.__dict__['coordinates'] = Coordinates(x = x, y = y)
-        self.__dict__['blockMove'] = blockMove
-        self.__dict__['blockSight'] = blockSight
-        self.__dict__['baseSymbol'] = baseSymbol
-        self.__dict__['baseColor'] = baseColor
-        self.__dict__['baseDescription'] = baseDescription
-        self.__dict__['baseBackground'] = baseBackground
+        self.x = kwargs['x']
+        self.y = kwargs['y']
         
-        self.__dict__['objects'] = ItemInventory()      # The objects on this tile 
-        self.__dict__['creature'] = None   #The creature on this tile.  The ONE creature, by the way.
+        self.blockMove = kwargs['blockMove']
+        self.blockSight = kwargs['blockSight']
+       
+        self.baseSymbol = kwargs['baseSymbol']
+        self.baseColor = kwargs.get('baseColor', 
+                                    libtcod.Color(kwargs['baseColorR'], kwargs['baseColorG'], kwargs['baseColorB']) )
+
+        self.baseColorR = kwargs.get('baseColor', self.baseColor.r)
+        self.baseColorG = kwargs.get('baseColor', self.baseColor.g)
+        self.baseColorB = kwargs.get('baseColor', self.baseColor.b)
         
-        self.__dict__['feature'] = feature
+        self.baseBackgroundColor = kwargs.get('baseBackgroundColor', 
+                                              libtcod.Color(kwargs['baseBackgroundColorR'], kwargs['baseBackgroundColorG'], kwargs['baseBackgroundColorB']) )
+       
+        self.baseDescription = kwargs['baseDescription']
+        
+        self.level = kwargs['level']
+        
+#        libtcod.Color(0,0,0)
+
+        
+#        self.objects = ItemInventory()      # The objects on this tile 
+#        self.creature = None   
+#        self.feature = kwargs['feature']
         
 
+    id = Column(Integer, primary_key=True)
+    
+    x = Column(Integer)
+    y = Column(Integer)
+    
+    blockMove = Column(Boolean)
+    blockSight = Column(Boolean)
+    
+    baseSymbol = Column(String(length=1))
+    
+    baseColorR = Column(Integer)
+    baseColorG = Column(Integer)
+    baseColorB = Column(Integer)
+    
+    baseBackgroundColorR = Column(Integer)
+    baseBackgroundColorG = Column(Integer)
+    baseBackgroundColorB = Column(Integer)
+    
+    level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
+    levelId = Column(Integer, ForeignKey("levels.id"))
+    
+    
             
     def toDraw(self):
         # Returns a tuple of the tile's symbol, color, and background for the
         # drawing functionality
-        return self.symbol(), self.color(), self.background()
+        return self.getSymbol(), self.getColor(), self.getBackground()
     
     def blocksMove(self):
          # Determine whether creatures can see through this square.
@@ -93,7 +128,7 @@ class Tile(GetSet):
     
     def removeObjects(self, indices):
         # Take some objects from this tile
-        return [removeObject(ind) for ind in indices]
+        return [self.removeObject(ind) for ind in indices]
     
     def addCreature(self, creature):
         if (not self.blocksMove()) and (not self.creature):
@@ -123,9 +158,9 @@ class Tile(GetSet):
             self.feature.passTime(turns)
         
         
-    # Some functions that show what's in the Tile        
-    def symbol(self):
+    def getSymbol(self):
         # Determine which symbol to use to draw this tile
+        
         if self.creature and self.creature.isVisible():
             return self.creature.symbol()
         
@@ -138,8 +173,9 @@ class Tile(GetSet):
         else:
             return self.baseSymbol
         
-    def color(self):
+    def getColor(self):
         # Determine which color to use to draw this tile
+        
         if self.creature and self.creature.isVisible():
             return self.creature.color()
         
@@ -152,18 +188,18 @@ class Tile(GetSet):
         else:
             return self.baseColor        
 
-    def background(self):
+    def getBackground(self):
         # Determine which background to use to draw this tile
-        if self.creature and self.creature.isVisible():
-            return self.creature.background()
+#        if self.creature and self.creature.isVisible():
+#            return self.creature.background()
         
-        elif self.feature and self.feature.isVisible():
+        if self.feature and self.feature.isVisible():
             return self.feature.background()
                 
         else:
             return self.baseBackground   
 
-    def description(self):
+    def getDescription(self):
         # Determine which description to use to draw this tile
         if self.creature and self.creature.isVisible():
             return self.creature.description
@@ -177,8 +213,6 @@ class Tile(GetSet):
         else:
             return self.baseDescription   
         
-    def coords(self):
-        return self.coordinates
     
 #    # drawing management stuff. will be moved to the console class?    
 #    def draw(self, con):
@@ -195,9 +229,8 @@ class Tile(GetSet):
         
             
 def main():
-    tile = Tile(baseSymbol = 'x', baseDescription = 'some junk')  
-    print tile.color(), tile.symbol(), tile.description()
-            
+    pass
+
 if __name__ == '__main__':
     main()
 
