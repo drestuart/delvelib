@@ -1,3 +1,9 @@
+'''
+Created on Mar 10, 2013
+
+@author: dstu
+'''
+
 from Import import *
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey
@@ -79,7 +85,7 @@ class Tile(Base):
         return self.getSymbol(), self.getColor(), self.getBackground()
     
     def blocksMove(self):
-         # Determine whether creatures can see through this square.
+        # Determine whether creatures can see through this square.
         
         if self.creature:
             # Blocked by creature.  All creatures block movement
