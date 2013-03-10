@@ -8,6 +8,7 @@ from Import import *
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer, Boolean
+import colors
 import database as db
 
 libtcod = importLibtcod()
@@ -74,6 +75,8 @@ class Tile(Base):
     baseBackgroundColorG = Column(Integer)
     baseBackgroundColorB = Column(Integer)
     
+    baseDescription = Column(String)
+    
     level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
     levelId = Column(Integer, ForeignKey("levels.id"))
     
@@ -120,10 +123,10 @@ class Tile(Base):
                 
         return blocks
     
-    def addObject(self, object):
-        # Put an object into this tile, if possible.
+    def addObject(self, obj):
+        # Put an obj into this tile, if possible.
         if not self.blockMove:
-            self.objects.add(object)
+            self.objects.add(obj)
     
     def addObjects(self, objects):
         # Put several objects into this tile
@@ -236,24 +239,41 @@ class Tile(Base):
 
 # Some classes representing different kinds of tiles
 
-def Wall(Tile):
-    pass
+class Wall(Tile):
+    
+    def __init__(self, **kwargs):
+        super(Wall, self).__init__(blockMove = True, blockSight = True, baseBackground = colors.black, baseSymbol = '#', **kwargs)
 
-def StoneFloor(Tile):
-    pass
+class WoodenWall(Wall):
+    
+    def __init__(self, **kwargs):
+        super(WoodenWall, self).__init__(baseDescription = "A wooden wall", baseColor = colors.colorWood, **kwargs)
 
-def GrassFloor(Tile):
-    pass
-
-def WoodWall(Wall):
-    pass
-
-def RockWall(Wall):
-    pass
-
-
+class RockWall(Wall):
+    
+    def __init__(self, **kwargs):
+        super(WoodenWall, self).__init__(baseDescription = "A rock wall", baseColor = colors.colorRock, **kwargs)
 
 
+class Floor(Tile):
+        
+    def __init__(self, **kwargs):
+        super(Floor, self).__init__(blockMove = False, blockSight = False, baseBackground = colors.black, baseSymbol = '.', **kwargs)
+
+class StoneFloor(Floor):
+        
+    def __init__(self, **kwargs):
+        super(StoneFloor, self).__init__(baseDescription = "A stone floor", baseColor = colors.colorStone, **kwargs)
+
+class GrassFloor(Floor):
+            
+    def __init__(self, **kwargs):
+        super(GrassFloor, self).__init__(baseDescription = "Grass", baseColor = colors.colorGrass, **kwargs)
+
+class WoodFloor(Floor):
+            
+    def __init__(self, **kwargs):
+        super(WoodFloor, self).__init__(baseDescription = "A wooden floor", baseColor = colors.colorWood, **kwargs)
 
         
             
