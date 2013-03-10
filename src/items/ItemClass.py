@@ -1,42 +1,100 @@
-###############################################################
-#
-# OLD STUFF
-#
-###############################################################
+'''
+Created on Mar 10, 2013
 
-# External imports
-import libtcodpy as libtcod
+@author: dstu
+'''
 
-from GetSetClass import *
+from sqlalchemy.orm import relationship
+from sqlalchemy.schema import Column, ForeignKey
+from sqlalchemy.types import String, Integer, Float
+import database as db
 
-# The item class-component
-class Item(GetSet):
-    def __init__(self, use_function=None):
-        self.use_function = use_function
+Base = db.saveDB.getDeclarativeBase()
+
+class Item(Base):
+    '''
+    The abstract item baseclass
+    '''
+    __tablename__ = "items"
+    __table_args__ = {'extend_existing': True}
+
+
+    def __init__(self, **kwargs):
+        self.weight = kwargs['weight']
+        self.possessor = kwargs['possessor']
+        self.type_ = kwargs['type_']
+        self.onUse = kwargs['onUse']
+        self.onDrop = kwargs['onDrop']
+        self.onPickup = kwargs['onPickup']
+
+    id = Column(Integer, primary_key=True)
+    weight = Column(Float)
+    type_ = Column(String)
+
+    possessor = relationship("Creature", primaryjoin="Creature.id==Item.possessorId")
+    possessorId = Column(Integer, ForeignKey("creatures.id"))
+#    containerId = Column(Integer, ForeignKey("inventories.id"))
     
-    #an item that can be picked up and used.
-    def pickUp(self):
-        #add to the player's inventory and remove from the map
-        if len(inventory) >= 52:
-            message('Your inventory is full, cannot pick up '
-                    + self.owner.name + '.', libtcod.red)
-        else:
-            inventory.append(self.owner)
-            objects.remove(self.owner)
-            message('You picked up a ' + self.owner.name + '!', libtcod.green)
+    # For items that have an inventory
+#    inventoryId = Column(Integer, ForeignKey("inventories.id"))
+#    inventory = relationship("Inventory", uselist=False, primaryjoin="Inventory.id==Item.inventoryId")
 
+    
+    __mapper_args__ = {
+        'polymorphic_on':type_,
+        'polymorphic_identity':'item'
+    }
+    
+#    def getContainer(self):
+#        return self.container
+#    
+#    def setContainer(self, val):
+#        self.container = val
+#        return self
+    
     def drop(self):
-        #add to the map and remove from the player's inventory. also, place it at the player's coordinates
-        objects.append(self.owner)
-        inventory.remove(self.owner)
-        self.owner.x = player.x
-        self.owner.y = player.y
-        message('You dropped a ' + self.owner.name + '.', libtcod.yellow)
-
+        # TODO: Handle universal dropping logic
+        self.onDrop()
+        
+    def pickup(self):
+        # TODO: Handle universal pickup logic
+        self.onPickup()
+        
     def use(self):
-        #just call the "use_function" if it is defined
-        if self.use_function is None:
-            message('The ' + self.owner.name + ' cannot be used.')
-        else:
-            if self.use_function() != 'cancelled':
-                inventory.remove(self.owner)  #destroy after use, unless it was cancelled for some reason
+        self.onUse()
+    
+    
+    def getId(self):
+        return self.id
+
+    def setId(self, val):
+        self.id = val
+        return self
+    
+    def getWeight(self):
+        return self.weight
+    
+    def setWeight(self, val):
+        self.weight = val
+        return self
+    
+    def getPossessor(self):
+        return self.possessor
+    
+    def setPossessor(self, val):
+        self.possessor = val
+        return self
+    
+def main():
+    pass
+
+
+    
+if __name__ == '__main__':
+    main()
+    
+    
+    
+    
+    
+    
