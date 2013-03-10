@@ -115,7 +115,7 @@ class Room(Base, Rect):
     centerX = Column(Integer)
     centerY = Column(Integer)
     
-    level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
+    level = relationship("Level", primaryjoin="Level.id==Room.levelId")
     levelId = Column(Integer, ForeignKey("levels.id"))
     
     tiles = relationship("Tile", backref=backref("tile", uselist=False), primaryjoin="Room.id==Tile.roomId")

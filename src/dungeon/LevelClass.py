@@ -9,21 +9,25 @@
 # showing what they know/remember about the level.
 
 from Import import *
-import random
-import os
-import copy
-
 from TileClass import *
-from CreatureClass import *
-import colors
 import Const as C
+import colors
+import copy
+import os
+import random
+
+#from CreatureClass import *
 
 libtcod = importLibtcod()
 
 
 class Level(Base):
     '''A class that models a map, essentially an array of tiles.  Holds functionality for drawing itself in a console.  Subclassed into DungeonLevel and FOVMap.'''
-        
+    
+    __tablename__ = "levels"
+    __table_args__ = {'extend_existing': True}
+    
+    
     def __init__(self, width, height, name = '', depth = 0):
         self.__dict__['WIDTH'] = width
         self.__dict__['HEIGHT'] = height
@@ -46,6 +50,9 @@ class Level(Base):
         
         self.__dict__['toRecomputeFOV'] = True
         self.__dict__['toRecomputeFOVProps'] = True
+        
+    id = Column(Integer, primary_key=True)
+
 
     def recomputeFOV(self):
         self.__dict__['toRecomputeFOV'] = True
