@@ -8,38 +8,17 @@
 # The plan is to have two maps: the *actual* level map, and the player's map
 # showing what they know/remember about the level.
 
-# External imports
+from Import import *
 import random
-import libtcodpy as libtcod
 import os
 import copy
 
-# Internal imports
 from TileClass import *
 from CreatureClass import *
-from GetSetClass import *
-from CoordinatesClass import *
-from colors import *
+import colors
+import Const as C
 
-# Max monsters per room
-MAX_ROOM_MONSTERS = 3
-
-# Max items per room
-MAX_ROOM_ITEMS = 2
-
-# Field of view constants
-FOV_ALGO = 0  #default FOV algorithm
-FOV_LIGHT_WALLS = True
-
-
-# Map dimensions
-MAP_WIDTH = 80
-MAP_HEIGHT = 50
-
-# Some dungeon generation constants
-ROOM_MAX_SIZE = 10
-ROOM_MIN_SIZE = 6
-MAX_ROOMS = 30
+libtcod = importLibtcod()
 
 
 # The Rectangle class
@@ -62,8 +41,8 @@ class Rect:
                 self.y1 <= other.y2 and self.y2 >= other.y1)
         
         
-class Map(GetSet):
-    '''A class that models a map, essentially an array of tiles.  Holds functionality for drawing itself in a console.  Subclassed into LevelMap and FOVMap.'''
+class Level(Base):
+    '''A class that models a map, essentially an array of tiles.  Holds functionality for drawing itself in a console.  Subclassed into DungeonLevel and FOVMap.'''
         
     def __init__(self, width, height, name = '', depth = 0):
         self.__dict__['WIDTH'] = width
@@ -74,7 +53,7 @@ class Map(GetSet):
         #fill map with "wall" tiles
 
         self.__dict__['tiles'] = [[ Tile(x, y, blockMove = True, blockSight = True, baseSymbol = '#', 
-                             baseColor = colorDarkWall, baseDescription = 'Rock wall') 
+                             baseColor = colors.colorDarkWall, baseDescription = 'Rock wall') 
                              for y in range(self.HEIGHT) ]
                              for x in range(self.WIDTH) ]
         
@@ -234,21 +213,21 @@ class Map(GetSet):
             
             
             
-class LevelMap(Map):
-    '''A Map subclass for modeling one dungeon level.  Includes functionality for passing time and level construction.'''
+class DungeonLevel(Level):
+    '''A Level subclass for modeling one dungeon level.  Includes functionality for passing time and level construction.'''
     def __init__(self, width, height, name = '', depth = 0):
-        super(LevelMap, self).__init__(width, height, name, depth)
+        super(DungeonLevel, self).__init__(width, height, name, depth)
     
     def createRooms(self):
-        '''Add some rooms to the map'''
+        '''Add some rooms to the level'''
         rooms = []
         num_rooms = 0
      
         # Make some rooms
-        for r in range(MAX_ROOMS):
+        for r in range(C.MAX_ROOMS):
             #random width and height
-            w = libtcod.random_get_int(0, ROOM_MIN_SIZE, ROOM_MAX_SIZE)
-            h = libtcod.random_get_int(0, ROOM_MIN_SIZE, ROOM_MAX_SIZE)
+            w = libtcod.random_get_int(0, C.ROOM_MIN_SIZE, C.ROOM_MAX_SIZE)
+            h = libtcod.random_get_int(0, C.ROOM_MIN_SIZE, C.ROOM_MAX_SIZE)
     
             #random position without going out of the boundaries of the map
             x = libtcod.random_get_int(0, 0, self.WIDTH - w - 1)
@@ -368,84 +347,8 @@ class LevelMap(Map):
         else:
             return None, None
 
-    # Add some monsters! Rawr!
-    def placeObjects(self, room):
-        # Disable for now
-        return
-        #choose random number of monsters
-#        num_monsters = libtcod.random_get_int(0, 0, MAX_ROOM_MONSTERS)
-#     
-#        for i in range(num_monsters):
-#            #choose random spot for this monster
-#            x = libtcod.random_get_int(0, room.x1+1, room.x2-1)
-#            y = libtcod.random_get_int(0, room.y1+1, room.y2-1)
-#    
-#            #only place it if the tile is not blocked
-#            if not isBlocked(x, y):
-#     
-#                #80% chance of getting an orc
-#                if libtcod.random_get_int(0, 0, 100) < 80:  
-#                    
-#                    #create an orc
-#                    fighter_component = Fighter(hp=10, defense=0, power=3, 
-#                                                death_function=monster_death)
-#                    ai_component = BasicMonster()
-#     
-#                    monster = Object(x, y, 'o', 'orc', libtcod.desaturated_green,
-#                        blocks=True, fighter=fighter_component, ai=ai_component)
-#                else:
-#                    #create a troll
-#                    fighter_component = Fighter(hp=16, defense=1, power=4, 
-#                                                death_function=monster_death)
-#                    ai_component = BasicMonster()
-#     
-#                    monster = Object(x, y, 'T', 'troll', libtcod.darker_green,
-#                        blocks=True, fighter=fighter_component, ai=ai_component)
-#    
-#     
-#                objects.append(monster)
-#    
-#        #choose random number of items
-#        num_items = libtcod.random_get_int(0, 0, MAX_ROOM_ITEMS)
-#     
-#        for i in range(num_items):
-#            #choose random spot for this item
-#            x = libtcod.random_get_int(0, room.x1+1, room.x2-1)
-#            y = libtcod.random_get_int(0, room.y1+1, room.y2-1)
-#     
-#            #only place it if the tile is not blocked
-#            if not isBlocked(x, y):
-#                dice = libtcod.random_get_int(0, 0, 100)
-#                if dice < 70:
-#                    #create a healing potion (70% chance)
-#                    item_component = Item(use_function=cast_heal)
-#     
-#                    item = Object(x, y, '!', 'healing potion', libtcod.violet, 
-#                                  item=item_component)
-#                    #print "Placed healing potion at ", str(x), ", ", str(y)
-#                elif dice < 70+10:
-#                    #create a lightning bolt scroll (10% chance)
-#                    item_component = Item(use_function=cast_lightning)
-#     
-#                    item = Object(x, y, '?', 'scroll of lightning bolt', libtcod.light_yellow, item=item_component)
-#                
-#                elif dice < 70+10+10:
-#                    #create a fireball scroll (10% chance)
-#                    item_component = Item(use_function=cast_fireball)
-#     
-#                    item = Object(x, y, '#', 'scroll of fireball', libtcod.light_yellow, item=item_component)
-#                
-#                else:
-#                    #create a confuse scroll (10% chance)
-#                    item_component = Item(use_function=cast_confuse)
-#     
-#                    item = Object(x, y, '?', 'scroll of confusion', libtcod.light_yellow, item=item_component)
-#    
-#                objects.append(item)
-
-
 class FOVMap():
-    '''A map subclass for a creature's Field of View.  Keeps track of what the creature can see, and only updates squares that can be seen.  Reads from its corresponding LevelMap object.'''
+    '''A map subclass for a creature's Field of View.  Keeps track of what the creature can see, and only updates squares that can be seen.  Reads from its corresponding DungeonLevel object.'''
 
 
     def __init__(self, baseMap):
@@ -454,7 +357,7 @@ class FOVMap():
         self.__dict__['toRecompute'] = True
         
         # Initialize the fov_map object for libtcod
-        self.__dict__['fov_map'] = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
+        self.__dict__['fov_map'] = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
         
         self.__dict__['tiles'] = [[ None 
                                     for y in range(self.baseMap.HEIGHT) ]
@@ -493,7 +396,7 @@ class FOVMap():
             self.__dict__['toRecompute'] = False
             
             libtcod.map_compute_fov(self.fov_map, position['x'], position['y'], 
-                                radius, FOV_LIGHT_WALLS, FOV_ALGO)
+                                radius, C.FOV_LIGHT_WALLS, C.FOV_ALGO)
 
             self.computeFOVProperties()
             
@@ -522,7 +425,7 @@ class FOVMap():
                         
                 else:
                     background = libtcod.BKGND_NONE
-                    color = colorDarkGround
+                    color = colors.colorDarkGround
                     symbol = ' '
                     
                 libtcod.console_set_foreground_color(con, color)
@@ -540,8 +443,8 @@ def main():
     libtcod.sys_set_fps(20)
     con = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-    map = Map(40, 40)
-    lmap = LevelMap(40, 50)
+    map = Level(40, 40)
+    lmap = DungeonLevel(40, 50)
     fovmap = FOVMap(lmap)
     coords = fovmap.baseMap.getRandOpenSpace()
     
