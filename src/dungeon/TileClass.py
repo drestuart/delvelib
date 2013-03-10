@@ -30,10 +30,10 @@ class Tile(Base):
         self.x = kwargs['x']
         self.y = kwargs['y']
         
-        self.blockMove = kwargs['blockMove']
-        self.blockSight = kwargs['blockSight']
+        self.blockMove = kwargs.get('blockMove', False)
+        self.blockSight = kwargs.get('blockSight', False)
        
-        self.baseSymbol = kwargs['baseSymbol']
+        self.baseSymbol = kwargs.get('baseSymbol', ' ')
         self.baseColor = kwargs.get('baseColor', 
                                     libtcod.Color(kwargs['baseColorR'], kwargs['baseColorG'], kwargs['baseColorB']) )
 
@@ -44,9 +44,9 @@ class Tile(Base):
         self.baseBackgroundColor = kwargs.get('baseBackgroundColor', 
                                               libtcod.Color(kwargs['baseBackgroundColorR'], kwargs['baseBackgroundColorG'], kwargs['baseBackgroundColorB']) )
        
-        self.baseDescription = kwargs['baseDescription']
+        self.baseDescription = kwargs.get('baseDescription', '')
         
-        self.level = kwargs['level']
+        self.level = kwargs.get('level', None)
         
 #        libtcod.Color(0,0,0)
 
@@ -76,6 +76,9 @@ class Tile(Base):
     
     level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
     levelId = Column(Integer, ForeignKey("levels.id"))
+    
+    room = relationship("room", primaryjoin = "Room.id = Tile.roomId")
+    roomId = Column(Integer, ForeignKey("rooms.id"))
     
     
             
