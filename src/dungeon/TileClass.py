@@ -231,7 +231,28 @@ class Tile(Base):
 #        #erase the character that represents this object
 #        libtcod.console_put_char(con, self.x, self.y, ' ', libtcod.BKGND_NONE)
         
-        
+
+# Some classes representing different kinds of tiles
+
+def Wall(Tile):
+    pass
+
+def StoneFloor(Tile):
+    pass
+
+def GrassFloor(Tile):
+    pass
+
+def WoodWall(Wall):
+    pass
+
+def RockWall(Wall):
+    pass
+
+
+
+
+
         
             
 def main():
