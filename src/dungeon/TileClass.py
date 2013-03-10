@@ -80,7 +80,6 @@ class Tile(Base):
     room = relationship("room", primaryjoin = "Room.id = Tile.roomId")
     roomId = Column(Integer, ForeignKey("rooms.id"))
     
-    
             
     def toDraw(self):
         # Returns a tuple of the tile's symbol, color, and background for the
