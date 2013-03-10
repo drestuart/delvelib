@@ -12,6 +12,8 @@
 <path>/delveRL/src/dungeon</path>
 <path>/delveRL/src/creatures</path>
 <path>/delveRL/src/items</path>
+<path>/delveRL/src/database</path>
+<path>/delveRL/src/random</path>
 </pydev_pathproperty>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.7</pydev_property>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
