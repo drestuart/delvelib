@@ -35,16 +35,20 @@ class Tile(Base):
         self.blockSight = kwargs.get('blockSight', False)
        
         self.baseSymbol = kwargs.get('baseSymbol', ' ')
-        self.baseColor = kwargs.get('baseColor', 
-                                    libtcod.Color(kwargs['baseColorR'], kwargs['baseColorG'], kwargs['baseColorB']) )
-
-        self.baseColorR = kwargs.get('baseColor', self.baseColor.r)
-        self.baseColorG = kwargs.get('baseColor', self.baseColor.g)
-        self.baseColorB = kwargs.get('baseColor', self.baseColor.b)
         
-        self.baseBackgroundColor = kwargs.get('baseBackgroundColor', 
-                                              libtcod.Color(kwargs['baseBackgroundColorR'], kwargs['baseBackgroundColorG'], kwargs['baseBackgroundColorB']) )
-       
+        self.baseColor = kwargs.get('baseColor', None)
+
+        self.baseColorR = self.baseColor.r
+        self.baseColorG = self.baseColor.g
+        self.baseColorB = self.baseColor.b
+        
+        self.baseBackgroundColor = kwargs.get('baseBackgroundColor', None)
+        
+        self.baseBackgroundColorR = self.baseBackgroundColor.r
+        self.baseBackgroundColorG = self.baseBackgroundColor.g
+        self.baseBackgroundColorB = self.baseBackgroundColor.b
+        
+        
         self.baseDescription = kwargs.get('baseDescription', '')
         
         self.level = kwargs.get('level', None)
@@ -80,7 +84,7 @@ class Tile(Base):
     level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
     levelId = Column(Integer, ForeignKey("levels.id"))
     
-    room = relationship("room", primaryjoin = "Room.id = Tile.roomId")
+    room = relationship("Room", primaryjoin = "Room.id==Tile.roomId")
     roomId = Column(Integer, ForeignKey("rooms.id"))
     
             
@@ -242,7 +246,7 @@ class Tile(Base):
 class Wall(Tile):
     
     def __init__(self, **kwargs):
-        super(Wall, self).__init__(blockMove = True, blockSight = True, baseBackground = colors.black, baseSymbol = '#', **kwargs)
+        super(Wall, self).__init__(blockMove = True, blockSight = True, baseBackgroundColor = colors.black, baseSymbol = '#', **kwargs)
 
 class WoodenWall(Wall):
     
@@ -258,7 +262,7 @@ class RockWall(Wall):
 class Floor(Tile):
         
     def __init__(self, **kwargs):
-        super(Floor, self).__init__(blockMove = False, blockSight = False, baseBackground = colors.black, baseSymbol = '.', **kwargs)
+        super(Floor, self).__init__(blockMove = False, blockSight = False, baseBackgroundColor = colors.black, baseSymbol = '.', **kwargs)
 
 class StoneFloor(Floor):
         
@@ -278,20 +282,18 @@ class WoodFloor(Floor):
         
             
 def main():
-    pass
+    
+    import LevelClass
+    import RoomClass
+    
+    db.saveDB.start()
+    
+    t1 = WoodFloor(x=1, y=2)
+    db.saveDB.save(t1)
+    
+    
+    
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-
-
-
-
-
-
 
