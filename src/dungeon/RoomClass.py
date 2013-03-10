@@ -137,9 +137,13 @@ class Room(Base, Rect):
             rightWall = self.defaultWallType(x=self.x2, y=y)
             self.tiles.append(rightWall)
         
+        
         # Create floor tiles
         for x in range(self.x1 + 1, self.x2 - 1):
             for y in range(self.y1 + 1, self.y2 - 1):
+                
+                # Add some chance for a dungeon feature here
+                
                 floor = self.defaultFloorType(x=x, y=y)
                 self.tiles.append(floor)
                 
