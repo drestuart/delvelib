@@ -133,20 +133,22 @@ class Room(Rect, Base):
         
         # Top and bottom walls
         for x in range(self.x1 - 1, self.x2 + 1):
-            topWall = self.defaultWallType(x=x, y=self.y2 + 1, level=self.getLevel())
-            self.tiles.append(topWall)
-            bottomWall = self.defaultWallType(x=x, y=self.y1 - 1, level=self.getLevel())
-            self.tiles.append(bottomWall)
+#            topWall = self.defaultWallType(x=x, y=self.y2 + 1, level=self.getLevel())
+#            self.tiles.append(topWall)
+#            bottomWall = self.defaultWallType(x=x, y=self.y1 - 1, level=self.getLevel())
+#            self.tiles.append(bottomWall)
+            pass
             
 #            print topWall
 #            print bottomWall
         
         # Left and right walls
         for y in range(self.y1, self.y2):  # Don't need to do the corners again!
-            leftWall = self.defaultWallType(x=self.x1 - 1, y=y, level=self.getLevel())
-            self.tiles.append(leftWall)
-            rightWall = self.defaultWallType(x=self.x2 + 1, y=y, level=self.getLevel())
-            self.tiles.append(rightWall)
+#            leftWall = self.defaultWallType(x=self.x1 - 1, y=y, level=self.getLevel())
+#            self.tiles.append(leftWall)
+#            rightWall = self.defaultWallType(x=self.x2 + 1, y=y, level=self.getLevel())
+#            self.tiles.append(rightWall)
+            pass
             
 #            print rightWall
 #            print leftWall
