@@ -307,8 +307,10 @@ class DungeonLevel(Level):
         
         for x in range(min(x1, x2), max(x1, x2)):
                 
-                if newRoom.contains(x, y) or prevRoom.contains(x, y):
-                    continue
+                for room in self.rooms:
+                    if room.contains(x, y):
+#                if newRoom.contains(x, y) or prevRoom.contains(x, y):
+                        continue
                 
                 newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
                 self.addTile(newTunnelTile)
@@ -317,8 +319,10 @@ class DungeonLevel(Level):
         
         for y in range(min(y1, y2), max(y1, y2)):
                 
-                if newRoom.contains(x, y) or prevRoom.contains(x, y):
-                    continue
+                for room in self.rooms:
+                    if room.contains(x, y):
+#                if newRoom.contains(x, y) or prevRoom.contains(x, y):
+                        continue
             
                 newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
                 self.addTile(newTunnelTile)
