@@ -271,12 +271,36 @@ class DungeonLevel(Level):
 
             # Place upstair and downstair
             self.placeStairs()
-            
+        
+        # Fill in empty spaces
+        self.fillInSpaces()
+        
+        # Construct self.tiles
+        for x in len(self.tileArray):
+            tileCol = self.tileArray[x]
+            for y in len(tileCol):
+                self.tiles.append(self.tileArray[x][y])
+        
+        
         # Save tiles
 #        print "saving", len(self.tiles), "tiles"
 #        db.saveDB.saveAll(self.tiles)
 #        db.saveDB.saveAll(self.rooms)
 
+
+    def fillInSpaces(self):
+        # Fill in empty spaces with wall tiles
+        for x in len(self.tileArray):
+            tileCol = self.tileArray[x]
+            for y in len(tileCol):
+                
+                try:
+                    tile = self.tileArray[x][y]
+                except IndexError:
+                    tile = None
+                
+                if tile == None:
+                    tile = self.defaultTunnelWallType(x = x, y = y, level = self, room = None)
                                                
     # Create a room
     def createRoom(self, room):
@@ -290,17 +314,16 @@ class DungeonLevel(Level):
     def addTile(self, tile):
 #        print "(", tile.x, ",", tile.y, ")"
         
-        try:
-            oldTileCol = self.tileArray[tile.x]
-            oldTile = oldTileCol[tile.y]
-            if oldTile:
-                self.tiles.remove(oldTile)
-#                print "removed a tile"
-    #            self.tileArray[tile.x].remove(oldTile)
-        except IndexError:
-            pass
+#        try:
+#            oldTileCol = self.tileArray[tile.x]
+#            oldTile = oldTileCol[tile.y]
+#            if oldTile:
+#                self.tiles.remove(oldTile)
+##                print "removed a tile"
+#        except IndexError:
+#            pass
         
-        self.tiles.append(tile)
+#        self.tiles.append(tile)
         self.tileArray[tile.x][tile.y] = tile
 
     def createHTunnel(self, prevRoom, newRoom, x1, x2, y):
