@@ -37,3 +37,6 @@ nosetests.xml
 # Save files
 *.db
 *.sav
+
+# Mac
+.DS_Store
