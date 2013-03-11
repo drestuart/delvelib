@@ -48,10 +48,10 @@ class Tile(Base):
         self.baseBackgroundColorG = self.baseBackgroundColor.g
         self.baseBackgroundColorB = self.baseBackgroundColor.b
         
-        
         self.baseDescription = kwargs.get('baseDescription', '')
         
         self.level = kwargs.get('level', None)
+        self.room = kwargs.get('room', None)
         
 #        libtcod.Color(0,0,0)
 

@@ -123,28 +123,28 @@ class Room(Base, Rect):
     def fillWithTiles(self):
         # Create wall tiles
         
-        # Top and bottom walls
-        for x in range(self.x1, self.x2):
-            topWall = self.defaultWallType(x=x, y=self.y2)
-            self.tiles.append(topWall)
-            bottomWall = self.defaultWallType(x=x, y=self.y1)
-            self.tiles.append(bottomWall)
-        
-        # Left and right walls
-        for y in range(self.y1 + 1, self.y2 - 1):  # Don't need to do the corners again!
-            leftWall = self.defaultWallType(x=self.x1, y=y)
-            self.tiles.append(leftWall)
-            rightWall = self.defaultWallType(x=self.x2, y=y)
-            self.tiles.append(rightWall)
+#        # Top and bottom walls
+#        for x in range(self.x1, self.x2):
+#            topWall = self.defaultWallType(x=x, y=self.y2)
+#            self.tiles.append(topWall)
+#            bottomWall = self.defaultWallType(x=x, y=self.y1)
+#            self.tiles.append(bottomWall)
+#        
+#        # Left and right walls
+#        for y in range(self.y1 + 1, self.y2 - 1):  # Don't need to do the corners again!
+#            leftWall = self.defaultWallType(x=self.x1, y=y)
+#            self.tiles.append(leftWall)
+#            rightWall = self.defaultWallType(x=self.x2, y=y)
+#            self.tiles.append(rightWall)
         
         
         # Create floor tiles
-        for x in range(self.x1 + 1, self.x2 - 1):
-            for y in range(self.y1 + 1, self.y2 - 1):
+        for x in range(self.x1, self.x2):
+            for y in range(self.y1, self.y2):
                 
                 # Add some chance for a dungeon feature here
                 
-                floor = self.defaultFloorType(x=x, y=y)
+                floor = self.defaultFloorType(x = x, y = y, room = self, level = self.getLevel())
                 self.tiles.append(floor)
                 
         # Save
