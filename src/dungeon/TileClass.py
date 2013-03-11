@@ -5,8 +5,7 @@ Created on Mar 10, 2013
 '''
 
 from Import import *
-from sqlalchemy.orm import relationship
-from sqlalchemy.schema import Column, ForeignKey
+from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
 from sqlalchemy.types import String, Integer, Boolean
 import colors
 import database as db
@@ -24,7 +23,9 @@ class Tile(Base):
     # a tile of the map and its properties
     
     __tablename__ = "tiles"
+#    __table_args__ = (UniqueConstraint('x', 'y', 'levelId', name='_tile_location_uc'), {'extend_existing': True})
     __table_args__ = {'extend_existing': True}
+
     
     def __init__(self, **kwargs):
         
@@ -52,6 +53,7 @@ class Tile(Base):
         
         self.level = kwargs.get('level', None)
         self.room = kwargs.get('room', None)
+        
         
 #        libtcod.Color(0,0,0)
 
@@ -235,6 +237,16 @@ class Tile(Base):
     def __str__(self):
         return self.baseDescription
     
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y and self.levelId == other.levelId
+    
+    def setLevel(self, level):
+        self.level = level
+        if level:
+            self.levelId = level.id
+        else:
+            self.levelId = None
+        
     
 #    # drawing management stuff. will be moved to the console class?    
 #    def draw(self, con):

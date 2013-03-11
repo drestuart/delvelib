@@ -9,17 +9,18 @@
 # showing what they know/remember about the level.
 
 from Import import *
-import RoomClass as R
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer, Boolean
 import Const as C
+import RoomClass as R
 import TileClass as T
 import colors
 import copy
 import database as db
 import os
 import random
+import sqlalchemy.exc
 
 
 #from CreatureClass import *
@@ -67,6 +68,9 @@ class Level(Base):
     
     levelType = Column(String)
     
+    tileArray = [[None]*C.MAP_HEIGHT]*C.MAP_WIDTH
+
+    
     __mapper_args__ = {'polymorphic_on': levelType,
                        'polymorphic_identity': 'level'}
     
@@ -78,10 +82,10 @@ class Level(Base):
         self.__dict__['toRecomputeFOV'] = False
         
         
-#    def getTile(self, coords):
-#        # Return a tile by coordinates, with a Coordinates object.
-#        x, y = coords['x'], coords['y']
-#        return self.tiles[x][y]
+    def getTile(self, x, y):
+        for tile in self.tiles:
+            if tile.x == x and tile.y == y:
+                return tile
     
 #    def setTile(self, coords, tile):
 #        x, y = coords['x'], coords['y']
@@ -244,8 +248,8 @@ class DungeonLevel(Level):
 #            x = libtcod.random_get_int(0, 0, self.WIDTH - w - 1)
 #            y = libtcod.random_get_int(0, 0, self.HEIGHT - h - 1)
             
-            x = random.randint(0, C.MAP_WIDTH - w - 1)
-            y = random.randint(0, C.MAP_HEIGHT - h - 1)
+            x = random.randint(0, C.MAP_WIDTH - w - 1 - C.DUNGEON_MARGIN)
+            y = random.randint(0, C.MAP_HEIGHT - h - 1 - C.DUNGEON_MARGIN)
     
             newRoom = R.Room(x = x, y = y, width = w, height = h, level = self,
                              defaultFloorType = self.defaultFloorType, defaultWallType = self.defaultWallType)
@@ -285,16 +289,34 @@ class DungeonLevel(Level):
             
         # Save tiles
 #        print "saving", len(self.tiles), "tiles"
-        db.saveDB.saveAll(self.tiles)
-        db.saveDB.saveAll(self.rooms)
+#        db.saveDB.saveAll(self.tiles)
+#        db.saveDB.saveAll(self.rooms)
 
                                                
     # Create a room
     def createRoom(self, room):
         
         room.fillWithTiles()
-        self.tiles += room.getTiles()
+        
+        for tile in room.getTiles():
+            self.addTile(tile)
 #        print "Room created with", len(room.getTiles()), "tiles"
+
+    def addTile(self, tile):
+#        print "(", tile.x, ",", tile.y, ")"
+        
+        try:
+            oldTileCol = self.tileArray[tile.x]
+            oldTile = oldTileCol[tile.y]
+            if oldTile:
+                self.tiles.remove(oldTile)
+#                print "removed a tile"
+    #            self.tileArray[tile.x].remove(oldTile)
+        except IndexError:
+            pass
+        
+        self.tiles.append(tile)
+        self.tileArray[tile.x][tile.y] = tile
 
     # Carve out a tunnel
     def createTunnel(self, prevRoom, newRoom):
@@ -311,12 +333,12 @@ class DungeonLevel(Level):
                     continue
                 
                 newTunnelTile = self.defaultTunnelFloorType(x = x, y = y1, level = self, room = None)
-                self.tiles.append(newTunnelTile)
+                self.addTile(newTunnelTile)
                 
                 topWallTile = self.defaultTunnelWallType(x = x, y = y1 + 1, level = self, room = None)
                 bottomWallTile = self.defaultTunnelWallType(x = x, y = y1 - 1, level = self, room = None)
-                self.tiles.append(topWallTile)
-                self.tiles.append(bottomWallTile)
+                self.addTile(topWallTile)
+                self.addTile(bottomWallTile)
             
             for y in range(min(y1, y2), max(y1, y2) + 1):
                 
@@ -324,12 +346,12 @@ class DungeonLevel(Level):
                     continue
             
                 newTunnelTile = self.defaultTunnelFloorType(x = x2, y = y, level = self, room = None)
-                self.tiles.append(newTunnelTile)
+                self.addTile(newTunnelTile)
                 
                 leftWallTile = self.defaultTunnelWallType(x = x2 - 1, y = y, level = self, room = None)
                 rightWallTile = self.defaultTunnelWallType(x = x2 + 1, y = y, level = self, room = None)
-                self.tiles.append(leftWallTile)
-                self.tiles.append(rightWallTile)
+                self.addTile(leftWallTile)
+                self.addTile(rightWallTile)
                 
         else:
             #Vertical first
@@ -614,15 +636,41 @@ class FOVMap():
 
 def main():
     
+    import sys
+    
     db.saveDB.start(True)
+    
+#    seed = random.randint(0, sys.maxint)
+    seed = 1155272238
+    print seed
+#    myRand = random.Random(seed)
+    random.seed(seed)
     
     d1 = DungeonLevel(name = "Test", depth = 1, defaultFloorType = T.StoneFloor,
                       defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
+    
     d1.createRooms()
+    
+    tuplesSeen = {}
+    for tile in d1.tiles:
+        tuple = (tile.x, tile.y, tile.levelId)
+        tuplesSeen[tuple] = 1 + tuplesSeen.get(tuple, 0)
+    
+    for key in tuplesSeen.keys():
+        val = tuplesSeen[key]
+        if val != 1:
+            print key, "occurred", val, "times"
 
-    db.saveDB.save(d1)
+#    try:
+#        db.saveDB.save(d1)
+#    except sqlalchemy.exc.IntegrityError:
+        
+    
+        
+    
+    
 #    db.saveDB.saveAll(d1.tiles)
-
+    db.saveDB.save(d1)
 
 if __name__ == '__main__':
     main()

@@ -100,7 +100,10 @@ class Room(Rect, Base):
 
     def __init__(self, **kwargs):
         super(Room, self).__init__(kwargs['x'], kwargs['y'], kwargs['width'], kwargs['height'])
-        self.level = kwargs.get('level', None)
+#        self.level = kwargs.get('level', None)
+        
+        self.setLevel(kwargs.get('level', None))
+        
         
         self.defaultFloorType = kwargs.get('defaultFloorType', None)
         self.defaultWallType = kwargs.get('defaultWallType', None)
@@ -130,9 +133,9 @@ class Room(Rect, Base):
         
         # Top and bottom walls
         for x in range(self.x1 - 1, self.x2 + 1):
-            topWall = self.defaultWallType(x=x, y=self.y2 + 1)
+            topWall = self.defaultWallType(x=x, y=self.y2 + 1, level=self.getLevel())
             self.tiles.append(topWall)
-            bottomWall = self.defaultWallType(x=x, y=self.y1 - 1)
+            bottomWall = self.defaultWallType(x=x, y=self.y1 - 1, level=self.getLevel())
             self.tiles.append(bottomWall)
             
 #            print topWall
@@ -140,9 +143,9 @@ class Room(Rect, Base):
         
         # Left and right walls
         for y in range(self.y1, self.y2):  # Don't need to do the corners again!
-            leftWall = self.defaultWallType(x=self.x1 - 1, y=y)
+            leftWall = self.defaultWallType(x=self.x1 - 1, y=y, level=self.getLevel())
             self.tiles.append(leftWall)
-            rightWall = self.defaultWallType(x=self.x2 + 1, y=y)
+            rightWall = self.defaultWallType(x=self.x2 + 1, y=y, level=self.getLevel())
             self.tiles.append(rightWall)
             
 #            print rightWall
@@ -191,6 +194,10 @@ class Room(Rect, Base):
 
     def setLevel(self, value):
         self.level = value
+        if value:
+            self.setLevelId(value.id)
+        else:
+            self.setLevelId(None)
 
     def setX1(self, value):
         self.x1 = value
