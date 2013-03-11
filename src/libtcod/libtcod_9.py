@@ -69,7 +69,7 @@ class Rect:
         self.x2 = x + width
         self.y2 = y + height
  
-    def center(self):
+    def getCenter(self):
         center_x = (self.x1 + self.x2) / 2
         center_y = (self.y1 + self.y2) / 2
         return (center_x, center_y)
@@ -318,8 +318,8 @@ def make_map():
             #add some contents to this room, such as monsters
             place_objects(new_room)
  
-            #center coordinates of new room, will be useful later
-            (new_x, new_y) = new_room.center()
+            #getCenter coordinates of new room, will be useful later
+            (new_x, new_y) = new_room.getCenter()
  
             if num_rooms == 0:
                 #this is the first room, where the player starts at
@@ -329,8 +329,8 @@ def make_map():
                 #all rooms after the first:
                 #connect it to the previous room with a tunnel
  
-                #center coordinates of previous room
-                (prev_x, prev_y) = rooms[num_rooms-1].center()
+                #getCenter coordinates of previous room
+                (prev_x, prev_y) = rooms[num_rooms-1].getCenter()
  
                 #draw a coin (random number that is either 0 or 1)
                 if libtcod.random_get_int(0, 0, 1) == 1:
