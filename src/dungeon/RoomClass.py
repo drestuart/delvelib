@@ -9,6 +9,7 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer, Boolean
 import database as db
+import TileClass as T
 
 libtcod = importLibtcod()
 
@@ -77,7 +78,7 @@ class Rect(object):
     def delCenterY(self):
         del self.centerY
 
-    def center(self):
+    def getCenter(self):
         self.centerX = (self.x1 + self.x2) / 2
         self.centerY = (self.y1 + self.y2) / 2
         return (self.centerX, self.centerY)
@@ -86,9 +87,13 @@ class Rect(object):
         #returns true if this rectangle intersects with another one
         return (self.x1 <= other.x2 and self.x2 >= other.x1 and
                 self.y1 <= other.y2 and self.y2 >= other.y1)
+        
+    def contains(self, x, y):
+        return (self.x1 <= x and self.x2 >= x and
+                self.y1 <= y and self.y2 >= y)
 
 
-class Room(Base, Rect):
+class Room(Rect, Base):
     
     __tablename__ = "rooms"
     __table_args__ = {'extend_existing': True}
@@ -100,7 +105,7 @@ class Room(Base, Rect):
         self.defaultFloorType = kwargs.get('defaultFloorType', None)
         self.defaultWallType = kwargs.get('defaultWallType', None)
         
-        self.center()
+        self.getCenter()
         
         self.tiles = []
     
@@ -115,40 +120,46 @@ class Room(Base, Rect):
     centerX = Column(Integer)
     centerY = Column(Integer)
     
-    level = relationship("Level", primaryjoin="Level.id==Room.levelId")
+#    level = relationship("Level", primaryjoin="Level.id==Room.levelId")
     levelId = Column(Integer, ForeignKey("levels.id"))
     
-    tiles = relationship("Tile", backref=backref("tile", uselist=False), primaryjoin="Room.id==Tile.roomId")
+#    tiles = relationship("Tile", backref=backref("room", uselist=False), primaryjoin="Room.id==Tile.roomId")
     
     def fillWithTiles(self):
         # Create wall tiles
         
-#        # Top and bottom walls
-#        for x in range(self.x1, self.x2):
-#            topWall = self.defaultWallType(x=x, y=self.y2)
-#            self.tiles.append(topWall)
-#            bottomWall = self.defaultWallType(x=x, y=self.y1)
-#            self.tiles.append(bottomWall)
-#        
-#        # Left and right walls
-#        for y in range(self.y1 + 1, self.y2 - 1):  # Don't need to do the corners again!
-#            leftWall = self.defaultWallType(x=self.x1, y=y)
-#            self.tiles.append(leftWall)
-#            rightWall = self.defaultWallType(x=self.x2, y=y)
-#            self.tiles.append(rightWall)
+        # Top and bottom walls
+        for x in range(self.x1 - 1, self.x2 + 1):
+            topWall = self.defaultWallType(x=x, y=self.y2 + 1)
+            self.tiles.append(topWall)
+            bottomWall = self.defaultWallType(x=x, y=self.y1 - 1)
+            self.tiles.append(bottomWall)
+            
+#            print topWall
+#            print bottomWall
+        
+        # Left and right walls
+        for y in range(self.y1, self.y2):  # Don't need to do the corners again!
+            leftWall = self.defaultWallType(x=self.x1 - 1, y=y)
+            self.tiles.append(leftWall)
+            rightWall = self.defaultWallType(x=self.x2 + 1, y=y)
+            self.tiles.append(rightWall)
+            
+#            print rightWall
+#            print leftWall
         
         
         # Create floor tiles
         for x in range(self.x1, self.x2):
             for y in range(self.y1, self.y2):
-                
                 # Add some chance for a dungeon feature here
                 
                 floor = self.defaultFloorType(x = x, y = y, room = self, level = self.getLevel())
                 self.tiles.append(floor)
+#                print floor
                 
         # Save
-        db.saveDB.saveAll(self.tiles)
+#        db.saveDB.saveAll(self.tiles)
         
 
     def getLevel(self):
@@ -174,6 +185,9 @@ class Room(Base, Rect):
 
     def getLevelId(self):
         return self.levelId
+    
+    def getTiles(self):
+        return self.tiles
 
     def setLevel(self, value):
         self.level = value
@@ -227,9 +241,19 @@ class Room(Base, Rect):
     
     
 def main():
-    r = Rect(1, 2, 10, 20)
-    print r.getX1()
-    print r.getX2()
+    
+    import LevelClass
+    
+    db.saveDB.start(True)
+
+
+    r1 = Room(x = 10, y = 20, width = 5, height = 5,
+              defaultFloorType = T.WoodFloor, defaultWallType = T.WoodWall)
+    
+    r1.fillWithTiles()
+    db.saveDB.save(r1)
+    db.saveDB.saveAll(r1.tiles)
+
     
     
 if __name__ == '__main__':

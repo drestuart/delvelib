@@ -81,12 +81,16 @@ class Tile(Base):
     
     baseDescription = Column(String)
     
-    level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
+#    level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
     levelId = Column(Integer, ForeignKey("levels.id"))
     
-    room = relationship("Room", primaryjoin = "Room.id==Tile.roomId")
+#    room = relationship("Room", primaryjoin = "Room.id==Tile.roomId")
     roomId = Column(Integer, ForeignKey("rooms.id"))
     
+    tileType = Column(String)
+    
+    __mapper_args__ = {'polymorphic_on': tileType,
+                       'polymorphic_identity': 'tile'}
             
     def toDraw(self):
         # Returns a tuple of the tile's symbol, color, and background for the
@@ -228,6 +232,9 @@ class Tile(Base):
         else:
             return self.baseDescription   
         
+    def __str__(self):
+        return self.baseDescription
+    
     
 #    # drawing management stuff. will be moved to the console class?    
 #    def draw(self, con):
@@ -248,15 +255,15 @@ class Wall(Tile):
     def __init__(self, **kwargs):
         super(Wall, self).__init__(blockMove = True, blockSight = True, baseBackgroundColor = colors.black, baseSymbol = '#', **kwargs)
 
-class WoodenWall(Wall):
+class WoodWall(Wall):
     
     def __init__(self, **kwargs):
-        super(WoodenWall, self).__init__(baseDescription = "A wooden wall", baseColor = colors.colorWood, **kwargs)
+        super(WoodWall, self).__init__(baseDescription = "A wooden wall", baseColor = colors.colorWood, **kwargs)
 
 class RockWall(Wall):
     
     def __init__(self, **kwargs):
-        super(WoodenWall, self).__init__(baseDescription = "A rock wall", baseColor = colors.colorRock, **kwargs)
+        super(RockWall, self).__init__(baseDescription = "A rock wall", baseColor = colors.colorRock, **kwargs)
 
 
 class Floor(Tile):
@@ -279,14 +286,21 @@ class WoodFloor(Floor):
     def __init__(self, **kwargs):
         super(WoodFloor, self).__init__(baseDescription = "A wooden floor", baseColor = colors.colorWood, **kwargs)
 
+class RockTunnel(Floor):
+    
+    def __init__(self, **kwargs):
+        super(RockTunnel, self).__init__(baseDescription = "A rocky tunnel", baseColor = colors.colorRock, **kwargs)
         
+
             
 def main():
     
     import LevelClass
     import RoomClass
     
-    db.saveDB.start()
+    db.saveDB.start(True)
+#    db.saveDB.start()
+
     
     t1 = WoodFloor(x=1, y=2)
     db.saveDB.save(t1)
