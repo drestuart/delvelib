@@ -13,7 +13,7 @@ libtcod = importLibtcod()
 
 
 FONTS_DIR = os.path.join("..", "..", "fonts")
-DEFAULT_FONT = os.path.join(FONTS_DIR, "arial10x10.png")
+DEFAULT_FONT = os.path.join(FONTS_DIR, "arial12x12.png")
 
 mapConsole = None
 
@@ -33,11 +33,12 @@ class UI(object):
         self.currentLevel = kwargs.get('level', None)
         
     def createWindow(self):
-        libtcod.console_set_custom_font('..\\..\\fonts\\arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+        libtcod.console_set_custom_font(DEFAULT_FONT, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
         libtcod.console_init_root(C.SCREEN_WIDTH, C.SCREEN_HEIGHT, C.TITLE, False)
         libtcod.sys_set_fps(C.LIMIT_FPS)
         
         mapConsole = libtcod.console_new(C.MAP_WIDTH, C.MAP_HEIGHT)
+        libtcod.console_set_default_background(0, libtcod.BKGND_NONE)
         libtcod.console_set_default_background(mapConsole, libtcod.BKGND_NONE)
         
     def getCurrentLevel(self):
@@ -53,7 +54,8 @@ class UI(object):
             libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS|libtcod.EVENT_MOUSE,key,mouse)
             libtcod.console_clear(mapConsole)
             
-            self.currentLevel.draw(mapConsole)  #Hanging here
+            print "Drawing"
+            self.currentLevel.draw(mapConsole)
     #        libtcod.console_blit(mapConsole, 0, 0, C.MAP_WIDTH, C.MAP_HEIGHT, 0, 0, 0)
             libtcod.console_blit(mapConsole, 0, 0, 0, 0, 0, 0, 0)
     

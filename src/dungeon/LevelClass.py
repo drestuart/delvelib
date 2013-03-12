@@ -46,6 +46,8 @@ class Level(Base):
         
         self.tiles = []
         self.rooms = []
+        self.tileArray = [[None]*C.MAP_HEIGHT]*C.MAP_WIDTH
+
     
     id = Column(Integer, primary_key=True)
     name = Column(String)
@@ -61,9 +63,6 @@ class Level(Base):
     rooms = relationship("Room", backref = "level")
     
     levelType = Column(String)
-    
-    tileArray = [[None]*C.MAP_HEIGHT]*C.MAP_WIDTH
-    
     
 
     
@@ -105,26 +104,22 @@ class Level(Base):
                 
     # Draw that map!
     def draw(self, mapConsole):
-#        libtcod.console_set_foreground_color(mapConsole, self.color())
-#        libtcod.console_put_char(mapConsole, self.x, self.y, self.symbol(), self.background())
 
-        for x in range(C.MAP_WIDTH):
-            for y in range(C.MAP_HEIGHT):
-                tile = self.getTile(x, y)
-                if tile:
-#                    print "Drawing", x, ",", y
-                    symbol, color, background = tile.toDraw()
-                    symbol = symbol.encode('ascii', 'ignore')
-                    
-                    libtcod.console_put_char_ex(mapConsole, x, y, symbol, color, background)
-#                else:
-#                    print "None"
+        for tile in self.tiles:
+            if tile:
+                x = tile.x
+                y = tile.y
+                print "Drawing", x, ",", y, ":", tile.toDraw()
+                symbol, color, background = tile.toDraw()
+                symbol = symbol.encode('ascii', 'ignore')
+                
+                libtcod.console_put_char_ex(mapConsole, x, y, symbol, color, background)
                     
     # Erase that map!
     def clear(self, mapConsole):
         for x in range(C.MAP_WIDTH):
             for y in range(C.MAP_HEIGHT):
-                libtcod.console_put_char(mapConsole, x, y, ' ', libtcod.BKGND_NONE)
+                libtcod.console_put_char_ex(mapConsole, x, y, ' ', colors.black, libtcod.BKGND_NONE)
                 
             
     def getSpacesInRadius(self, radius, centerCoords):
@@ -236,8 +231,8 @@ class DungeonLevel(Level):
     
             #random position without going out of the boundaries of the map
             
-            x = random.randint(0, C.MAP_WIDTH - w - 1 - C.DUNGEON_MARGIN)
-            y = random.randint(0, C.MAP_HEIGHT - h - 1 - C.DUNGEON_MARGIN)
+            x = random.randint(C.DUNGEON_MARGIN, C.MAP_WIDTH - w - 1 - C.DUNGEON_MARGIN)
+            y = random.randint(C.DUNGEON_MARGIN, C.MAP_HEIGHT - h - 1 - C.DUNGEON_MARGIN)
     
             newRoom = R.Room(x = x, y = y, width = w, height = h,
                              defaultFloorType = self.defaultFloorType, defaultWallType = self.defaultWallType)
@@ -274,17 +269,24 @@ class DungeonLevel(Level):
             firstRoom = self.rooms[0]
             self.createTunnel(lastRoom, firstRoom)
         
+        print "Saving open tiles"
+        db.saveDB.save(self)
+        
+        print "Placing walls"
         # Fill in empty spaces
-#        self.fillInSpaces()
+        self.fillInSpaces()
         
 
 
     def fillInSpaces(self):
+        loopnum = 0
         # Fill in empty spaces with wall tiles
         for x in range(C.MAP_WIDTH):
             for y in range(C.MAP_HEIGHT):
-                tilesAtSpace = self.getTileFromDB(x, y, self)
-                if len(tilesAtSpace) == 0:
+
+                tile = self.tileArray[x][y]
+                
+                if (tile is None):
                     newTile = self.defaultTunnelWallType(x, y, room = None)
                     self.tiles.append(newTile)
                     
@@ -297,6 +299,7 @@ class DungeonLevel(Level):
 #                print "Creating tile at", x, ",", y
                 newTile = self.defaultFloorType(x=x, y=y, room = room)
                 self.tiles.append(newTile)
+                self.tileArray[x][y] = newTile
         
 #        for x in range(room.getX1(), room.getX2()):
 #            for y in range(room.getY1(), room.getY2()):
@@ -339,6 +342,7 @@ class DungeonLevel(Level):
 #                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
                 newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, room = None)
                 self.tiles.append(newTunnelTile)
+                self.tileArray[x][y] = newTunnelTile
 #                self.tileArray[x][y] = newTunnelTile
 #                self.addTile(newTunnelTile)
 
@@ -353,6 +357,7 @@ class DungeonLevel(Level):
 #                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
                 newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, room = None)
                 self.tiles.append(newTunnelTile)
+                self.tileArray[x][y] = newTunnelTile
 #                self.tileArray[x][y] = newTunnelTile
 #                self.addTile(newTunnelTile)
 
@@ -505,7 +510,6 @@ def main():
                       defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
     
     d1.createRooms()
-    d1.fillInSpaces()
     
     db.saveDB.save(d1)
 #    db.saveDB.saveAll(d1.tiles)
