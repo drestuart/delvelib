@@ -296,7 +296,7 @@ class DungeonLevel(Level):
         for x in range(room.getX1(), room.getX2()):
             for y in range(room.getY1(), room.getY2()):
 #                print "Creating tile at", x, ",", y
-                newTile = self.defaultFloorType(x=x, y=y)
+                newTile = self.defaultFloorType(x=x, y=y, room = room)
                 self.tiles.append(newTile)
         
 #        for x in range(room.getX1(), room.getX2()):
