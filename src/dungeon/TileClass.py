@@ -23,8 +23,8 @@ class Tile(Base):
     # a tile of the map and its properties
     
     __tablename__ = "tiles"
-#    __table_args__ = (UniqueConstraint('x', 'y', 'levelId', name='_tile_location_uc'), {'extend_existing': True})
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (UniqueConstraint('x', 'y', 'levelId', name='_tile_location_uc'), {'extend_existing': True})
+#    __table_args__ = {'extend_existing': True}
 
     
     def __init__(self, **kwargs):
@@ -182,31 +182,31 @@ class Tile(Base):
     def getSymbol(self):
         # Determine which symbol to use to draw this tile
         
-        if self.creature and self.creature.isVisible():
-            return self.creature.symbol()
-        
-        elif self.feature and self.feature.isVisible():
-            return self.feature.symbol()
-        
-        elif self.objects:
-            return self.objects[0].symbol()
-        
-        else:
+#        if self.creature and self.creature.isVisible():
+#            return self.creature.symbol()
+#        
+#        elif self.feature and self.feature.isVisible():
+#            return self.feature.symbol()
+#        
+#        elif self.objects:
+#            return self.objects[0].symbol()
+#        
+#        else:
             return self.baseSymbol
         
     def getColor(self):
         # Determine which color to use to draw this tile
         
-        if self.creature and self.creature.isVisible():
-            return self.creature.color()
-        
-        elif self.feature and self.feature.isVisible():
-            return self.feature.color()
-        
-        elif self.objects:
-            return self.objects[0].color()
-        
-        else:
+#        if self.creature and self.creature.isVisible():
+#            return self.creature.color()
+#        
+#        elif self.feature and self.feature.isVisible():
+#            return self.feature.color()
+#        
+#        elif self.objects:
+#            return self.objects[0].color()
+#        
+#        else:
             return self.baseColor        
 
     def getBackground(self):
@@ -214,11 +214,11 @@ class Tile(Base):
 #        if self.creature and self.creature.isVisible():
 #            return self.creature.background()
         
-        if self.feature and self.feature.isVisible():
-            return self.feature.background()
-                
-        else:
-            return self.baseBackground   
+#        if self.feature and self.feature.isVisible():
+#            return self.feature.background()
+#                
+#        else:
+            return self.baseBackgroundColor   
 
     def getDescription(self):
         # Determine which description to use to draw this tile

@@ -5,7 +5,7 @@ from Import import *
 libtcod = importLibtcod()
 
 black = libtcod.Color(0,0,0)
-
+white = libtcod.Color(255, 255, 255)
 # Wall and ground colors
 
 colorDarkWall = libtcod.Color(0, 0, 100)
@@ -14,6 +14,6 @@ colorDarkGround = libtcod.Color(50, 50, 150)
 colorLightGround = libtcod.Color(200, 180, 50)
 
 colorWood = libtcod.sepia
-colorRock = libtcod.darker_gray
-colorStone = libtcod.dark_grey
+colorRock = libtcod.light_gray
+colorStone = libtcod.lighter_grey
 colorGrass = libtcod.darker_green

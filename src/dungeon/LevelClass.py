@@ -63,6 +63,8 @@ class Level(Base):
     levelType = Column(String)
     
     tileArray = [[None]*C.MAP_HEIGHT]*C.MAP_WIDTH
+    
+    
 
     
     __mapper_args__ = {'polymorphic_on': levelType,
@@ -102,18 +104,25 @@ class Level(Base):
 
         for x in range(C.MAP_WIDTH):
             for y in range(C.MAP_HEIGHT):
-                #try:
-                    symbol, color, background = self.getTile(x, y).toDraw()
-                    libtcod.console_set_foreground_color(con, color)
-                    libtcod.console_put_char(con, x, y, symbol, background)
-                #except:
-                #    print symbol, color, background
+                tile = self.getTile(x, y)
+                if tile:
+#                    print "Drawing", x, ",", y
+                    symbol, color, background = tile.toDraw()
+                    symbol = symbol.encode('ascii', 'ignore')
+#                    print tile.toDraw()
+                    libtcod.console_set_char_background(con, x, y, colors.colorGrass, libtcod.BKGND_SET)
+                    libtcod.console_set_default_foreground(con, color)
+#                    libtcod.console_set_char_foreground(con, x, y, color)
+#                    libtcod.console_put_char(con, x, y, symbol)
                     
+                    libtcod.console_put_char_ex(con, x, y, symbol, color, background)
+#                else:
+#                    print "None"
                     
     # Erase that map!
     def clear(self, con):
-        for x in range(self.WIDTH):
-            for y in range(self.HEIGHT):
+        for x in range(C.MAP_WIDTH):
+            for y in range(C.MAP_HEIGHT):
                 libtcod.console_put_char(con, x, y, ' ', libtcod.BKGND_NONE)
                 
             
@@ -303,21 +312,21 @@ class DungeonLevel(Level):
         for tile in room.getTiles():
             x = tile.x
             y = tile.y
-#            self.addTile(tile)
-            self.tileArray[x][y] = tile
+            self.addTile(tile)
+#            self.tileArray[x][y] = tile
 #        print "Room created with", len(room.getTiles()), "tiles"
 
     def addTile(self, tile):
         print "add (", tile.x, ",", tile.y, ")"
         
-        try:
-            oldTileCol = self.tileArray[tile.x]
-            oldTile = oldTileCol[tile.y]
-            if oldTile:
-                self.tiles.remove(oldTile)
-#                print "removed a tile"
-        except IndexError:
-            pass
+#        try:
+#            oldTileCol = self.tileArray[tile.x]
+#            oldTile = oldTileCol[tile.y]
+#            if oldTile:
+#                self.tiles.remove(oldTile)
+##                print "removed a tile"
+#        except IndexError:
+#            pass
         
         self.tiles.append(tile)
         self.tileArray[tile.x][tile.y] = tile
@@ -565,6 +574,7 @@ class DungeonLevel(Level):
 
 def main():
     
+    import time
     db.saveDB.start(True)
     
 #    seed = random.randint(0, sys.maxint)
@@ -578,19 +588,19 @@ def main():
     
     d1.createRooms()
     
-    tuplesSeen = dict()
-    for tile in d1.tiles:
-        if tile:
-            x = tile.x
-            y = tile.y
-            thisTuple = (x, y)
-            tuplesSeen[thisTuple] = 1 + tuplesSeen.get(thisTuple, 0)
-        else:
-            print "null tile"
-    for key in tuplesSeen.keys():
-        val = tuplesSeen[key]
+#    tuplesSeen = dict()
+#    for tile in d1.tiles:
+#        if tile:
+#            x = tile.x
+#            y = tile.y
+#            thisTuple = (x, y)
+#            tuplesSeen[thisTuple] = 1 + tuplesSeen.get(thisTuple, 0)
+#        else:
+#            print "null tile"
+#    for key in tuplesSeen.keys():
+#        val = tuplesSeen[key]
 #        if val != 1:
-        print key, "occurred", val, "times"
+#            print key, "occurred", val, "times"
 
     print "level has", len(d1.tiles), "total tiles"
     
@@ -598,6 +608,45 @@ def main():
 #    db.saveDB.saveAll(d1.tiles)
     db.saveDB.save(d1)
     db.saveDB.saveAll(d1.tiles)
+    
+    
+    libtcod.console_set_custom_font('..\\..\\fonts\\arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+    libtcod.console_init_root(C.SCREEN_WIDTH, C.SCREEN_HEIGHT, 'python/libtcod tutorial', False)
+    libtcod.sys_set_fps(C.LIMIT_FPS)
+    
+    con = libtcod.console_new(C.MAP_WIDTH, C.MAP_HEIGHT)
+    libtcod.console_set_default_background(con, colors.black)
+    
+    
+    key = libtcod.Key()
+    mouse = libtcod.Mouse()
+
+    def handle_keys():
+     
+        if key.vk == libtcod.KEY_ESCAPE:
+            return 'exit'  #exit game
+        else:
+            return 'didnt-take-turn'
+    
+#    libtcod.console_credits()
+    
+    while not libtcod.console_is_window_closed():
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS|libtcod.EVENT_MOUSE,key,mouse)
+        libtcod.console_clear(con)
+        
+        d1.draw(con)
+#        libtcod.console_blit(con, 0, 0, C.MAP_WIDTH, C.MAP_HEIGHT, 0, 0, 0)
+        libtcod.console_blit(con, 0, 0, 0, 0, 0, 0, 0)
+
+        
+        libtcod.console_flush()
+        
+        d1.clear(con)
+        
+        player_action = handle_keys()
+        if player_action == 'exit':
+            break
+        
 
 if __name__ == '__main__':
     main()
