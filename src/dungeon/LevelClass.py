@@ -282,15 +282,12 @@ class DungeonLevel(Level):
     def fillInSpaces(self):
         # Fill in empty spaces with wall tiles
         for x in range(C.MAP_WIDTH):
-            tileCol = self.tileArray[x]
             for y in range(C.MAP_HEIGHT):
-                tile = self.tileArray[x][y]
+                tilesAtSpace = self.getTileFromDB(x, y, self)
+                if len(tilesAtSpace) == 0:
+                    newTile = self.defaultTunnelWallType(x, y, room = None)
+                    self.tiles.append(newTile)
                     
-                if tile is None:
-#                    tile = self.defaultTunnelWallType(x = x, y = y, level = self, room = None)
-                    tile = self.defaultTunnelWallType(x = x, y = y)
-                    self.tileArray[x][y] = tile
-#                    self.addTile(tile)
                                                
     # Create a room
     def createRoom(self, room):
@@ -508,19 +505,7 @@ def main():
                       defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
     
     d1.createRooms()
-
-    
-#    aRoom = R.Room(x = 20, y = 20, width = 10, height = 10,
-#                             defaultFloorType = d1.defaultFloorType, defaultWallType = d1.defaultWallType)
-#    d1.createRoom(aRoom)
-#    
-#    anotherRoom = R.Room(x=10, y=0, width = 10, height = 10, 
-#                             defaultFloorType = d1.defaultFloorType, defaultWallType = d1.defaultWallType)
-#    d1.createRoom(anotherRoom)
-        
-    print "level has", len(d1.tiles), "total tiles"
-    print "level has", len([tile for tile in d1.tiles if not (tile is None)]), "good tiles"
-    
+    d1.fillInSpaces()
     
     db.saveDB.save(d1)
 #    db.saveDB.saveAll(d1.tiles)
