@@ -53,11 +53,10 @@ class UI(object):
             libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS|libtcod.EVENT_MOUSE,key,mouse)
             libtcod.console_clear(mapConsole)
             
-            self.currentLevel.draw(mapConsole)
+            self.currentLevel.draw(mapConsole)  #Hanging here
     #        libtcod.console_blit(mapConsole, 0, 0, C.MAP_WIDTH, C.MAP_HEIGHT, 0, 0, 0)
             libtcod.console_blit(mapConsole, 0, 0, 0, 0, 0, 0, 0)
     
-            
             libtcod.console_flush()
             
             self.currentLevel.clear(mapConsole)

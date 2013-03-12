@@ -83,6 +83,9 @@ class Level(Base):
             if tile.x == x and tile.y == y:
                 return tile
     
+    
+    def getTileFromDB(self, x, y, level):
+        pass
 
     # Test if a square is blocked
 #    def isBlocked(self, x, y):
@@ -258,19 +261,20 @@ class DungeonLevel(Level):
                 #add some contents to this room, such as monsters
                 #self.placeObjects(newRoom)
                 
-                if len(rooms) >= 1:
-                    #all rooms after the first:
-                    #connect it to the previous room with a tunnel
-                    prevRoom = rooms[-1]
-                    
-                    self.createTunnel(prevRoom, newRoom)
-                    
-                    
                 # Append the new room to the list
                 rooms.append(newRoom)
                 self.rooms.append(newRoom)
 
-#        self.rooms = rooms
+        # Connect them with tunnels
+        if len(self.rooms) >= 1:
+            for rn in range(len(self.rooms) - 1):
+                thisRoom, nextRoom = self.rooms[rn], self.rooms[rn + 1]
+                
+                self.createTunnel(thisRoom, nextRoom)
+            
+            lastRoom = self.rooms[-1]
+            firstRoom = self.rooms[0]
+            self.createTunnel(lastRoom, firstRoom)
         
         # Fill in empty spaces
 #        self.fillInSpaces()
@@ -331,7 +335,7 @@ class DungeonLevel(Level):
 
     def createHTunnel(self, prevRoom, newRoom, x1, x2, y):
         
-        for x in range(min(x1, x2), max(x1, x2)):
+        for x in range(min(x1, x2) - 1, max(x1, x2)):
             skip = False
             for room in self.rooms:
                 if room.contains(x, y):
@@ -347,7 +351,7 @@ class DungeonLevel(Level):
 
     def createVTunnel(self, prevRoom, newRoom, x, y1, y2):
         
-        for y in range(min(y1, y2), max(y1, y2)):
+        for y in range(min(y1, y2) - 1, max(y1, y2)):
             skip = False
             for room in self.rooms:
                 if room.contains(x, y):
@@ -374,91 +378,16 @@ class DungeonLevel(Level):
             self.createHTunnel(prevRoom, newRoom, x1, x2, min(y1, y2))
             self.createVTunnel(prevRoom, newRoom, max(x1, x2), y1, y2)
             
-#            for x in range(min(x1, x2), max(x1, x2) + 1):
-#                
-#                if newRoom.contains(x, y1) or prevRoom.contains(x, y1):
-#                    continue
-#                
-#                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y1, level = self, room = None)
-#                self.addTile(newTunnelTile)
-                
-#                topWallTile = self.defaultTunnelWallType(x = x, y = y1 + 1, level = self, room = None)
-#                bottomWallTile = self.defaultTunnelWallType(x = x, y = y1 - 1, level = self, room = None)
-#                self.addTile(topWallTile)
-#                self.addTile(bottomWallTile)
-            
-#            for y in range(min(y1, y2), max(y1, y2) + 1):
-#                
-#                if newRoom.contains(x2, y) or prevRoom.contains(x2, y):
-#                    continue
-#            
-#                newTunnelTile = self.defaultTunnelFloorType(x = x2, y = y, level = self, room = None)
-#                self.addTile(newTunnelTile)
-                
-#                leftWallTile = self.defaultTunnelWallType(x = x2 - 1, y = y, level = self, room = None)
-#                rightWallTile = self.defaultTunnelWallType(x = x2 + 1, y = y, level = self, room = None)
-#                self.addTile(leftWallTile)
-#                self.addTile(rightWallTile)
                 
         else:
             #Vertical first
             self.createVTunnel(prevRoom, newRoom, min(x1, x2), y1, y2)
             self.createHTunnel(prevRoom, newRoom, x1, x2, max(y1, y2))
             
-#            for y in range(min(y1, y2), max(y1, y2) + 1):
-#                
-#                if newRoom.contains(x1, y) or prevRoom.contains(x1, y):
-#                    continue
-#            
-#                newTunnelTile = self.defaultTunnelFloorType(x = x1, y = y, level = self, room = None)
-#                self.tiles.append(newTunnelTile)
-#                
-#                leftWallTile = self.defaultTunnelWallType(x = x1 - 1, y = y, level = self, room = None)
-#                rightWallTile = self.defaultTunnelWallType(x = x1 + 1, y = y, level = self, room = None)
-#                self.tiles.append(leftWallTile)
-#                self.tiles.append(rightWallTile)
-#                
-#            for x in range(min(x1, x2), max(x1, x2) + 1):
-#                
-#                if newRoom.contains(x, y2) or prevRoom.contains(x, y2):
-#                    continue
-#                
-#                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y2, level = self, room = None)
-#                self.tiles.append(newTunnelTile)
-#                
-#                topWallTile = self.defaultTunnelWallType(x = x, y = y2 + 1, level = self, room = None)
-#                bottomWallTile = self.defaultTunnelWallType(x = x, y = y2 - 1, level = self, room = None)
-#                self.tiles.append(topWallTile)
-#                self.tiles.append(bottomWallTile)
 
     def placeStairs(self):
         pass
 
-    # Carve out a horizontal tunnel
-#    def createHTunnelOld(self, x1, x2, y):
-#        for x in range(min(x1, x2), max(x1, x2) + 1):
-#            
-#            newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
-#            self.tiles.append(newTunnelTile)
-#            
-#            topWallTile = self.defaultTunnelWallType(x = x, y = y + 1, level = self, room = None)
-#            bottomWallTile = self.defaultTunnelWallType(x = x, y = y - 1, level = self, room = None)
-#            self.tiles.append(topWallTile)
-#            self.tiles.append(bottomWallTile)
-            
-
-    # Carve out a vertical tunnel
-#    def createVTunnelOld(self, y1, y2, x):
-#        for y in range(min(y1, y2), max(y1, y2) + 1):
-#            
-#            newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
-#            self.tiles.append(newTunnelTile)
-#            
-#            leftWallTile = self.defaultTunnelWallType(x = x - 1, y = y, level = self, room = None)
-#            rightWallTile = self.defaultTunnelWallType(x = x + 1, y = y, level = self, room = None)
-#            self.tiles.append(leftWallTile)
-#            self.tiles.append(rightWallTile)
-    
     
 #    def passTime(self, turns = 1):
 #        print "tick"
