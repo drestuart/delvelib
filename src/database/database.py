@@ -122,6 +122,15 @@ class Database(object):
         query = self.session.query(clazz)
         return query.filter(filter_).one()
     
+    def getQueryObj(self, clazz):
+        return self.session.query(clazz)
+    
+    def runQueryGetOneRecord(self, query):
+        return query.one()
+    
+    def runQuery(self, query):
+        return query.all()
+    
     def fillInObjectList(self, clazz, nameCol, dataDict, targetColumnName):
         nameList = re.split(r' *, *', dataDict[targetColumnName])
         objList = self.getRecordsByFilter(clazz, nameCol.in_(nameList))
