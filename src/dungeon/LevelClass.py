@@ -224,9 +224,8 @@ class DungeonLevel(Level):
     
     def createRooms(self):
         '''Add some rooms to the level'''
-        self.rooms = []
-        num_rooms = 0
-     
+        rooms = []
+
         # Make some rooms
         for dummy in range(C.MAX_ROOMS):
             #random width and height
@@ -244,7 +243,7 @@ class DungeonLevel(Level):
      
             #run through the other rooms and see if they intersect with this one
             failed = False
-            for otherRoom in self.rooms:
+            for otherRoom in rooms:
                 if newRoom.intersect(otherRoom):
                     failed = True
                     del newRoom
@@ -259,37 +258,23 @@ class DungeonLevel(Level):
                 #add some contents to this room, such as monsters
                 #self.placeObjects(newRoom)
                 
-                if num_rooms >= 1:
+                if len(rooms) >= 1:
                     #all rooms after the first:
                     #connect it to the previous room with a tunnel
-                    prevRoom = self.rooms[-1]
+                    prevRoom = rooms[-1]
                     
                     self.createTunnel(prevRoom, newRoom)
                     
                     
                 # Append the new room to the list
+                rooms.append(newRoom)
                 self.rooms.append(newRoom)
-                num_rooms += 1
 
-                # Place upstair and downstair
-                #self.placeStairs()
-
+#        self.rooms = rooms
+        
         # Fill in empty spaces
-        self.fillInSpaces()
+#        self.fillInSpaces()
         
-        # Construct self.tiles
-        for xx in range(C.MAP_WIDTH):
-#            tileCol = self.tileArray[xx]
-            for yy in range(C.MAP_HEIGHT):
-                tile = self.tileArray[xx][yy]
-#                tile.setLevel(self)
-                self.tiles.append(tile)
-        
-#        db.saveDB.save(self)
-        # Save tiles
-#        print "saving", len(self.tiles), "tiles"
-#        db.saveDB.saveAll(self.tiles)
-#        db.saveDB.saveAll(self.rooms)
 
 
     def fillInSpaces(self):
@@ -307,13 +292,26 @@ class DungeonLevel(Level):
                                                
     # Create a room
     def createRoom(self, room):
-        room.fillWithTiles()
         
-        for tile in room.getTiles():
-            x = tile.x
-            y = tile.y
+        for x in range(room.getX1(), room.getX2()):
+            for y in range(room.getY1(), room.getY2()):
+#                print "Creating tile at", x, ",", y
+                newTile = self.defaultFloorType(x=x, y=y)
+                self.tiles.append(newTile)
+        
+#        for x in range(room.getX1(), room.getX2()):
+#            for y in range(room.getY1(), room.getY2()):
+#                newTile = self.defaultFloorType(x = x, y = y)
+#                self.tileArray[x][y] = newTile
+#                room.tiles.append(newTile)
+        
+#        room.fillWithTiles()
+#        
+#        for tile in room.getTiles():
+#            x = tile.x
+#            y = tile.y
 #            self.addTile(tile)
-            self.tileArray[x][y] = tile
+#            self.tileArray[x][y] = tile
 #        print "Room created with", len(room.getTiles()), "tiles"
 
     def addTile(self, tile):
@@ -337,14 +335,14 @@ class DungeonLevel(Level):
             skip = False
             for room in self.rooms:
                 if room.contains(x, y):
-#                if newRoom.contains(x, y) or prevRoom.contains(x, y):
                     skip = True
-                    break
+#                    break
             
             if not skip:
 #                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
                 newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, room = None)
-                self.tileArray[x][y] = newTunnelTile
+                self.tiles.append(newTunnelTile)
+#                self.tileArray[x][y] = newTunnelTile
 #                self.addTile(newTunnelTile)
 
     def createVTunnel(self, prevRoom, newRoom, x, y1, y2):
@@ -355,11 +353,13 @@ class DungeonLevel(Level):
                 if room.contains(x, y):
 #                if newRoom.contains(x, y) or prevRoom.contains(x, y):
                     skip = True
-                    break
+#                    break
+
             if not skip:
 #                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
                 newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, room = None)
-                self.tileArray[x][y] = newTunnelTile
+                self.tiles.append(newTunnelTile)
+#                self.tileArray[x][y] = newTunnelTile
 #                self.addTile(newTunnelTile)
 
     # Carve out a tunnel
@@ -586,8 +586,18 @@ def main():
                       defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
     
     d1.createRooms()
+
     
+#    aRoom = R.Room(x = 20, y = 20, width = 10, height = 10,
+#                             defaultFloorType = d1.defaultFloorType, defaultWallType = d1.defaultWallType)
+#    d1.createRoom(aRoom)
+#    
+#    anotherRoom = R.Room(x=10, y=0, width = 10, height = 10, 
+#                             defaultFloorType = d1.defaultFloorType, defaultWallType = d1.defaultWallType)
+#    d1.createRoom(anotherRoom)
+        
     print "level has", len(d1.tiles), "total tiles"
+    print "level has", len([tile for tile in d1.tiles if not (tile is None)]), "good tiles"
     
     
     db.saveDB.save(d1)

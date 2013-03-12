@@ -23,14 +23,14 @@ class Tile(Base):
     # a tile of the map and its properties
     
     __tablename__ = "tiles"
-    __table_args__ = (UniqueConstraint('x', 'y', 'levelId', name='_tile_location_uc'), {'extend_existing': True})
-#    __table_args__ = {'extend_existing': True}
+#    __table_args__ = (UniqueConstraint('x', 'y', 'levelId', name='_tile_location_uc'), {'extend_existing': True})
+    __table_args__ = {'extend_existing': True}
 
     
-    def __init__(self, **kwargs):
-        
-        self.x = kwargs['x']
-        self.y = kwargs['y']
+    def __init__(self, x, y, **kwargs):
+        #print "Tile.__init__"
+        self.x = x
+        self.y = y
         
         self.blockMove = kwargs.get('blockMove', False)
         self.blockSight = kwargs.get('blockSight', False)
@@ -207,7 +207,14 @@ class Tile(Base):
 #            return self.objects[0].color()
 #        
 #        else:
-            return self.baseColor        
+            return self.getBaseColor()
+        
+    def getBaseColor(self):        
+        if self.__dict__.get('baseColor', None):
+            return self.baseColor
+        else:
+            self.baseColor = libtcod.Color(self.baseColorR, self.baseColorG, self.baseColorB)
+            return self.baseColor
 
     def getBackground(self):
         # Determine which background to use to draw this tile
@@ -218,7 +225,14 @@ class Tile(Base):
 #            return self.feature.background()
 #                
 #        else:
-            return self.baseBackgroundColor   
+            return self.getBaseBackgroundColor()
+        
+    def getBaseBackgroundColor(self):
+        if self.__dict__.get('baseBackgroundColor', None):
+            return self.baseBackgroundColor
+        else:
+            self.baseBackgroundColor = libtcod.Color(self.baseBackgroundColorR, self.baseBackgroundColorG, self.baseBackgroundColorB)
+            return self.baseBackgroundColor
 
     def getDescription(self):
         # Determine which description to use to draw this tile
@@ -272,58 +286,60 @@ class Tile(Base):
 
 class Wall(Tile):
     
-    def __init__(self, **kwargs):
-        super(Wall, self).__init__(blockMove = True, blockSight = True, baseBackgroundColor = colors.black, baseSymbol = '#', **kwargs)
+    def __init__(self, x, y, **kwargs):
+        super(Wall, self).__init__(x, y, blockMove = True, blockSight = True, baseBackgroundColor = colors.black, baseSymbol = '#', **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'wall'}
     
 class WoodWall(Wall):
     
-    def __init__(self, **kwargs):
-        super(WoodWall, self).__init__(baseDescription = "A wooden wall", baseColor = colors.colorWood, **kwargs)
+    def __init__(self, x, y, **kwargs):
+        super(WoodWall, self).__init__(x, y, baseDescription = "A wooden wall", baseColor = colors.colorWood, **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'woodwall'}
 
 class RockWall(Wall):
     
-    def __init__(self, **kwargs):
-        super(RockWall, self).__init__(baseDescription = "A rock wall", baseColor = colors.colorRock, **kwargs)
+    def __init__(self, x, y, **kwargs):
+        super(RockWall, self).__init__(x, y, baseDescription = "A rock wall", baseColor = colors.colorRock, **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'rockwall'}
 
 
 class Floor(Tile):
         
-    def __init__(self, **kwargs):
-        super(Floor, self).__init__(blockMove = False, blockSight = False, baseBackgroundColor = colors.black, baseSymbol = '.', **kwargs)
+    def __init__(self, x, y, **kwargs):
+        #print "Floor.__init__"
+        super(Floor, self).__init__(x, y, blockMove = False, blockSight = False, baseBackgroundColor = colors.black, baseSymbol = '.', **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'floor'}
 
 class StoneFloor(Floor):
         
-    def __init__(self, **kwargs):
-        super(StoneFloor, self).__init__(baseDescription = "A stone floor", baseColor = colors.colorStone, **kwargs)
+    def __init__(self, x, y, **kwargs):
+        #print "StoneFloor.__init__"
+        super(StoneFloor, self).__init__(x, y, baseDescription = "A stone floor", baseColor = colors.colorStone, **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'stonefloor'}
 
 class GrassFloor(Floor):
             
-    def __init__(self, **kwargs):
-        super(GrassFloor, self).__init__(baseDescription = "Grass", baseColor = colors.colorGrass, **kwargs)
+    def __init__(self, x, y, **kwargs):
+        super(GrassFloor, self).__init__(x, y, baseDescription = "Grass", baseColor = colors.colorGrass, **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'grassfloor'}
 
 class WoodFloor(Floor):
             
-    def __init__(self, **kwargs):
-        super(WoodFloor, self).__init__(baseDescription = "A wooden floor", baseColor = colors.colorWood, **kwargs)
+    def __init__(self, x, y, **kwargs):
+        super(WoodFloor, self).__init__(x, y, baseDescription = "A wooden floor", baseColor = colors.colorWood, **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'woodfloor'}
 
 class RockTunnel(Floor):
     
-    def __init__(self, **kwargs):
-        super(RockTunnel, self).__init__(baseDescription = "A rocky tunnel", baseColor = colors.colorRock, **kwargs)
+    def __init__(self, x, y, **kwargs):
+        super(RockTunnel, self).__init__(x, y, baseDescription = "A rocky tunnel", baseColor = colors.colorRock, **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'rocktunnel'}
         
@@ -338,8 +354,8 @@ def main():
 #    db.saveDB.start()
 
     
-    t1 = WoodFloor(x=1, y=2)
-    db.saveDB.save(t1)
+    t2 = StoneFloor(x=3, y=4)
+    print t2.getColor()
     
     
 
