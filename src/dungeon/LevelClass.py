@@ -1,9 +1,3 @@
-###############################################################
-#
-# OLD STUFF
-#
-###############################################################
-
 # The map class.  This will contain the code for creating and displaying maps.
 # The plan is to have two maps: the *actual* level map, and the player's map
 # showing what they know/remember about the level.
@@ -63,8 +57,8 @@ class Level(Base):
     previousLevel = relationship("Level", uselist=False, primaryjoin="Level.id==Level.previousLevelId")
     previousLevelId = Column(Integer, ForeignKey("levels.id"))
     
-    tiles = relationship("Tile", backref=backref("level", uselist=False), primaryjoin="Level.id==Tile.levelId")
-    rooms = relationship("Room", backref=backref("level", uselist=False), primaryjoin="Level.id==Room.levelId")
+    tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
+    rooms = relationship("Room", backref = "level")
     
     levelType = Column(String)
     
@@ -221,7 +215,7 @@ class DungeonLevel(Level):
     
     def createRooms(self):
         '''Add some rooms to the level'''
-        rooms = []
+        self.rooms = []
         num_rooms = 0
      
         # Make some rooms
@@ -236,52 +230,53 @@ class DungeonLevel(Level):
             x = random.randint(0, C.MAP_WIDTH - w - 1 - C.DUNGEON_MARGIN)
             y = random.randint(0, C.MAP_HEIGHT - h - 1 - C.DUNGEON_MARGIN)
     
-            newRoom = R.Room(x = x, y = y, width = w, height = h, level = self,
+            newRoom = R.Room(x = x, y = y, width = w, height = h,
                              defaultFloorType = self.defaultFloorType, defaultWallType = self.defaultWallType)
      
             #run through the other rooms and see if they intersect with this one
             failed = False
-            for otherRoom in rooms:
+            for otherRoom in self.rooms:
                 if newRoom.intersect(otherRoom):
-#                    print "Room intersection detected"
                     failed = True
+                    del newRoom
                     break
-    
+            
             if not failed:
-#                print "No room intersection detected"
+                #print "No room intersection detected"
                 #this means there are no intersections, so this room is valid
                 #"paint" it to the map's tiles
                 self.createRoom(newRoom)
-    
+                
                 #add some contents to this room, such as monsters
-#                self.placeObjects(newRoom)
-     
+                #self.placeObjects(newRoom)
+                
                 if num_rooms >= 1:
                     #all rooms after the first:
                     #connect it to the previous room with a tunnel
                     prevRoom = self.rooms[-1]
                     
                     self.createTunnel(prevRoom, newRoom)
-    
-     
+                    
+                    
                 # Append the new room to the list
-                rooms.append(newRoom)
                 self.rooms.append(newRoom)
                 num_rooms += 1
 
-            # Place upstair and downstair
-            self.placeStairs()
-        
+                # Place upstair and downstair
+                #self.placeStairs()
+
         # Fill in empty spaces
         self.fillInSpaces()
         
         # Construct self.tiles
-        for x in len(self.tileArray):
-            tileCol = self.tileArray[x]
-            for y in len(tileCol):
-                self.tiles.append(self.tileArray[x][y])
+        for xx in range(C.MAP_WIDTH):
+#            tileCol = self.tileArray[xx]
+            for yy in range(C.MAP_HEIGHT):
+                tile = self.tileArray[xx][yy]
+#                tile.setLevel(self)
+                self.tiles.append(tile)
         
-        
+#        db.saveDB.save(self)
         # Save tiles
 #        print "saving", len(self.tiles), "tiles"
 #        db.saveDB.saveAll(self.tiles)
@@ -290,65 +285,73 @@ class DungeonLevel(Level):
 
     def fillInSpaces(self):
         # Fill in empty spaces with wall tiles
-        for x in len(self.tileArray):
+        for x in range(C.MAP_WIDTH):
             tileCol = self.tileArray[x]
-            for y in len(tileCol):
-                
-                try:
-                    tile = self.tileArray[x][y]
-                except IndexError:
-                    tile = None
-                
-                if tile == None:
-                    tile = self.defaultTunnelWallType(x = x, y = y, level = self, room = None)
+            for y in range(C.MAP_HEIGHT):
+                tile = self.tileArray[x][y]
+                    
+                if tile is None:
+#                    tile = self.defaultTunnelWallType(x = x, y = y, level = self, room = None)
+                    tile = self.defaultTunnelWallType(x = x, y = y)
+                    self.tileArray[x][y] = tile
+#                    self.addTile(tile)
                                                
     # Create a room
     def createRoom(self, room):
-        
         room.fillWithTiles()
         
         for tile in room.getTiles():
-            self.addTile(tile)
+            x = tile.x
+            y = tile.y
+#            self.addTile(tile)
+            self.tileArray[x][y] = tile
 #        print "Room created with", len(room.getTiles()), "tiles"
 
     def addTile(self, tile):
-#        print "(", tile.x, ",", tile.y, ")"
+        print "add (", tile.x, ",", tile.y, ")"
         
-#        try:
-#            oldTileCol = self.tileArray[tile.x]
-#            oldTile = oldTileCol[tile.y]
-#            if oldTile:
-#                self.tiles.remove(oldTile)
-##                print "removed a tile"
-#        except IndexError:
-#            pass
+        try:
+            oldTileCol = self.tileArray[tile.x]
+            oldTile = oldTileCol[tile.y]
+            if oldTile:
+                self.tiles.remove(oldTile)
+#                print "removed a tile"
+        except IndexError:
+            pass
         
-#        self.tiles.append(tile)
+        self.tiles.append(tile)
         self.tileArray[tile.x][tile.y] = tile
 
     def createHTunnel(self, prevRoom, newRoom, x1, x2, y):
         
         for x in range(min(x1, x2), max(x1, x2)):
-                
-                for room in self.rooms:
-                    if room.contains(x, y):
+            skip = False
+            for room in self.rooms:
+                if room.contains(x, y):
 #                if newRoom.contains(x, y) or prevRoom.contains(x, y):
-                        continue
-                
-                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
-                self.addTile(newTunnelTile)
+                    skip = True
+                    break
+            
+            if not skip:
+#                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
+                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, room = None)
+                self.tileArray[x][y] = newTunnelTile
+#                self.addTile(newTunnelTile)
 
     def createVTunnel(self, prevRoom, newRoom, x, y1, y2):
         
         for y in range(min(y1, y2), max(y1, y2)):
-                
-                for room in self.rooms:
-                    if room.contains(x, y):
+            skip = False
+            for room in self.rooms:
+                if room.contains(x, y):
 #                if newRoom.contains(x, y) or prevRoom.contains(x, y):
-                        continue
-            
-                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
-                self.addTile(newTunnelTile)
+                    skip = True
+                    break
+            if not skip:
+#                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
+                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, room = None)
+                self.tileArray[x][y] = newTunnelTile
+#                self.addTile(newTunnelTile)
 
     # Carve out a tunnel
     def createTunnel(self, prevRoom, newRoom):
@@ -423,198 +426,87 @@ class DungeonLevel(Level):
         pass
 
     # Carve out a horizontal tunnel
-    def createHTunnelOld(self, x1, x2, y):
-        for x in range(min(x1, x2), max(x1, x2) + 1):
-            
-            newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
-            self.tiles.append(newTunnelTile)
-            
-            topWallTile = self.defaultTunnelWallType(x = x, y = y + 1, level = self, room = None)
-            bottomWallTile = self.defaultTunnelWallType(x = x, y = y - 1, level = self, room = None)
-            self.tiles.append(topWallTile)
-            self.tiles.append(bottomWallTile)
+#    def createHTunnelOld(self, x1, x2, y):
+#        for x in range(min(x1, x2), max(x1, x2) + 1):
+#            
+#            newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
+#            self.tiles.append(newTunnelTile)
+#            
+#            topWallTile = self.defaultTunnelWallType(x = x, y = y + 1, level = self, room = None)
+#            bottomWallTile = self.defaultTunnelWallType(x = x, y = y - 1, level = self, room = None)
+#            self.tiles.append(topWallTile)
+#            self.tiles.append(bottomWallTile)
             
 
     # Carve out a vertical tunnel
-    def createVTunnelOld(self, y1, y2, x):
-        for y in range(min(y1, y2), max(y1, y2) + 1):
-            
-            newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
-            self.tiles.append(newTunnelTile)
-            
-            leftWallTile = self.defaultTunnelWallType(x = x - 1, y = y, level = self, room = None)
-            rightWallTile = self.defaultTunnelWallType(x = x + 1, y = y, level = self, room = None)
-            self.tiles.append(leftWallTile)
-            self.tiles.append(rightWallTile)
+#    def createVTunnelOld(self, y1, y2, x):
+#        for y in range(min(y1, y2), max(y1, y2) + 1):
+#            
+#            newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
+#            self.tiles.append(newTunnelTile)
+#            
+#            leftWallTile = self.defaultTunnelWallType(x = x - 1, y = y, level = self, room = None)
+#            rightWallTile = self.defaultTunnelWallType(x = x + 1, y = y, level = self, room = None)
+#            self.tiles.append(leftWallTile)
+#            self.tiles.append(rightWallTile)
     
     
-    def passTime(self, turns = 1):
-        print "tick"
-        
-        for i in range(turns):
-            creatures = []
-            
-            for x in range(self.WIDTH):
-                for y in range(self.HEIGHT):
-                    coords = Coordinates(x = x, y = y)
-                    
-                    tile = self.getTile(coords)
-                    tile.passTime()
-                    cr = tile.creature
-                    
-                    if cr is not None:
-                        creatures.append(cr)
-                        
-            for cr in creatures:
-                cr.passTime()
-    
-    
-    def placeCreature(self, creature):
-        while True:
-            coords = self.getRandOpenSpace() 
-            tile = self.getTile(coords)
-            
-            if not tile.creature:
-                tile.addCreature(creature)
-                creature.setPosition(self, coords)
-                break
-            
-    def placeCreatures(self, num_creatures):
-        for i in range(num_creatures):
-            self.placeCreature(randomCreature(self))
-
-    def getRandOpenSpace(self):
-        '''Get a random open square on the map'''
-        while True:
-            randx = libtcod.random_get_int(0, 0, self.WIDTH - 1)
-            randy = libtcod.random_get_int(0, 0, self.HEIGHT - 1)
-        
-            if not self.isBlocked(randx, randy):
-                return Coordinates(x = randx, y = randy)
-                
-    def getRandOpenSpace_NEW(self):
-        '''Get the coordinates of a random open square on the map'''
-        if self.openSpaces:
-            randOpenTile = random.choice(self.openSpaces)
-            return Coordinates(x = randOpenTile.x, y = randOpenTile.y)
-        
-        else:
-            return None, None
-
-class FOVMap():
-    '''A map subclass for a creature's Field of View.  Keeps track of what the creature can see, and only updates squares that can be seen.  Reads from its corresponding DungeonLevel object.'''
-
-
-    def __init__(self, baseMap):
-        #super(FOVMap, self).__init__(width, height, name, depth)
-        self.__dict__['baseMap'] = baseMap
-        self.__dict__['toRecompute'] = True
-        
-        # Initialize the fov_map object for libtcod
-        self.__dict__['fov_map'] = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
-        
-        self.__dict__['tiles'] = [[ None 
-                                    for y in range(self.baseMap.HEIGHT) ]
-                                    for x in range(self.baseMap.WIDTH) ]
-        
-        self.computeFOVProperties()
-        
-    def getTile(self, coords):
-        # Return a tile by coordinates, with a Coordinates object.
-        x, y = coords['x'], coords['y']
-        return self.tiles[x][y]
-    
-    def setTile(self, coords, tileIn):
-        self.__dict__['tiles'][coords['x']][coords['y']] = copy.deepcopy(tileIn)
-        
-    def computeFOVProperties(self):
-        for y in range(self.baseMap.HEIGHT):
-            for x in range(self.baseMap.WIDTH):
-                libtcod.map_set_properties(self.fov_map, x, y, 
-                                           not self.baseMap.blocksMove(x, y), 
-                                           not self.baseMap.blocksSight(x, y))
-        
-        
-    def recompute(self):
-        self.__dict__['toRecompute'] = True
-        
-    def recomputed(self):
-        self.__dict__['toRecompute'] = False
-                
-    def computeFOV(self, position, radius):
-        '''Compute the field of view of this map with respect to a particular position'''
-        if self.toRecompute == False and self.baseMap.toRecomputeFOV == False:
-            return
-        else:
-            
-            self.__dict__['toRecompute'] = False
-            
-            libtcod.map_compute_fov(self.fov_map, position['x'], position['y'], 
-                                radius, C.FOV_LIGHT_WALLS, C.FOV_ALGO)
-
-            self.computeFOVProperties()
-            
-            self.recomputed()
-            self.baseMap.recomputedFOV()
-        
-    def clear(self, con):
-        self.baseMap.clear(con)
-        
-    def draw(self, con, position, radius):
-        self.computeFOV(position, radius)
-        
-        for x in range(self.baseMap.WIDTH):
-            for y in range(self.baseMap.HEIGHT):
-                coords = Coordinates(x = x, y = y)
-                tile = self.baseMap.getTile(coords)
-                
-                if libtcod.map_is_in_fov(self.fov_map, x, y):  # We can see this tile
-                    symbol, color, background = tile.toDraw()
-                    self.setTile(coords, tile)  # Remember this tile
-                
-                elif self.getTile(coords):  # We've seen this one before
-                    symbol = self.getTile(coords).symbol()
-                    color = libtcod.dark_grey
-                    background = libtcod.light_grey
-                        
-                else:
-                    background = libtcod.BKGND_NONE
-                    color = colors.colorDarkGround
-                    symbol = ' '
-                    
-                libtcod.console_set_foreground_color(con, color)
-                libtcod.console_put_char(con, x, y, symbol, background)
-                
-
-                
-#def main():
-#    SCREEN_WIDTH = 80
-#    SCREEN_HEIGHT = 69
-#    
-#    libtcod.console_set_custom_font(os.path.join('../fonts', 'arial10x10.png'), 
-#                                libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
-#    libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'delveRL', False)
-#    libtcod.sys_set_fps(20)
-#    con = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
-#
-#    map = Level(40, 40)
-#    lmap = DungeonLevel(40, 50)
-#    fovmap = FOVMap(lmap)
-#    coords = fovmap.baseMap.getRandOpenSpace()
-#    
-#    while not libtcod.console_is_window_closed():
-# 
-#        fovmap.draw(con, coords, 5)
-#        libtcod.console_blit(con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0)
-#        libtcod.console_flush()
-#        fovmap.clear(con)
+#    def passTime(self, turns = 1):
+#        print "tick"
 #        
-#        
-#    print "Win"
+#        for i in range(turns):
+#            creatures = []
+#            
+#            for x in range(self.WIDTH):
+#                for y in range(self.HEIGHT):
+#                    coords = Coordinates(x = x, y = y)
+#                    
+#                    tile = self.getTile(coords)
+#                    tile.passTime()
+#                    cr = tile.creature
+#                    
+#                    if cr is not None:
+#                        creatures.append(cr)
+#                        
+#            for cr in creatures:
+#                cr.passTime()
+    
+    
+#    def placeCreature(self, creature):
+#        while True:
+#            coords = self.getRandOpenSpace() 
+#            tile = self.getTile(coords)
+#            
+#            if not tile.creature:
+#                tile.addCreature(creature)
+#                creature.setPosition(self, coords)
+#                break
+#            
+#    def placeCreatures(self, num_creatures):
+#        for i in range(num_creatures):
+#            self.placeCreature(randomCreature(self))
 #
-#if __name__ == '__main__':
-#        main()
+#    def getRandOpenSpace(self):
+#        '''Get a random open square on the map'''
+#        while True:
+#            randx = libtcod.random_get_int(0, 0, self.WIDTH - 1)
+#            randy = libtcod.random_get_int(0, 0, self.HEIGHT - 1)
+#        
+#            if not self.isBlocked(randx, randy):
+#                return Coordinates(x = randx, y = randy)
+#                
+#    def getRandOpenSpace_NEW(self):
+#        '''Get the coordinates of a random open square on the map'''
+#        if self.openSpaces:
+#            randOpenTile = random.choice(self.openSpaces)
+#            return Coordinates(x = randOpenTile.x, y = randOpenTile.y)
+#        
+#        else:
+#            return None, None
+
+
                 
+
                 
 #####################################################
 #
@@ -673,8 +565,6 @@ class FOVMap():
 
 def main():
     
-    import sys
-    
     db.saveDB.start(True)
     
 #    seed = random.randint(0, sys.maxint)
@@ -688,26 +578,26 @@ def main():
     
     d1.createRooms()
     
-    tuplesSeen = {}
+    tuplesSeen = dict()
     for tile in d1.tiles:
-        tuple = (tile.x, tile.y, tile.levelId)
-        tuplesSeen[tuple] = 1 + tuplesSeen.get(tuple, 0)
-    
+        if tile:
+            x = tile.x
+            y = tile.y
+            thisTuple = (x, y)
+            tuplesSeen[thisTuple] = 1 + tuplesSeen.get(thisTuple, 0)
+        else:
+            print "null tile"
     for key in tuplesSeen.keys():
         val = tuplesSeen[key]
-        if val != 1:
-            print key, "occurred", val, "times"
+#        if val != 1:
+        print key, "occurred", val, "times"
 
-#    try:
-#        db.saveDB.save(d1)
-#    except sqlalchemy.exc.IntegrityError:
-        
-    
-        
+    print "level has", len(d1.tiles), "total tiles"
     
     
 #    db.saveDB.saveAll(d1.tiles)
     db.saveDB.save(d1)
+    db.saveDB.saveAll(d1.tiles)
 
 if __name__ == '__main__':
     main()

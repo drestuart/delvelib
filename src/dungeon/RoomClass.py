@@ -102,9 +102,6 @@ class Room(Rect, Base):
         super(Room, self).__init__(kwargs['x'], kwargs['y'], kwargs['width'], kwargs['height'])
 #        self.level = kwargs.get('level', None)
         
-        self.setLevel(kwargs.get('level', None))
-        
-        
         self.defaultFloorType = kwargs.get('defaultFloorType', None)
         self.defaultWallType = kwargs.get('defaultWallType', None)
         
@@ -125,8 +122,8 @@ class Room(Rect, Base):
     
 #    level = relationship("Level", primaryjoin="Level.id==Room.levelId")
     levelId = Column(Integer, ForeignKey("levels.id"))
-    
-#    tiles = relationship("Tile", backref=backref("room", uselist=False), primaryjoin="Room.id==Tile.roomId")
+
+    tiles = relationship("Tile", backref=backref("room"), primaryjoin="Room.id==Tile.roomId")
     
     def fillWithTiles(self):
         # Create wall tiles
@@ -159,8 +156,9 @@ class Room(Rect, Base):
             for y in range(self.y1, self.y2):
                 # Add some chance for a dungeon feature here
                 
-                floor = self.defaultFloorType(x = x, y = y, room = self, level = self.getLevel())
-                self.tiles.append(floor)
+#                floor = self.defaultFloorType(x = x, y = y, room = self, level = self.getLevel())
+                floor = self.defaultFloorType(x = x, y = y, room = self)
+#                self.tiles.append(floor)
 #                print floor
                 
         # Save
