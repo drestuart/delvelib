@@ -139,12 +139,12 @@ class Object:
         #only show if it's visible to the player
         if libtcod.map_is_in_fov(fov_map, self.x, self.y):
             #set the color and then draw the character that represents this object at its position
-            libtcod.console_set_default_foreground(con, self.color)
-            libtcod.console_put_char(con, self.x, self.y, self.char, libtcod.BKGND_NONE)
+            libtcod.console_set_default_foreground(mapConsole, self.color)
+            libtcod.console_put_char(mapConsole, self.x, self.y, self.char, libtcod.BKGND_NONE)
  
     def clear(self):
         #erase the character that represents this object
-        libtcod.console_put_char(con, self.x, self.y, ' ', libtcod.BKGND_NONE)
+        libtcod.console_put_char(mapConsole, self.x, self.y, ' ', libtcod.BKGND_NONE)
  
  
 class Fighter:
@@ -461,15 +461,15 @@ def render_all():
                     #if it's not visible right now, the player can only see it if it's explored
                     if map[x][y].explored:
                         if wall:
-                            libtcod.console_set_char_background(con, x, y, color_dark_wall, libtcod.BKGND_SET)
+                            libtcod.console_set_char_background(mapConsole, x, y, color_dark_wall, libtcod.BKGND_SET)
                         else:
-                            libtcod.console_set_char_background(con, x, y, color_dark_ground, libtcod.BKGND_SET)
+                            libtcod.console_set_char_background(mapConsole, x, y, color_dark_ground, libtcod.BKGND_SET)
                 else:
                     #it's visible
                     if wall:
-                        libtcod.console_set_char_background(con, x, y, color_light_wall, libtcod.BKGND_SET )
+                        libtcod.console_set_char_background(mapConsole, x, y, color_light_wall, libtcod.BKGND_SET )
                     else:
-                        libtcod.console_set_char_background(con, x, y, color_light_ground, libtcod.BKGND_SET )
+                        libtcod.console_set_char_background(mapConsole, x, y, color_light_ground, libtcod.BKGND_SET )
                     #since it's visible, explore it
                     map[x][y].explored = True
  
@@ -480,8 +480,8 @@ def render_all():
             object.draw()
     player.draw()
  
-    #blit the contents of "con" to the root console
-    libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+    #blit the contents of "mapConsole" to the root console
+    libtcod.console_blit(mapConsole, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
  
  
     #prepare to render the GUI panel
@@ -546,7 +546,7 @@ def menu(header, options, width):
     if len(options) > 26: raise ValueError('Cannot have a menu with more than 26 options.')
  
     #calculate total height for the header (after auto-wrap) and one line per option
-    header_height = libtcod.console_get_height_rect(con, 0, 0, width, SCREEN_HEIGHT, header)
+    header_height = libtcod.console_get_height_rect(mapConsole, 0, 0, width, SCREEN_HEIGHT, header)
     height = len(options) + header_height
  
     #create an off-screen console that represents the menu's window
@@ -758,7 +758,7 @@ def cast_confuse():
 libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'python/libtcod tutorial', False)
 libtcod.sys_set_fps(LIMIT_FPS)
-con = libtcod.console_new(MAP_WIDTH, MAP_HEIGHT)
+mapConsole = libtcod.console_new(MAP_WIDTH, MAP_HEIGHT)
 panel = libtcod.console_new(SCREEN_WIDTH, PANEL_HEIGHT)
  
 #create object representing the player

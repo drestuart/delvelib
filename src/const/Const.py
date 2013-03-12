@@ -6,6 +6,8 @@ Created on Mar 10, 2013
 
 # Global constants
 
+TITLE = "delveRL"
+
 # Max monsters per room
 MAX_ROOM_MONSTERS = 3
 

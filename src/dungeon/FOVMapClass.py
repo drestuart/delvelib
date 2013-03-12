@@ -60,10 +60,10 @@ class FOVMap():
             self.recomputed()
             self.baseMap.recomputedFOV()
         
-    def clear(self, con):
-        self.baseMap.clear(con)
+    def clear(self, mapConsole):
+        self.baseMap.clear(mapConsole)
         
-    def draw(self, con, position, radius):
+    def draw(self, mapConsole, position, radius):
         self.computeFOV(position, radius)
         
         for x in range(self.baseMap.WIDTH):
@@ -85,5 +85,5 @@ class FOVMap():
                     color = colors.colorDarkGround
                     symbol = ' '
                     
-                libtcod.console_set_foreground_color(con, color)
-                libtcod.console_put_char(con, x, y, symbol, background)
+                libtcod.console_set_foreground_color(mapConsole, color)
+                libtcod.console_put_char(mapConsole, x, y, symbol, background)
