@@ -85,7 +85,10 @@ class Level(Base):
     
     
     def getTileFromDB(self, x, y, level):
-        pass
+        query = db.saveDB.getQueryObj(T.Tile)
+        query.filter(T.Tile.x == x).filter(T.Tile.y == y).filter(T.Tile.level == level)
+        return db.saveDB.runQuery(query)
+        
 
     # Test if a square is blocked
 #    def isBlocked(self, x, y):
@@ -112,11 +115,6 @@ class Level(Base):
 #                    print "Drawing", x, ",", y
                     symbol, color, background = tile.toDraw()
                     symbol = symbol.encode('ascii', 'ignore')
-#                    print tile.toDraw()
-                    libtcod.console_set_char_background(mapConsole, x, y, colors.colorGrass, libtcod.BKGND_SET)
-                    libtcod.console_set_default_foreground(mapConsole, color)
-#                    libtcod.console_set_char_foreground(mapConsole, x, y, color)
-#                    libtcod.console_put_char(mapConsole, x, y, symbol)
                     
                     libtcod.console_put_char_ex(mapConsole, x, y, symbol, color, background)
 #                else:
@@ -335,12 +333,10 @@ class DungeonLevel(Level):
 
     def createHTunnel(self, prevRoom, newRoom, x1, x2, y):
         
-        for x in range(min(x1, x2) - 1, max(x1, x2)):
+        for x in range(min(x1, x2), max(x1, x2)):
             skip = False
-            for room in self.rooms:
-                if room.contains(x, y):
-                    skip = True
-#                    break
+            if self.getTileFromDB(x, y, self):
+                skip = True
             
             if not skip:
 #                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
@@ -351,13 +347,10 @@ class DungeonLevel(Level):
 
     def createVTunnel(self, prevRoom, newRoom, x, y1, y2):
         
-        for y in range(min(y1, y2) - 1, max(y1, y2)):
+        for y in range(min(y1, y2), max(y1, y2)):
             skip = False
-            for room in self.rooms:
-                if room.contains(x, y):
-#                if newRoom.contains(x, y) or prevRoom.contains(x, y):
-                    skip = True
-#                    break
+            if self.getTileFromDB(x, y, self):
+                skip = True
 
             if not skip:
 #                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
