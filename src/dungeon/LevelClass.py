@@ -291,10 +291,8 @@ class DungeonLevel(Level):
                 #"paint" it to the map's tiles
                 self.createRoom(newRoom)
                 
-                #add some contents to this room, such as monsters
                 #self.placeObjects(newRoom)
                 
-                # Append the new room to the list
                 rooms.append(newRoom)
                 self.rooms.append(newRoom)
 
@@ -308,6 +306,9 @@ class DungeonLevel(Level):
             lastRoom = self.rooms[-1]
             firstRoom = self.rooms[0]
             self.createTunnel(lastRoom, firstRoom)
+            
+        # Place Stairs
+        self.placeStairs()
         
         print "Saving open tiles"
         db.saveDB.save(self)
@@ -464,7 +465,36 @@ class DungeonLevel(Level):
             
 
     def placeStairs(self):
-        pass
+        
+        # Choose rooms
+        upRoom = random.choice(self.rooms)
+        
+        while True:
+            downRoom = random.choice(self.rooms)
+            if len(self.rooms == 1) or downRoom is not upRoom:
+                break
+        
+        # Place stairs
+        
+        while True:
+            upTile = self.getRandomOpenTileInArea(upRoom.getX1(), upRoom.getX2(), upRoom.getY1(), upRoom.getY2())
+            if upTile.getFeature() is None:
+                upStair = F.upStair()
+                upTile.setFeature(upStair)
+                
+                # Set destination
+                
+                break
+        
+        while True:
+            downTile = self.getRandomOpenTileInArea(downRoom.getX1(), downRoom.getX2(), downRoom.getY1(), downRoom.getY2())
+            if downTile.getFeature() is None:
+                downStair = F.downStair()
+                downTile.setFeature(downStair)
+                
+                # Set destination
+                
+                break
 
     
 #    def passTime(self, turns = 1):

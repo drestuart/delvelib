@@ -49,7 +49,7 @@ class DungeonFeature(Base):
         
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    baseSymbol = Column(String(length=1, convert_unicode = False))
+    symbol = Column(String(length=1, convert_unicode = False))
     
     baseColorR = Column(Integer)
     baseColorG = Column(Integer)
