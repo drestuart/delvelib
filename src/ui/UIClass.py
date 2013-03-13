@@ -15,8 +15,6 @@ libtcod = importLibtcod()
 FONTS_DIR = os.path.join("..", "..", "fonts")
 DEFAULT_FONT = os.path.join(FONTS_DIR, "arial12x12.png")
 
-mapConsole = None
-
 key = libtcod.Key()
 mouse = libtcod.Mouse()
 
@@ -37,31 +35,34 @@ class UI(object):
         libtcod.console_init_root(C.SCREEN_WIDTH, C.SCREEN_HEIGHT, C.TITLE, False)
         libtcod.sys_set_fps(C.LIMIT_FPS)
         
-        mapConsole = libtcod.console_new(C.MAP_WIDTH, C.MAP_HEIGHT)
+        self.mapConsole = libtcod.console_new(C.MAP_WIDTH, C.MAP_HEIGHT)
+        self.currentLevel.setMapConsole(self.mapConsole)
+        
         libtcod.console_set_default_background(0, libtcod.BKGND_NONE)
-        libtcod.console_set_default_background(mapConsole, libtcod.BKGND_NONE)
+        libtcod.console_set_default_background(self.mapConsole, libtcod.BKGND_NONE)
         
     def getCurrentLevel(self):
         return self.currentLevel
     
     def setCurrentLevel(self, lvl):
         self.currentLevel = lvl
+        self.currentLevel.setMapConsole(self.mapConsole)
         
         
     def gameLoop(self):
         
         while not libtcod.console_is_window_closed():
             libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS|libtcod.EVENT_MOUSE,key,mouse)
-            libtcod.console_clear(mapConsole)
+            libtcod.console_clear(self.mapConsole)
             
-            print "Drawing"
-            self.currentLevel.draw(mapConsole)
+#            print "Drawing"
+            self.currentLevel.draw()
     #        libtcod.console_blit(mapConsole, 0, 0, C.MAP_WIDTH, C.MAP_HEIGHT, 0, 0, 0)
-            libtcod.console_blit(mapConsole, 0, 0, 0, 0, 0, 0, 0)
+            libtcod.console_blit(self.mapConsole, 0, 0, C.MAP_WIDTH, C.MAP_HEIGHT, 0, 0, 0)
     
             libtcod.console_flush()
             
-            self.currentLevel.clear(mapConsole)
+            self.currentLevel.clear()
             
             player_action = handle_keys()
             if player_action == 'exit':

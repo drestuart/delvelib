@@ -244,7 +244,9 @@ class Room(Rect, Base):
     def delLevelId(self):
         del self.levelId
         
-    
+    def contains(self, x, y):
+        return (self.x1 <= x and self.x2 >= x and
+                self.y1 <= y and self.y2 >= y)
     
     
 def main():

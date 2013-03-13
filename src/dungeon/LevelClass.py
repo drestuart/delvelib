@@ -46,7 +46,27 @@ class Level(Base):
         
         self.tiles = []
         self.rooms = []
-        self.tileArray = [[None]*C.MAP_HEIGHT]*C.MAP_WIDTH
+        
+##########################################################################
+#
+#        I N    M E M O R I A M
+#
+#    For the hours of my life that died here
+#
+##########################################################################        
+#        self.hasTile = [[False]*C.MAP_HEIGHT]*C.MAP_WIDTH
+        
+        # Initialize self.hasTile
+        self.hasTile = []
+        
+        for dummyx in range(C.MAP_WIDTH):
+            newCol = []
+            for dummyy in range(C.MAP_HEIGHT):
+                newCol.append(False)
+            self.hasTile.append(newCol)
+
+
+
 
     
     id = Column(Integer, primary_key=True)
@@ -64,7 +84,7 @@ class Level(Base):
     
     levelType = Column(String)
     
-
+    mapConsole = None
     
     __mapper_args__ = {'polymorphic_on': levelType,
                        'polymorphic_identity': 'level'}
@@ -88,6 +108,11 @@ class Level(Base):
         query.filter(T.Tile.x == x).filter(T.Tile.y == y).filter(T.Tile.level == level)
         return db.saveDB.runQuery(query)
         
+    def getMapConsole(self):
+        return self.mapConsole
+
+    def setMapConsole(self, con):
+        self.mapConsole = con
 
     # Test if a square is blocked
 #    def isBlocked(self, x, y):
@@ -100,26 +125,25 @@ class Level(Base):
 #        return self.getTile(x, y).blocksSight()
 
 
-
                 
     # Draw that map!
-    def draw(self, mapConsole):
+    def draw(self):
 
         for tile in self.tiles:
             if tile:
                 x = tile.x
                 y = tile.y
-                print "Drawing", x, ",", y, ":", tile.toDraw()
+#                print "Drawing", x, ",", y, ":", tile.toDraw()
                 symbol, color, background = tile.toDraw()
                 symbol = symbol.encode('ascii', 'ignore')
                 
-                libtcod.console_put_char_ex(mapConsole, x, y, symbol, color, background)
+                libtcod.console_put_char_ex(self.mapConsole, x, y, symbol, color, background)
                     
     # Erase that map!
-    def clear(self, mapConsole):
+    def clear(self):
         for x in range(C.MAP_WIDTH):
             for y in range(C.MAP_HEIGHT):
-                libtcod.console_put_char_ex(mapConsole, x, y, ' ', colors.black, libtcod.BKGND_NONE)
+                libtcod.console_put_char_ex(self.mapConsole, x, y, ' ', colors.black, libtcod.BKGND_NONE)
                 
             
     def getSpacesInRadius(self, radius, centerCoords):
@@ -206,8 +230,8 @@ class Level(Base):
                 coordList.append(newCoords)
                 
         return coordList
-            
-            
+
+
             
 class DungeonLevel(Level):
     '''A Level subclass for modeling one dungeon level.  Includes functionality for passing time and level construction.'''
@@ -279,16 +303,18 @@ class DungeonLevel(Level):
 
 
     def fillInSpaces(self):
-        loopnum = 0
         # Fill in empty spaces with wall tiles
         for x in range(C.MAP_WIDTH):
             for y in range(C.MAP_HEIGHT):
 
-                tile = self.tileArray[x][y]
+                hasTile = self.hasTile[x][y]
+#                tiles = self.getTileFromDB(x, y, self)
                 
-                if (tile is None):
+                if not hasTile:
+#                if (len(tiles) == 0):
                     newTile = self.defaultTunnelWallType(x, y, room = None)
                     self.tiles.append(newTile)
+                    self.hasTile[x][y] = True
                     
                                                
     # Create a room
@@ -299,12 +325,13 @@ class DungeonLevel(Level):
 #                print "Creating tile at", x, ",", y
                 newTile = self.defaultFloorType(x=x, y=y, room = room)
                 self.tiles.append(newTile)
-                self.tileArray[x][y] = newTile
+                self.hasTile[x][y] = True
+                self.hasTile[x][y]
         
 #        for x in range(room.getX1(), room.getX2()):
 #            for y in range(room.getY1(), room.getY2()):
 #                newTile = self.defaultFloorType(x = x, y = y)
-#                self.tileArray[x][y] = newTile
+#                self.hasTile[x][y] = newTile
 #                room.tiles.append(newTile)
         
 #        room.fillWithTiles()
@@ -313,14 +340,14 @@ class DungeonLevel(Level):
 #            x = tile.x
 #            y = tile.y
 #            self.addTile(tile)
-#            self.tileArray[x][y] = tile
+#            self.hasTile[x][y] = tile
 #        print "Room created with", len(room.getTiles()), "tiles"
 
     def addTile(self, tile):
         print "add (", tile.x, ",", tile.y, ")"
         
 #        try:
-#            oldTileCol = self.tileArray[tile.x]
+#            oldTileCol = self.hasTile[tile.x]
 #            oldTile = oldTileCol[tile.y]
 #            if oldTile:
 #                self.tiles.remove(oldTile)
@@ -329,36 +356,39 @@ class DungeonLevel(Level):
 #            pass
         
         self.tiles.append(tile)
-        self.tileArray[tile.x][tile.y] = tile
+        self.hasTile[tile.x][tile.y] = True
 
     def createHTunnel(self, prevRoom, newRoom, x1, x2, y):
         
         for x in range(min(x1, x2), max(x1, x2)):
             skip = False
-            if self.getTileFromDB(x, y, self):
+            tilesHere = self.hasTile[x][y]
+            if tilesHere:
                 skip = True
             
             if not skip:
 #                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
                 newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, room = None)
                 self.tiles.append(newTunnelTile)
-                self.tileArray[x][y] = newTunnelTile
-#                self.tileArray[x][y] = newTunnelTile
+                self.hasTile[x][y] = True
+#                self.hasTile[x][y] = newTunnelTile
 #                self.addTile(newTunnelTile)
 
     def createVTunnel(self, prevRoom, newRoom, x, y1, y2):
         
         for y in range(min(y1, y2), max(y1, y2)):
             skip = False
-            if self.getTileFromDB(x, y, self):
+            tilesHere = self.hasTile[x][y]
+            if tilesHere:
                 skip = True
 
             if not skip:
 #                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
                 newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, room = None)
                 self.tiles.append(newTunnelTile)
-                self.tileArray[x][y] = newTunnelTile
-#                self.tileArray[x][y] = newTunnelTile
+                self.hasTile[x][y] = True
+                self.hasTile[x][y]
+#                self.hasTile[x][y] = newTunnelTile
 #                self.addTile(newTunnelTile)
 
     # Carve out a tunnel
@@ -513,6 +543,8 @@ def main():
     
     db.saveDB.save(d1)
 #    db.saveDB.saveAll(d1.tiles)
+
+    print len(d1.tiles), "tiles"
     
     myUI = ui.UI(level=d1)
     myUI.createWindow()

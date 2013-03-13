@@ -318,7 +318,7 @@ class StoneFloor(Floor):
         
     def __init__(self, x, y, **kwargs):
         #print "StoneFloor.__init__"
-        super(StoneFloor, self).__init__(x, y, baseDescription = "A stone floor", baseColor = colors.red, **kwargs) # colors.colorStone
+        super(StoneFloor, self).__init__(x, y, baseDescription = "A stone floor", baseColor =  colors.colorStone, **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'stonefloor'}
 
@@ -339,7 +339,7 @@ class WoodFloor(Floor):
 class RockTunnel(Floor):
     
     def __init__(self, x, y, **kwargs):
-        super(RockTunnel, self).__init__(x, y, baseDescription = "A rocky tunnel", baseColor = colors.red, **kwargs) # colors.colorRock
+        super(RockTunnel, self).__init__(x, y, baseDescription = "A rocky tunnel", baseColor = colors.colorRock, **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'rocktunnel'}
         
