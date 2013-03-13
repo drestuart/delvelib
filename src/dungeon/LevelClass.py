@@ -63,6 +63,7 @@ class Level(Base):
         
         # Initialize self.hasTile
         self.hasTile = []
+        self.tileArray = []
         
         for dummyx in range(C.MAP_WIDTH):
             newCol = []
@@ -101,11 +102,27 @@ class Level(Base):
     def recomputedFOV(self):
         self.__dict__['toRecomputeFOV'] = False
         
+    
+    def buildTileArray(self):
+        self.tileArray = []
+        
+        # Initialize
+        for dummyx in range(C.MAP_WIDTH):
+            newCol = []
+            for dummyy in range(C.MAP_HEIGHT):
+                newCol.append(False)
+            self.tileArray.append(newCol)
+            
+        # Fill in
+        for tile in self.tiles:
+            self.tileArray[tile.x][tile.y] = tile
         
     def getTile(self, x, y):
-        for tile in self.tiles:
-            if tile.x == x and tile.y == y:
-                return tile
+        if not self.tileArray:
+            print "self.tileArray not initialized!"
+            return None
+        
+        return self.tileArray[x][y]
     
     
     def getTileFromDB(self, x, y, level):
