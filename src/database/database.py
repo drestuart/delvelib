@@ -107,18 +107,22 @@ class Database(object):
         return self
     
     def getRecordById(self, clazz, id):
+        self.session.commit()
         query = self.session.query(clazz)
         return query.filter(clazz.id == id).one()
     
     def getAllRecords(self, clazz):
+        self.session.commit()
         query = self.session.query(clazz)
         return query.all()
     
     def getRecordsByFilter(self, clazz, filter_):
+        self.session.commit()
         query = self.session.query(clazz)
         return query.filter(filter_).all()
     
     def getOneRecordByFilter(self, clazz, filter_):
+        self.session.commit()
         query = self.session.query(clazz)
         return query.filter(filter_).one()
     
@@ -126,9 +130,11 @@ class Database(object):
         return self.session.query(clazz)
     
     def runQueryGetOneRecord(self, query):
+        self.session.commit()
         return query.one()
     
     def runQuery(self, query):
+        self.session.commit()
         return query.all()
     
     def fillInObjectList(self, clazz, nameCol, dataDict, targetColumnName):
