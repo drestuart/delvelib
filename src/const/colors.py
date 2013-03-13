@@ -10,7 +10,7 @@ black = libtcod.black
 white = libtcod.white
 red = libtcod.red
 
-blankBackground = libtcod.BKGND_NONE
+#blankBackground = libtcod.BKGND_NONE
 # Wall and ground colors
 
 colorDarkWall = libtcod.Color(0, 0, 100)
