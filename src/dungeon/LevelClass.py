@@ -5,16 +5,13 @@
 from Import import *
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import String, Integer, Boolean
+from sqlalchemy.types import String, Integer
 import Const as C
 import RoomClass as R
 import TileClass as T
 import colors
-import copy
 import database as db
-import os
 import random
-import sqlalchemy.exc
 
 
 #from CreatureClass import *
