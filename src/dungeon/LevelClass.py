@@ -129,6 +129,17 @@ class Level(Base):
         query = db.saveDB.getQueryObj(T.Tile)
         query.filter(and_(T.Tile.x == x, T.Tile.y == y, T.Tile.level == level))
         return db.saveDB.runQuery(query)
+    
+    def getRandomTile(self):
+        randX = random.randint(0, C.MAP_WIDTH)
+        randY = random.randint(0, C.MAP_HEIGHT)
+        return self.getTile(randX, randY)
+    
+    def getRandomOpenTile(self):
+        while True:
+            randTile = self.getRandomTile()
+            if randTile.blocksMove():
+                return randTile
         
     def getMapConsole(self):
         return self.mapConsole
@@ -264,7 +275,7 @@ class DungeonLevel(Level):
     def __init__(self, **kwargs):
         super(DungeonLevel, self).__init__(**kwargs)
     
-    def createRooms(self):
+    def buildLevel(self):
         '''Add some rooms to the level'''
         rooms = []
 
@@ -304,7 +315,7 @@ class DungeonLevel(Level):
                 rooms.append(newRoom)
                 self.rooms.append(newRoom)
 
-        # Connect them with tunnels
+        # Connect rooms with tunnels
         if len(self.rooms) >= 1:
             for rn in range(len(self.rooms) - 1):
                 thisRoom, nextRoom = self.rooms[rn], self.rooms[rn + 1]
@@ -598,7 +609,7 @@ def main():
     d1 = DungeonLevel(name = "Test", depth = 1, defaultFloorType = T.StoneFloor,
                       defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
     
-    d1.createRooms()
+    d1.buildLevel()
     
     db.saveDB.save(d1)
 #    db.saveDB.saveAll(d1.tiles)
