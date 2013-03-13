@@ -246,8 +246,47 @@ class Door(DungeonFeature):
         return self.symbol
     
     
+class upStair(DungeonFeature):
+    
+    def __init__(self, **kwargs):
+        super(upStair, self).__init__(symbol = '<', baseColor = colors.colorStone, baseBackgroundColor = colors.black, **kwargs)
+        self.destination = kwargs.get('destination', None)
+        
+    __mapper_args__ = {'polymorphic_identity': 'downStair'}
 
+    destination = relationship("Tile", uselist=False)
+    destinationId = Column(Integer, ForeignKey('tiles.id'))
+    
+    def getDestination(self):
+        return self.destination
+    
+    def setDestination(self, d):
+        self.destination = d
+    
+    def goUp(self, creature):
+        creature.setTile(self.getDestination())
+        creature.setLevel(self.getDestination().getLevel())
 
+class downStair(DungeonFeature):
+    
+    def __init__(self, **kwargs):
+        super(downStair, self).__init__(symbol = '>', baseColor = colors.colorStone, baseBackgroundColor = colors.black, **kwargs)
+        self.destination = kwargs.get('destination', None)
+        
+    __mapper_args__ = {'polymorphic_identity': 'downStair'}
+
+    destination = relationship("Tile", uselist=False)
+    destinationId = Column(Integer, ForeignKey('tiles.id'))
+    
+    def getDestination(self):
+        return self.destination
+    
+    def setDestination(self, d):
+        self.destination = d
+    
+    def goDown(self, creature):
+        creature.setTile(self.getDestination())
+        creature.setLevel(self.getDestination().getLevel())
 
 
 
