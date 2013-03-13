@@ -1,3 +1,9 @@
+'''
+Created on Mar 10, 2013
+
+@author: dstu
+'''
+
 # The map class.  This will contain the code for creating and displaying maps.
 # The plan is to have two maps: the *actual* level map, and the player's map
 # showing what they know/remember about the level.
@@ -6,9 +12,11 @@ from Import import *
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer
+from sqlalchemy import and_
 import Const as C
 import RoomClass as R
 import TileClass as T
+import DungeonFeatureClass as F
 import colors
 import database as db
 import random
@@ -102,7 +110,7 @@ class Level(Base):
     
     def getTileFromDB(self, x, y, level):
         query = db.saveDB.getQueryObj(T.Tile)
-        query.filter(T.Tile.x == x).filter(T.Tile.y == y).filter(T.Tile.level == level)
+        query.filter(and_(T.Tile.x == x, T.Tile.y == y, T.Tile.level == level))
         return db.saveDB.runQuery(query)
         
     def getMapConsole(self):
@@ -355,7 +363,7 @@ class DungeonLevel(Level):
         self.tiles.append(tile)
         self.hasTile[tile.x][tile.y] = True
 
-    def createHTunnel(self, prevRoom, newRoom, x1, x2, y):
+    def createHTunnel(self, prevRoom, newRoom, x1, x2, y, placeDoorAtStart = False, placeDoorAtEnd = False):
         
         for x in range(min(x1, x2), max(x1, x2)):
             skip = False
@@ -366,12 +374,21 @@ class DungeonLevel(Level):
             if not skip:
 #                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
                 newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, room = None)
+                
+                if placeDoorAtStart and x == min(x1, x2):
+                    door = F.Door(tile = newTunnelTile)
+                    newTunnelTile.setFeature(door)
+                    
+                if placeDoorAtEnd and x == max(x1, x2):
+                    door = F.Door(tile = newTunnelTile)
+                    newTunnelTile.setFeature(door)
+                    
                 self.tiles.append(newTunnelTile)
                 self.hasTile[x][y] = True
 #                self.hasTile[x][y] = newTunnelTile
 #                self.addTile(newTunnelTile)
 
-    def createVTunnel(self, prevRoom, newRoom, x, y1, y2):
+    def createVTunnel(self, prevRoom, newRoom, x, y1, y2, placeDoorAtStart = False, placeDoorAtEnd = False):
         
         for y in range(min(y1, y2), max(y1, y2)):
             skip = False
@@ -382,6 +399,15 @@ class DungeonLevel(Level):
             if not skip:
 #                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
                 newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, room = None)
+                
+                if placeDoorAtStart and y == min(y1, y2):
+                    door = F.Door(tile = newTunnelTile)
+                    newTunnelTile.setFeature(door)
+                    
+                if placeDoorAtEnd and y == max(y1, y2):
+                    door = F.Door(tile = newTunnelTile)
+                    newTunnelTile.setFeature(door)
+                    
                 self.tiles.append(newTunnelTile)
                 self.hasTile[x][y] = True
                 self.hasTile[x][y]
@@ -397,14 +423,33 @@ class DungeonLevel(Level):
         if random.randint(0, 1) == 1:
             # Horizontal first
             
-            self.createHTunnel(prevRoom, newRoom, x1, x2, min(y1, y2))
-            self.createVTunnel(prevRoom, newRoom, max(x1, x2), y1, y2)
+            # Place doors?
+            placeDoorAtStart = False
+            if random.randint(0, 1) == 1:
+                placeDoorAtStart = True
+            
+            placeDoorAtEnd = False
+            if random.randint(0, 1) == 1:
+                placeDoorAtEnd = True
+            
+            self.createHTunnel(prevRoom, newRoom, x1, x2, min(y1, y2), placeDoorAtStart = placeDoorAtStart)
+            self.createVTunnel(prevRoom, newRoom, max(x1, x2), y1, y2, placeDoorAtEnd = placeDoorAtEnd)
             
                 
         else:
             #Vertical first
-            self.createVTunnel(prevRoom, newRoom, min(x1, x2), y1, y2)
-            self.createHTunnel(prevRoom, newRoom, x1, x2, max(y1, y2))
+            
+            # Place doors?
+            placeDoorAtStart = False
+            if random.randint(0, 1) == 1:
+                placeDoorAtStart = True
+            
+            placeDoorAtEnd = False
+            if random.randint(0, 1) == 1:
+                placeDoorAtEnd = True
+                
+            self.createVTunnel(prevRoom, newRoom, min(x1, x2), y1, y2, placeDoorAtStart = placeDoorAtStart)
+            self.createHTunnel(prevRoom, newRoom, x1, x2, max(y1, y2), placeDoorAtEnd = placeDoorAtEnd)
             
 
     def placeStairs(self):
@@ -541,8 +586,6 @@ def main():
     db.saveDB.save(d1)
 #    db.saveDB.saveAll(d1.tiles)
 
-    print len(d1.tiles), "tiles"
-    
     myUI = ui.UI(level=d1)
     myUI.createWindow()
     myUI.gameLoop()

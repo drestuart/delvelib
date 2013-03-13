@@ -29,7 +29,7 @@ class Creature(GetSet):
         self.__dict__['ai'] = ai
         self.ai.setOwner(self)
         
-        self.__dict__['baseSymbol'] = baseSymbol
+        self.__dict__['symbol'] = baseSymbol
         self.__dict__['baseColor'] = baseColor
         self.__dict__['baseBackground'] = baseBackground
         
@@ -100,7 +100,7 @@ class Creature(GetSet):
         return self.baseColor
     
     def symbol(self):
-        return self.baseSymbol
+        return self.symbol
     
     def background(self):
         return self.baseBackground

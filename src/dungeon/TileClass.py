@@ -5,6 +5,7 @@ Created on Mar 10, 2013
 '''
 
 from Import import *
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
 from sqlalchemy.types import String, Integer, Boolean
 import colors
@@ -54,7 +55,8 @@ class Tile(Base):
         self.level = kwargs.get('level', None)
         self.room = kwargs.get('room', None)
         
-        
+        self.feature = kwargs.get('feature', None)
+
 #        libtcod.Color(0,0,0)
 
         
@@ -88,6 +90,9 @@ class Tile(Base):
     
 #    room = relationship("Room", primaryjoin = "Room.id==Tile.roomId")
     roomId = Column(Integer, ForeignKey("rooms.id"))
+    
+    feature_id = Column(Integer, ForeignKey('dungeon_features.id'))
+    feature = relationship("DungeonFeature", backref=backref("tile", uselist=False))
     
     tileType = Column(String)
     
@@ -179,19 +184,25 @@ class Tile(Base):
             self.feature.passTime(turns)
         
         
+    def getFeature(self):
+        return self.feature
+
+    def setFeature(self, value):
+        self.feature = value    
+        
     def getSymbol(self):
         # Determine which symbol to use to draw this tile
         
 #        if self.creature and self.creature.isVisible():
 #            return self.creature.symbol()
 #        
-#        elif self.feature and self.feature.isVisible():
-#            return self.feature.symbol()
+        if self.feature and self.feature.isVisible():
+            return self.feature.getSymbol()
 #        
 #        elif self.objects:
 #            return self.objects[0].symbol()
 #        
-#        else:
+        else:
             return self.baseSymbol
         
     def getColor(self):
@@ -200,13 +211,13 @@ class Tile(Base):
 #        if self.creature and self.creature.isVisible():
 #            return self.creature.color()
 #        
-#        elif self.feature and self.feature.isVisible():
-#            return self.feature.color()
+        if self.feature and self.feature.isVisible():
+            return self.feature.getColor()
 #        
 #        elif self.objects:
 #            return self.objects[0].color()
 #        
-#        else:
+        else:
             return self.getBaseColor()
         
     def getBaseColor(self):        
@@ -221,10 +232,10 @@ class Tile(Base):
 #        if self.creature and self.creature.isVisible():
 #            return self.creature.background()
         
-#        if self.feature and self.feature.isVisible():
-#            return self.feature.background()
-#                
-#        else:
+        if self.feature and self.feature.isVisible():
+            return self.feature.getBackgroundColor()
+                
+        else:
             return self.getBaseBackgroundColor()
         
     def getBaseBackgroundColor(self):
