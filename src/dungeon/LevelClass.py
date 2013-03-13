@@ -140,6 +140,31 @@ class Level(Base):
             randTile = self.getRandomTile()
             if randTile.blocksMove():
                 return randTile
+            
+    def getRandomTileInArea(self, x1, x2, y1, y2):
+        
+        x1 = max(0, x1)
+        x1 = min(x1, C.MAP_WIDTH)
+        
+        x2 = max(0, x2)
+        x2 = min(x2, C.MAP_WIDTH)
+        
+        y1 = max(0, y1)
+        y1 = min(y1, C.MAP_HEIGHT)
+        
+        y2 = max(0, y2)
+        y2 = min(y2, C.MAP_HEIGHT)
+        
+        
+        randX = random.randint(x1, x2)
+        randY = random.randint(y1, y2)
+        return self.getTile(randX, randY)
+    
+    def getRandomOpenTileInArea(self, x1, x2, y1, y2):
+        while True:
+            randTile = self.getRandomTileInArea(x1, x2, y1, y2)
+            if randTile.blocksMove():
+                return randTile
         
     def getMapConsole(self):
         return self.mapConsole
