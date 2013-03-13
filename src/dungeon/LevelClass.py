@@ -138,7 +138,7 @@ class Level(Base):
     def getRandomOpenTile(self):
         while True:
             randTile = self.getRandomTile()
-            if randTile.blocksMove():
+            if randTile and not randTile.blocksMove():
                 return randTile
             
     def getRandomTileInArea(self, x1, x2, y1, y2):
@@ -163,7 +163,8 @@ class Level(Base):
     def getRandomOpenTileInArea(self, x1, x2, y1, y2):
         while True:
             randTile = self.getRandomTileInArea(x1, x2, y1, y2)
-            if randTile.blocksMove():
+            blocked = randTile.blocksMove()
+            if randTile and not blocked:
                 return randTile
         
     def getMapConsole(self):
@@ -306,8 +307,13 @@ class DungeonLevel(Level):
             lastRoom = self.rooms[-1]
             firstRoom = self.rooms[0]
             self.createTunnel(lastRoom, firstRoom)
-            
+        
+        
+        print "Building tile array"    
+        self.buildTileArray()    
+        
         # Place Stairs
+        print "Placing stairs"
         self.placeStairs()
         
         print "Saving open tiles"
@@ -471,14 +477,15 @@ class DungeonLevel(Level):
         
         while True:
             downRoom = random.choice(self.rooms)
-            if len(self.rooms == 1) or downRoom is not upRoom:
+            if len(self.rooms) == 1 or downRoom is not upRoom:
                 break
         
         # Place stairs
         
         while True:
             upTile = self.getRandomOpenTileInArea(upRoom.getX1(), upRoom.getX2(), upRoom.getY1(), upRoom.getY2())
-            if upTile.getFeature() is None:
+            feature = upTile.getFeature()
+            if feature is None:
                 upStair = F.upStair()
                 upTile.setFeature(upStair)
                 
