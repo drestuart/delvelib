@@ -92,7 +92,11 @@ class Tile(Base):
     roomId = Column(Integer, ForeignKey("rooms.id"))
     
     feature_id = Column(Integer, ForeignKey('dungeon_features.id'))
-    feature = relationship("DungeonFeature", backref=backref("tile", uselist=False))
+    feature = relationship("DungeonFeature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.feature_id == DungeonFeature.id") #
+    
+    destinationOfId = Column(Integer, ForeignKey('dungeon_features.id'))
+    destinationOf = relationship("DungeonFeature", backref=backref("destination", uselist=False), uselist = False, primaryjoin = "Tile.destinationOfId == DungeonFeature.id")
+    
     
     tileType = Column(String)
     
@@ -107,9 +111,9 @@ class Tile(Base):
     def blocksMove(self):
         # Determine whether creatures can see through this square.
         
-        if self.creature:
+#        if self.creature:
             # Blocked by creature.  All creatures block movement
-            return True 
+#            return True 
         
         blocks = self.blockMove
                 

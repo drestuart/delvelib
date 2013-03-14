@@ -6,13 +6,13 @@ Created on Mar 12, 2013
 
 from Import import *
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.schema import Column, ForeignKey
+from sqlalchemy.schema import Column, ForeignKey, ForeignKeyConstraint
 from sqlalchemy.types import String, Integer, Boolean
 import Const as C
 import RoomClass as R
 import TileClass as T
-import database as db
 import colors
+import database as db
 
 libtcod = importLibtcod()
 
@@ -59,7 +59,7 @@ class DungeonFeature(Base):
     baseBackgroundColorG = Column(Integer)
     baseBackgroundColorB = Column(Integer)
     
-#    tile_id = Column(Integer, ForeignKey('tiles.id'))
+    tileId = Column(Integer) #, ForeignKey('tiles.id')
     
     visible = Column(Boolean)
     
@@ -245,6 +245,18 @@ class Door(DungeonFeature):
             self.symbol = "'"
         return self.symbol
     
+class Stair(DungeonFeature):
+    
+    def __init__(self, **kwargs):
+        super(Stair, self).__init__(**kwargs)
+    
+    __mapper_args__ = {'polymorphic_identity': 'Stair'}
+    
+    def getDestination(self):
+        return self.destination
+    
+    def setDestination(self, d):
+        self.destination = d
     
 class upStair(DungeonFeature):
     
@@ -252,16 +264,8 @@ class upStair(DungeonFeature):
         super(upStair, self).__init__(symbol = '<', baseColor = colors.colorStone, baseBackgroundColor = colors.black, **kwargs)
         self.destination = kwargs.get('destination', None)
         
-    __mapper_args__ = {'polymorphic_identity': 'downStair'}
-
-    destination = relationship("Tile", uselist=False)
-    destinationId = Column(Integer, ForeignKey('tiles.id'))
-    
-    def getDestination(self):
-        return self.destination
-    
-    def setDestination(self, d):
-        self.destination = d
+    __mapper_args__ = {'polymorphic_identity': 'upStair'}
+ 
     
     def goUp(self, creature):
         creature.setTile(self.getDestination())
@@ -275,15 +279,6 @@ class downStair(DungeonFeature):
         
     __mapper_args__ = {'polymorphic_identity': 'downStair'}
 
-    destination = relationship("Tile", uselist=False)
-    destinationId = Column(Integer, ForeignKey('tiles.id'))
-    
-    def getDestination(self):
-        return self.destination
-    
-    def setDestination(self, d):
-        self.destination = d
-    
     def goDown(self, creature):
         creature.setTile(self.getDestination())
         creature.setLevel(self.getDestination().getLevel())
