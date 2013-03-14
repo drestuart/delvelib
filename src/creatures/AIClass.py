@@ -9,6 +9,7 @@ from Import import *
 libtcod = importLibtcod()
 
 import Util as U
+import random
 
 class AI(object):
     
@@ -50,4 +51,37 @@ class PlayerAI(AI):
             
             elif key.vk == libtcod.KEY_KP9 or  U.get_key(key) == 'u':
                 self.owner.move(1, -1)
+
+
+class AggressiveAI(AI):
+    def takeTurn(self):
+        print self.owner.name, "moves"
+        while True:
+            randX = random.randint(-1, 1)
+            if randX:
+                randY = random.randint(-1, 1)
+            else:
+                randY = random.choice([-1, 1])
+                
+            if self.owner.move(randX, randY):
+                break
+
+
+class NeutralAI(AI):
+    def takeTurn(self):
+        print self.name, "moves"
+        while True:
+            randX = random.randint(-1, 1)
+            if randX:
+                randY = random.randint(-1, 1)
+            else:
+                randY = random.choice([-1, 1])
+                
+            if self.owner.move(randX, randY):
+                break
+
+
+class SedentaryAI(AI):
+    def takeTurn(self):
+        pass
 
