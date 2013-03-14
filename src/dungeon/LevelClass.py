@@ -49,6 +49,8 @@ class Level(Base):
         self.nextLevel = kwargs.get('nextLevel', None)
         self.previousLevel = kwargs.get('previousLevel', None)
         
+        self.FOVMap = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
+        
         self.tiles = []
         self.rooms = []
         
@@ -96,13 +98,6 @@ class Level(Base):
                        'polymorphic_identity': 'level'}
     
 
-    def recomputeFOV(self):
-        self.__dict__['toRecomputeFOV'] = True
-    
-    def recomputedFOV(self):
-        self.__dict__['toRecomputeFOV'] = False
-        
-    
     def buildTileArray(self):
         self.tileArray = []
         
@@ -197,6 +192,23 @@ class Level(Base):
                 symbol = symbol.encode('ascii', 'ignore')
                 
                 libtcod.console_put_char_ex(self.mapConsole, x, y, symbol, color, background)
+                
+    def drawSpace(self, x, y):
+        tile = self.tileArray[x][y]
+        
+        symbol, color, background = tile.toDraw()
+        symbol = symbol.encode('ascii', 'ignore')
+        
+        libtcod.console_put_char_ex(self.mapConsole, x, y, symbol, color, background)
+        
+    def drawTile(self, tile):
+        x = tile.x
+        y = tile.y
+        
+        symbol, color, background = tile.toDraw()
+        symbol = symbol.encode('ascii', 'ignore')
+        
+        libtcod.console_put_char_ex(self.mapConsole, x, y, symbol, color, background)
                     
     # Erase that map!
     def clear(self):
@@ -248,6 +260,18 @@ class Level(Base):
         assert len(tiles) == 4*radius - 4
         
         return tiles
+    
+    def computeFOVProperties(self):
+        for x in range(C.MAP_WIDTH):
+            for y in range(C.MAP_HEIGHT):
+                tile = self.tileArray[x][y]
+                blocksMove = tile.blocksMove()
+                blocksSight = tile.blocksSight()
+                
+                if not self.FOVMap:
+                    self.FOVMap = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
+                
+                libtcod.map_set_properties(self.FOVMap, x, y, not blocksMove, not blocksSight)
 
             
 class DungeonLevel(Level):
@@ -579,7 +603,7 @@ class DungeonLevel(Level):
 #        (x, y) = (mouse.cx, mouse.cy)
 # 
 #        #accept the target if the player clicked in FOV, and in case a range is specified, if it's in that range
-#        if (mouse.lbutton_pressed and libtcod.map_is_in_fov(fov_map, x, y) and
+#        if (mouse.lbutton_pressed and libtcod.map_is_in_fov(FOVMap, x, y) and
 #            (max_range is None or player.distance(x, y) <= max_range)):
 #            return (x, y)
 #                    
@@ -606,7 +630,7 @@ class DungeonLevel(Level):
 # 
 #    for object in objects:
 #        if (object.fighter and not object == player 
-#            and libtcod.map_is_in_fov(fov_map, object.x, object.y)):
+#            and libtcod.map_is_in_fov(FOVMap, object.x, object.y)):
 #
 #            #calculate distance between this object and the player
 #            dist = player.distance_to(object)
