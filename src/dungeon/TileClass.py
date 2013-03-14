@@ -93,8 +93,11 @@ class Tile(Base):
 #    room = relationship("Room", primaryjoin = "Room.id==Tile.roomId")
     roomId = Column(Integer, ForeignKey("rooms.id"))
     
-    feature_id = Column(Integer, ForeignKey('dungeon_features.id'))
-    feature = relationship("DungeonFeature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.feature_id == DungeonFeature.id") #
+    creatureId = Column(Integer, ForeignKey('creatures.id'))
+    creature = relationship("Creature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.creatureId == Creature.id")
+    
+    featureId = Column(Integer, ForeignKey('dungeon_features.id'))
+    feature = relationship("DungeonFeature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.featureId == DungeonFeature.id")
     
     destinationOfId = Column(Integer, ForeignKey('dungeon_features.id'))
     destinationOf = relationship("DungeonFeature", backref=backref("destination", uselist=False), uselist = False, primaryjoin = "Tile.destinationOfId == DungeonFeature.id")
