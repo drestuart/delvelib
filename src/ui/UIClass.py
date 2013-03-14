@@ -12,7 +12,8 @@ import colors
 libtcod = importLibtcod()
 
 
-FONTS_DIR = os.path.join("..", "..", "fonts")
+#FONTS_DIR = os.path.join("..", "..", "fonts")
+FONTS_DIR = os.path.join("fonts")
 DEFAULT_FONT = os.path.join(FONTS_DIR, "arial12x12.png")
 
 key = libtcod.Key()
