@@ -271,13 +271,13 @@ class Level(Base):
         if not self.FOVMap:
             self.FOVMap = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
         
-        for x in range(C.MAP_WIDTH):
-            for y in range(C.MAP_HEIGHT):
-                tile = self.tileArray[x][y]
-                blocksMove = tile.blocksMove()
-                blocksSight = tile.blocksSight()
-                
-                libtcod.map_set_properties(self.FOVMap, x, y, not blocksMove, not blocksSight)
+        for tile in self.tiles:
+            x = tile.x
+            y = tile.y
+            blocksMove = tile.blocksMove()
+            blocksSight = tile.blocksSight()
+            
+            libtcod.map_set_properties(self.FOVMap, x, y, not blocksMove, not blocksSight)
                 
     def computeFOV(self, x, y, radius = 0):
         '''Compute the field of view of this map with respect to a particular position'''
@@ -692,7 +692,7 @@ def main():
 
     myUI = ui.UI(level=d1)
     myUI.createWindow()
-    d1.computeFOV(11, 11, 4)
+    d1.computeFOV(11, 11, 0)
     myUI.gameLoop()
 
 

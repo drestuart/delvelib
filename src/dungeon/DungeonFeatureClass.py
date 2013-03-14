@@ -26,8 +26,8 @@ class DungeonFeature(Base):
     __table_args__ = {'extend_existing': True}
     
     def __init__(self, symbol, baseColor, baseBackgroundColor, **kwargs):
-        self.blockSight = kwargs.get('blockSight', False)
-        self.blockMove = kwargs.get('blockMove', False)
+#        self.blockSight = kwargs.get('blockSight', False)
+#        self.blockMove = kwargs.get('blockMove', False)
         self.symbol = symbol
         
         self.baseColor = baseColor
@@ -74,12 +74,12 @@ class DungeonFeature(Base):
     def setVisible(self, val):
         self.visible = val
 
-    def getBlockSight(self):
-        return self.blockSight
-
-
-    def getBlockMove(self):
-        return self.blockMove
+#    def getBlockSight(self):
+#        return self.blockSight
+#
+#
+#    def getBlockMove(self):
+#        return self.blockMove
 
 
     def getSymbol(self):
@@ -233,10 +233,10 @@ class Door(DungeonFeature):
             return True
 
     def isClosed(self):
-        return self.__closed
+        return self.closed
 
     def setClosed(self, value):
-        self.__closed = value
+        self.closed = value
 
     def getSymbol(self):
         if self.closed:
@@ -245,10 +245,19 @@ class Door(DungeonFeature):
             self.symbol = "'"
         return self.symbol
     
+    def getBlockSight(self):
+        return self.isClosed()
+    
+    def getBlockMove(self):
+        return self.isClosed()
+    
+    
 class Stair(DungeonFeature):
     
     def __init__(self, **kwargs):
         super(Stair, self).__init__(**kwargs)
+        self.blockMove = False
+        self.blockSight = False
     
     __mapper_args__ = {'polymorphic_identity': 'Stair'}
     
@@ -257,33 +266,53 @@ class Stair(DungeonFeature):
     
     def setDestination(self, d):
         self.destination = d
-    
-class upStair(DungeonFeature):
+        
+class upStair(Stair):
     
     def __init__(self, **kwargs):
+        
         super(upStair, self).__init__(symbol = '<', baseColor = colors.colorStone, baseBackgroundColor = colors.black, **kwargs)
+        
         self.destination = kwargs.get('destination', None)
         
     __mapper_args__ = {'polymorphic_identity': 'upStair'}
  
+    blockMove = False
+    blockSight = False
     
     def goUp(self, creature):
         creature.setTile(self.getDestination())
         creature.setLevel(self.getDestination().getLevel())
+        
+    def getBlockSight(self):
+        return self.blockSight
 
-class downStair(DungeonFeature):
+
+    def getBlockMove(self):
+        return self.blockMove
+
+class downStair(Stair):
     
     def __init__(self, **kwargs):
         super(downStair, self).__init__(symbol = '>', baseColor = colors.colorStone, baseBackgroundColor = colors.black, **kwargs)
+        
         self.destination = kwargs.get('destination', None)
         
     __mapper_args__ = {'polymorphic_identity': 'downStair'}
+    
+    blockMove = False
+    blockSight = False
 
     def goDown(self, creature):
         creature.setTile(self.getDestination())
         creature.setLevel(self.getDestination().getLevel())
 
+    def getBlockSight(self):
+        return self.blockSight
 
+
+    def getBlockMove(self):
+        return self.blockMove
 
 
 

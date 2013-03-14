@@ -123,7 +123,7 @@ class Tile(Base):
             # If there's a dungeon feature, determine if it blocks movement
             # before returning. This also accounts for the case of a non-
             # blocking feature in a blocking square, which seems unlikely.
-            blocks = blocks and self.feature.blockSight
+            blocks = blocks or self.feature.getBlockMove()
                 
         return blocks
     
@@ -134,13 +134,13 @@ class Tile(Base):
         blocks = self.blockSight
         if self.creature:
             # Blocked by creature.  Not all creatures block sight
-            blocks = blocks and self.creature.blockSight 
+            blocks = blocks or self.creature.blockSight 
         
         elif self.feature:
             # If there's a dungeon feature, determine if it blocks sight. This
             # also accounts for the case of a non-blocking feature in a blocking
             # square, which seems unlikely.
-            blocks = blocks and self.feature.blockSight
+            blocks = blocks or self.feature.getBlockSight()
                 
         return blocks
     
