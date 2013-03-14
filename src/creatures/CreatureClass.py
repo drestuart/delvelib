@@ -1,8 +1,8 @@
-###############################################################
-#
-# OLD STUFF
-#
-###############################################################
+'''
+Created on Mar 13, 2013
+
+@author: dstu
+'''
 
 from Import import *
 from sqlalchemy.orm import relationship, backref
@@ -25,7 +25,7 @@ class Creature(Base):
     
     def __init__(self, **kwargs):
         
-        self.symbol = kwargs['baseSymbol']
+        self.symbol = kwargs['symbol']
         self.baseColor = kwargs['baseColor']
         self.baseBackgroundColor = kwargs['baseBackground']
         
@@ -44,9 +44,10 @@ class Creature(Base):
         self.maxHP = kwargs['maxHP']
         self.damageTaken = kwargs.get('damageTaken', 0)
         
-        self.AIClass = kwargs['AIClass']
-#        self.AI = AIClass()
+        self.visible = kwargs.get('visible', True)
         
+        self.AIClass = kwargs['AIClass']
+        self.initializeAI()
         
         
     id = Column(Integer, primary_key=True, unique=True)
@@ -64,20 +65,52 @@ class Creature(Base):
     description = Column(String)
     name = Column(String)
     species = Column(String)
+    creatureType = Column(String)
     
     maxHP = Column(Integer)
     damageTaken = Column(Integer)
     
-    AIClass = Column(String)
+    visible = Column(Boolean)
     
-    __mapper_args__ = {'polymorphic_on': species,
+    AIClassName = Column(String)
+    
+    __mapper_args__ = {'polymorphic_on': creatureType,
                        'polymorphic_identity': 'creature'}
+    
+    def move(self, dx, dy):
+        
+        newX = self.getX() + dx
+        newY = self.getY() + dy
+        level = self.getLevel()
+        newTile = level.getTile(newX, newY)
+        
+        if level.placeCreature(self, newTile):
+            
+            #Remove self from the old tile
+#            oldTile = self.map.getTile(self.coordinates)
+#            oldTile.removeCreature()
+        
+#            self.setPosition(self.map, newCoords)
+            #self.energy -= self.moveCost
+                        
+            print self.name + " moves to", self.getX(), self.getY()
+            self.getLevel().setNeedToComputeFOV(True)
+            return True
+        
+        else:
+            return False
     
     def getTile(self):
         return self.tile
     
     def setTile(self, tile):
         self.tile = tile
+        
+    def getX(self):
+        return self.tile.getX()
+    
+    def getY(self):
+        return self.tile.getY()
         
     def getLevel(self):
         return self.getTile().getLevel()
@@ -97,8 +130,16 @@ class Creature(Base):
         if self.hp <= 0:
             self.deathFunction(self)
 
-    def getBaseColor(self):
-        return self.baseColor
+    def getBaseColor(self):        
+        if self.__dict__.get('baseColor', None):
+            return self.baseColor
+        else:
+            self.baseColor = libtcod.Color(self.baseColorR, self.baseColorG, self.baseColorB)
+            return self.baseColor
+
+    
+    def getColor(self):
+        return self.getBaseColor()
 
 
     def getBaseBackgroundColor(self):
@@ -207,6 +248,30 @@ class Creature(Base):
 
     def setAIClass(self, value):
         self.AIClass = value
+
+    def isVisible(self):
+        return self.visible
+
+    def setVisible(self, value):
+        self.visible = value
+
+    def getSymbol(self):
+        return self.symbol
+
+    def setSymbol(self, value):
+        self.symbol = value
+        
+    def initializeAI(self):
+        if not self.AIClassName:
+            # Get AI class by name
+            pass
+        else:
+            self.AIClassName = self.AIClass.__name__
+        
+        self.AI = self.AIClass()
+        self.AI.setOwner(self)
+
+
 
 
     
