@@ -27,8 +27,7 @@ class Player(Cr.Creature):
     id = Column(Integer, ForeignKey('creatures.id'), primary_key=True)
     
     
-    def takeTurn(self):
-        self.AI.takeTurn()
+    
         
     
     

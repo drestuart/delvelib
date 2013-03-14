@@ -68,6 +68,9 @@ class UI(object):
     
             libtcod.console_flush()
             
+            for cr in self.currentLevel.creatures:
+                cr.takeTurn()
+            
             self.player.takeTurn()
             
             self.currentLevel.clear()
