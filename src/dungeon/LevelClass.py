@@ -4,10 +4,6 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
-# The map class.  This will contain the code for creating and displaying maps.
-# The plan is to have two maps: the *actual* level map, and the player's map
-# showing what they know/remember about the level.
-
 from Import import *
 libtcod = importLibtcod()
 
@@ -287,10 +283,7 @@ class Level(Base):
             
             self.setNeedToComputeFOV(False)
             
-            print "Computing FOV at", x, ",", y
             libtcod.map_compute_fov(self.FOVMap, x, y, radius, C.FOV_LIGHT_WALLS, C.FOV_ALGO)
-            print "Done computing FOV"
-#            self.computeFOVProperties()
 
     def getNeedToComputeFOV(self):
         return self.needToComputeFOV
