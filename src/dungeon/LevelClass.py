@@ -51,6 +51,8 @@ class Level(Base):
         self.tiles = []
         self.rooms = []
         
+        self.creatures = []
+        
 ##########################################################################
 #
 #        I N    M E M O R I A M
@@ -154,6 +156,12 @@ class Level(Base):
             blocked = randTile.blocksMove()
             if randTile and not blocked:
                 return randTile
+            
+    def getRandomTileInRoom(self, room):
+        return self.getRandomTileInArea(room.x1, room.x2, room.y1, room.y2)
+    
+    def getRandomOpenTileInRoom(self, room):
+        return self.getRandomOpenTileInArea(room.x1, room.x2, room.y1, room.y2)
         
     def getMapConsole(self):
         return self.mapConsole
@@ -290,6 +298,28 @@ class Level(Base):
 
     def setNeedToComputeFOV(self, value):
         self.needToComputeFOV = value
+        
+    def findCreatures(self):
+        self.creatures = []
+        for tile in self.tiles:
+            if tile.creature:
+                self.creatures.append(tile.creature)
+        
+    def placeCreature(self, creature, tile):
+        success = tile.placeCreature(creature)
+        if success and not creature in self.creatures:
+            self.creatures.append(creature)
+        return success
+    
+    def placeCreatureInRandomRoom(self, creature):
+        room = random.choice(self.rooms)
+        tile = self.getRandomOpenTileInRoom(room)
+        self.placeCreature(creature, tile)
+        
+    def placeCreatureInRandomTile(self, creature):
+        tile = self.getRandomOpenTile()
+        self.placeCreature(creature, tile)
+        
     
     
             
@@ -529,7 +559,7 @@ class DungeonLevel(Level):
         # Place stairs
         
         while True:
-            upTile = self.getRandomOpenTileInArea(upRoom.getX1(), upRoom.getX2(), upRoom.getY1(), upRoom.getY2())
+            upTile = self.getRandomOpenTileInRoom(upRoom)
             feature = upTile.getFeature()
             if feature is None:
                 upStair = F.upStair()
@@ -540,7 +570,7 @@ class DungeonLevel(Level):
                 break
         
         while True:
-            downTile = self.getRandomOpenTileInArea(downRoom.getX1(), downRoom.getX2(), downRoom.getY1(), downRoom.getY2())
+            downTile = self.getRandomOpenTileInRoom(downRoom)
             if downTile.getFeature() is None:
                 downStair = F.downStair()
                 downTile.setFeature(downStair)

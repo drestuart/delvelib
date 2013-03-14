@@ -30,6 +30,7 @@ class UI(object):
 
     def __init__(self, **kwargs):
         self.currentLevel = kwargs.get('level', None)
+        self.player = kwargs.get('player', None)
         
     def createWindow(self):
         libtcod.console_set_custom_font(DEFAULT_FONT, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
@@ -56,12 +57,16 @@ class UI(object):
             libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS|libtcod.EVENT_MOUSE,key,mouse)
             libtcod.console_clear(self.mapConsole)
             
+            self.currentLevel.computeFOV(self.player.getX(), self.player.getY(), 0)
+
 #            print "Drawing"
             self.currentLevel.draw()
     #        libtcod.console_blit(mapConsole, 0, 0, C.MAP_WIDTH, C.MAP_HEIGHT, 0, 0, 0)
             libtcod.console_blit(self.mapConsole, 0, 0, C.MAP_WIDTH, C.MAP_HEIGHT, 0, 0, 0)
     
             libtcod.console_flush()
+            
+            self.player.takeTurn()
             
             self.currentLevel.clear()
             

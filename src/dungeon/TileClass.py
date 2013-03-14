@@ -165,9 +165,13 @@ class Tile(Base):
         # Take some objects from this tile
         return [self.removeObject(ind) for ind in indices]
     
-    def addCreature(self, creature):
+    def placeCreature(self, creature):
         if (not self.blocksMove()) and (not self.creature):
-            self.__dict__['creature'] = creature
+            if creature.getTile():
+                creature.getTile().removeCreature()
+            
+            self.creature = creature
+            self.creature.setTile(self)
             return True
         
         else:
@@ -175,7 +179,8 @@ class Tile(Base):
         
     def removeCreature(self):
         if self.creature:
-            self.__dict__['creature'] = None
+            self.creature.setTile(None)
+            self.creature = None
             return True
         
         else:
@@ -202,10 +207,10 @@ class Tile(Base):
     def getSymbol(self):
         # Determine which symbol to use to draw this tile
         
-#        if self.creature and self.creature.isVisible():
-#            return self.creature.symbol()
-#        
-        if self.feature and self.feature.isVisible():
+        if self.creature and self.creature.isVisible():
+            return self.creature.getSymbol()
+        
+        elif self.feature and self.feature.isVisible():
             return self.feature.getSymbol()
 #        
 #        elif self.objects:
@@ -217,10 +222,10 @@ class Tile(Base):
     def getColor(self):
         # Determine which color to use to draw this tile
         
-#        if self.creature and self.creature.isVisible():
-#            return self.creature.color()
-#        
-        if self.feature and self.feature.isVisible():
+        if self.creature and self.creature.isVisible():
+            return self.creature.getColor()
+        
+        elif self.feature and self.feature.isVisible():
             return self.feature.getColor()
 #        
 #        elif self.objects:
@@ -266,7 +271,10 @@ class Tile(Base):
             return self.objects[0].description
         
         else:
-            return self.baseDescription   
+            return self.baseDescription 
+        
+    def getLevel(self):  
+        return self.level
         
     def __str__(self):
         return self.baseDescription
@@ -288,6 +296,12 @@ class Tile(Base):
             self.levelId = level.id
         else:
             self.levelId = None
+            
+    def getX(self):
+        return self.x
+    
+    def getY(self):
+        return self.y
         
     
 #    # drawing management stuff. will be moved to the console class?    

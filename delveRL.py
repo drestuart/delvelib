@@ -7,15 +7,17 @@ Created on Mar 10, 2013
 from Import import *
 libtcod = importLibtcod()
 
-import UIClass as ui
-import LevelClass as L
-import database as db
 import Const as C
+import CreatureClass as Cr
+import DungeonFeatureClass as F
+import LevelClass as L
 import RoomClass as R
 import TileClass as T
-import DungeonFeatureClass as F
-import CreatureClass as Cr
+import PlayerClass as P
+import UIClass as ui
+import database as db
 import random
+
 
 def main():
     
@@ -31,16 +33,13 @@ def main():
                       defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
     
     d1.buildLevel()
+    player = P.Player()
+    d1.placeCreatureInRandomRoom(player)
     
     db.saveDB.save(d1)
-#    db.saveDB.saveAll(d1.tiles)
 
-#    randTile = d1.getRandomOpenTile()
-    
-
-    myUI = ui.UI(level=d1)
+    myUI = ui.UI(level = d1, player = player)
     myUI.createWindow()
-    d1.computeFOV(11, 11, 0)
     myUI.gameLoop()
 
 
