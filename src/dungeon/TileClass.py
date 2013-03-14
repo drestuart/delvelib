@@ -56,6 +56,8 @@ class Tile(Base):
         self.room = kwargs.get('room', None)
         
         self.feature = kwargs.get('feature', None)
+        
+        self.creature = kwargs.get('creature', None)
 
 #        libtcod.Color(0,0,0)
 

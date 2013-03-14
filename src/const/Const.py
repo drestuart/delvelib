@@ -4,6 +4,8 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
+import libtcodpy as libtcod
+
 # Global constants
 
 TITLE = "delveRL"
@@ -15,7 +17,7 @@ MAX_ROOM_MONSTERS = 3
 MAX_ROOM_ITEMS = 2
 
 # Field of view constants
-FOV_ALGO = 0  #default FOV algorithm
+FOV_ALGO = libtcod.FOV_BASIC  #default FOV algorithm
 FOV_LIGHT_WALLS = True
 
 

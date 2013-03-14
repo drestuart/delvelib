@@ -9,6 +9,8 @@ Created on Mar 10, 2013
 # showing what they know/remember about the level.
 
 from Import import *
+libtcod = importLibtcod()
+
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer
@@ -24,10 +26,8 @@ import random
 
 #from CreatureClass import *
 
-libtcod = importLibtcod()
 
 Base = db.saveDB.getDeclarativeBase()
-
 
 
 class Level(Base):
@@ -50,6 +50,7 @@ class Level(Base):
         self.previousLevel = kwargs.get('previousLevel', None)
         
         self.FOVMap = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
+        self.needToComputeFOV = True
         
         self.tiles = []
         self.rooms = []
@@ -73,10 +74,6 @@ class Level(Base):
                 newCol.append(False)
             self.hasTile.append(newCol)
 
-
-
-
-    
     id = Column(Integer, primary_key=True)
     name = Column(String)
     depth = Column(Integer)
@@ -105,7 +102,7 @@ class Level(Base):
         for dummyx in range(C.MAP_WIDTH):
             newCol = []
             for dummyy in range(C.MAP_HEIGHT):
-                newCol.append(False)
+                newCol.append(None)
             self.tileArray.append(newCol)
             
         # Fill in
@@ -191,6 +188,14 @@ class Level(Base):
                 symbol, color, background = tile.toDraw()
                 symbol = symbol.encode('ascii', 'ignore')
                 
+                # Determine visibility
+                
+                if libtcod.map_is_in_fov(self.FOVMap, x, y):
+                    background = colors.colorLightWall
+                
+                else:
+                    background = colors.colorDarkWall
+                
                 libtcod.console_put_char_ex(self.mapConsole, x, y, symbol, color, background)
                 
     def drawSpace(self, x, y):
@@ -262,17 +267,38 @@ class Level(Base):
         return tiles
     
     def computeFOVProperties(self):
+        
+        if not self.FOVMap:
+            self.FOVMap = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
+        
         for x in range(C.MAP_WIDTH):
             for y in range(C.MAP_HEIGHT):
                 tile = self.tileArray[x][y]
                 blocksMove = tile.blocksMove()
                 blocksSight = tile.blocksSight()
                 
-                if not self.FOVMap:
-                    self.FOVMap = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
-                
                 libtcod.map_set_properties(self.FOVMap, x, y, not blocksMove, not blocksSight)
+                
+    def computeFOV(self, x, y, radius = 0):
+        '''Compute the field of view of this map with respect to a particular position'''
+        if self.getNeedToComputeFOV() == False:
+            return
+        else:
+            
+            self.setNeedToComputeFOV(False)
+            
+            print "Computing FOV at", x, ",", y
+            libtcod.map_compute_fov(self.FOVMap, x, y, radius, C.FOV_LIGHT_WALLS, C.FOV_ALGO)
+            print "Done computing FOV"
+#            self.computeFOVProperties()
 
+    def getNeedToComputeFOV(self):
+        return self.needToComputeFOV
+
+    def setNeedToComputeFOV(self, value):
+        self.needToComputeFOV = value
+    
+    
             
 class DungeonLevel(Level):
     '''A Level subclass for modeling one dungeon level.  Includes functionality for passing time and level construction.'''
@@ -333,6 +359,10 @@ class DungeonLevel(Level):
             self.createTunnel(lastRoom, firstRoom)
         
         
+        print "Placing walls"
+        # Fill in empty spaces
+        self.fillInSpaces()
+        
         print "Building tile array"    
         self.buildTileArray()    
         
@@ -343,9 +373,8 @@ class DungeonLevel(Level):
         print "Saving open tiles"
         db.saveDB.save(self)
         
-        print "Placing walls"
-        # Fill in empty spaces
-        self.fillInSpaces()
+        print "Setting up FOV"
+        self.computeFOVProperties()
         
 
 
@@ -658,8 +687,12 @@ def main():
     db.saveDB.save(d1)
 #    db.saveDB.saveAll(d1.tiles)
 
+#    randTile = d1.getRandomOpenTile()
+    
+
     myUI = ui.UI(level=d1)
     myUI.createWindow()
+    d1.computeFOV(11, 11, 4)
     myUI.gameLoop()
 
 
