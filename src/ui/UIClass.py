@@ -43,6 +43,8 @@ class UI(object):
         libtcod.console_set_default_background(0, libtcod.BKGND_NONE)
         libtcod.console_set_default_background(self.mapConsole, libtcod.BKGND_NONE)
         
+        libtcod.console_set_keyboard_repeat(0, 0)
+        
     def getCurrentLevel(self):
         return self.currentLevel
     
