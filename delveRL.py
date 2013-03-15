@@ -32,7 +32,8 @@ def main():
     d1 = L.DungeonLevel(name = "Test", depth = 1, defaultFloorType = T.StoneFloor,
                       defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
     
-    d1.buildLevel()
+#    d1.buildLevel()
+    d1.buildLevelNew()
     player = P.Player()
     d1.placeCreatureInRandomRoom(player)
     

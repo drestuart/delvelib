@@ -227,7 +227,7 @@ def main():
     startx=80
     starty=40
     myMap = dMap()
-    myMap.makeMap(startx,starty,110,50,60) 
+    myMap.makeMap(startx,starty,110,20,60) 
     for y in range(starty):
         line = ""
         for x in range(startx):

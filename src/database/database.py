@@ -15,8 +15,8 @@ import re
 
 __all__ = ["Database", "DATA_DIR", "static", "SAVE_DIR", "saveDB"]
 
-DATA_DIR = os.path.abspath("../../data")
-SAVE_DIR = os.path.abspath("../../save")
+DATA_DIR = os.path.abspath("data")
+SAVE_DIR = os.path.abspath("save")
 DB_STR = 'sqlite:///'
 
 class NotInitializedException(Exception):

@@ -102,8 +102,8 @@ class Room(Rect, Base):
         super(Room, self).__init__(kwargs['x'], kwargs['y'], kwargs['width'], kwargs['height'])
 #        self.level = kwargs.get('level', None)
         
-        self.defaultFloorType = kwargs.get('defaultFloorType', None)
-        self.defaultWallType = kwargs.get('defaultWallType', None)
+#        self.defaultFloorType = kwargs.get('defaultFloorType', None)
+#        self.defaultWallType = kwargs.get('defaultWallType', None)
         
         self.getCenter()
         
@@ -125,44 +125,44 @@ class Room(Rect, Base):
 
     tiles = relationship("Tile", backref=backref("room"), primaryjoin="Room.id==Tile.roomId")
     
-    def fillWithTiles(self):
-        # Create wall tiles
-        
-        # Top and bottom walls
-        for x in range(self.x1 - 1, self.x2 + 1):
-#            topWall = self.defaultWallType(x=x, y=self.y2 + 1, level=self.getLevel())
-#            self.tiles.append(topWall)
-#            bottomWall = self.defaultWallType(x=x, y=self.y1 - 1, level=self.getLevel())
-#            self.tiles.append(bottomWall)
-            pass
-            
-#            print topWall
-#            print bottomWall
-        
-        # Left and right walls
-        for y in range(self.y1, self.y2):  # Don't need to do the corners again!
-#            leftWall = self.defaultWallType(x=self.x1 - 1, y=y, level=self.getLevel())
-#            self.tiles.append(leftWall)
-#            rightWall = self.defaultWallType(x=self.x2 + 1, y=y, level=self.getLevel())
-#            self.tiles.append(rightWall)
-            pass
-            
-#            print rightWall
-#            print leftWall
-        
-        
-        # Create floor tiles
-        for x in range(self.x1, self.x2):
-            for y in range(self.y1, self.y2):
-                # Add some chance for a dungeon feature here
-                
-#                floor = self.defaultFloorType(x = x, y = y, room = self, level = self.getLevel())
-                floor = self.defaultFloorType(x = x, y = y, room = self)
-#                self.tiles.append(floor)
-#                print floor
-                
-        # Save
-#        db.saveDB.saveAll(self.tiles)
+#    def fillWithTiles(self):
+#        # Create wall tiles
+#        
+#        # Top and bottom walls
+#        for x in range(self.x1 - 1, self.x2 + 1):
+##            topWall = self.defaultWallType(x=x, y=self.y2 + 1, level=self.getLevel())
+##            self.tiles.append(topWall)
+##            bottomWall = self.defaultWallType(x=x, y=self.y1 - 1, level=self.getLevel())
+##            self.tiles.append(bottomWall)
+#            pass
+#            
+##            print topWall
+##            print bottomWall
+#        
+#        # Left and right walls
+#        for y in range(self.y1, self.y2):  # Don't need to do the corners again!
+##            leftWall = self.defaultWallType(x=self.x1 - 1, y=y, level=self.getLevel())
+##            self.tiles.append(leftWall)
+##            rightWall = self.defaultWallType(x=self.x2 + 1, y=y, level=self.getLevel())
+##            self.tiles.append(rightWall)
+#            pass
+#            
+##            print rightWall
+##            print leftWall
+#        
+#        
+#        # Create floor tiles
+#        for x in range(self.x1, self.x2):
+#            for y in range(self.y1, self.y2):
+#                # Add some chance for a dungeon feature here
+#                
+##                floor = self.defaultFloorType(x = x, y = y, room = self, level = self.getLevel())
+#                floor = self.defaultFloorType(x = x, y = y, room = self)
+##                self.tiles.append(floor)
+##                print floor
+#                
+#        # Save
+##        db.saveDB.saveAll(self.tiles)
         
 
     def getLevel(self):
