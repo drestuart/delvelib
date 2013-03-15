@@ -327,8 +327,27 @@ class Creature(Base):
         self.hateList = value
         
     def attack(self, enemy):
-        print self.getName(), "attacks", enemy.getName()
-
+        print self.The() + "attacks" + enemy.the()
+        
+    def the(self):
+        return "the " + self.getName()
+    
+    def The(self):
+        return "The " + self.getName()
+    
+    def a_an(self):
+        if self.getName().startswith(('a', 'e', 'i', 'o', 'u')):
+            return "an " + self.getName()
+        else:
+            return "a " + self.getName()
+    
+    def A_An(self):
+        if self.getName().startswith(('a', 'e', 'i', 'o', 'u')):
+            return "An " + self.getName()
+        else:
+            return "A " + self.getName()
+    
+    
 
 class Orc(Creature):
     

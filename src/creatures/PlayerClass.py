@@ -49,7 +49,11 @@ class Player(Cr.Creature):
         else:
             return False
     
+    def the(self):
+        return self.getName()
     
+    def The(self):
+        return self.getName()
     
         
     

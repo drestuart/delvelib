@@ -702,8 +702,8 @@ class DungeonLevel(Level):
                             
                         elif shape == '+':
                             newTile = self.level.defaultFloorType(x, y)
-                            door = F.Door(tile = newTile)
-                            newTile.setFeature(door)
+#                            door = F.Door(tile = newTile)
+#                            newTile.setFeature(door)
                             
                             
                         else:
