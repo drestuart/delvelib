@@ -71,6 +71,9 @@ class AggressiveAI(AI):
     def takeTurn(self):
 #        print self.owner.name, "moves"
         while True:
+            if random.randint(0, 1) == 1:
+                break
+            
             randX = random.randint(-1, 1)
             if randX:
                 randY = random.randint(-1, 1)
@@ -85,6 +88,9 @@ class NeutralAI(AI):
     def takeTurn(self):
 #        print self.name, "moves"
         while True:
+            if random.randint(0, 1) == 1:
+                break
+            
             randX = random.randint(-1, 1)
             if randX:
                 randY = random.randint(-1, 1)
