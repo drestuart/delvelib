@@ -37,6 +37,7 @@ class Tile(Base):
         self.blockSight = kwargs.get('blockSight', False)
        
         self.baseSymbol = kwargs.get('baseSymbol', ' ')
+        self.lastSeenSymbol = kwargs.get('lastSeenSymbol', ' ')
         
         self.baseColor = kwargs.get('baseColor', None)
         
@@ -58,13 +59,11 @@ class Tile(Base):
         self.feature = kwargs.get('feature', None)
         
         self.creature = kwargs.get('creature', None)
-
-#        libtcod.Color(0,0,0)
+        
+        self.explored = False
 
         
 #        self.objects = ItemInventory()      # The objects on this tile 
-#        self.creature = None   
-#        self.feature = kwargs['feature']
         
 
     id = Column(Integer, primary_key=True, unique=True)
@@ -74,8 +73,11 @@ class Tile(Base):
     
     blockMove = Column(Boolean)
     blockSight = Column(Boolean)
+    explored = Column(Boolean)
     
     baseSymbol = Column(String(length=1, convert_unicode = False))
+    
+    lastSeenSymbol = Column(String(length=1, convert_unicode = False))
     
     baseColorR = Column(Integer)
     baseColorG = Column(Integer)
@@ -208,16 +210,19 @@ class Tile(Base):
         # Determine which symbol to use to draw this tile
         
         if self.creature and self.creature.isVisible():
-            return self.creature.getSymbol()
+            toReturn = self.creature.getSymbol()
         
         elif self.feature and self.feature.isVisible():
-            return self.feature.getSymbol()
+            toReturn = self.feature.getSymbol()
 #        
 #        elif self.objects:
-#            return self.objects[0].symbol()
+#            toReturn = self.objects[0].symbol()
 #        
         else:
-            return self.baseSymbol
+            toReturn = self.baseSymbol
+        
+        self.setLastSeenSymbol(toReturn)
+        return toReturn
         
     def getColor(self):
         # Determine which color to use to draw this tile
@@ -302,7 +307,19 @@ class Tile(Base):
     
     def getY(self):
         return self.y
-        
+    
+    def getExplored(self):
+        return self.explored
+
+    def setExplored(self, value):
+        self.explored = value
+
+    def getLastSeenSymbol(self):
+        return self.lastSeenSymbol
+
+    def setLastSeenSymbol(self, value):
+        self.lastSeenSymbol = value
+
     
 #    # drawing management stuff. will be moved to the console class?    
 #    def draw(self, con):

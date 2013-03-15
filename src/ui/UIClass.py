@@ -71,7 +71,7 @@ class UI(object):
             for cr in self.currentLevel.creatures:
                 cr.takeTurn()
             
-            self.player.takeTurn()
+#            self.player.takeTurn()
             
             self.currentLevel.clear()
             

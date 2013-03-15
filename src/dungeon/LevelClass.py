@@ -189,17 +189,30 @@ class Level(Base):
                 x = tile.x
                 y = tile.y
 #                print "Drawing", x, ",", y, ":", tile.toDraw()
-                symbol, color, background = tile.toDraw()
-                symbol = symbol.encode('ascii', 'ignore')
                 
                 # Determine visibility
                 
                 if libtcod.map_is_in_fov(self.FOVMap, x, y):
+                    
+                    tile.setExplored(True)
+                    
+                    symbol, color, background = tile.toDraw()
                     background = colors.colorLightWall
+                    
                 
                 else:
-                    background = colors.colorDarkWall
+                    
+                    if tile.getExplored():
+                        symbol = tile.getLastSeenSymbol()
+                        color = colors.colorNotInFOV
+                        background = colors.colorWallNotInFOV
+                        
+                    else:
+                        symbol = ' '
+                        color = colors.black
+                        background = libtcod.BKGND_NONE
                 
+                symbol = symbol.encode('ascii', 'ignore')
                 libtcod.console_put_char_ex(self.mapConsole, x, y, symbol, color, background)
                 
     def drawSpace(self, x, y):

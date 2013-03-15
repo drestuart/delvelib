@@ -26,6 +26,29 @@ class Player(Cr.Creature):
     
     id = Column(Integer, ForeignKey('creatures.id'), primary_key=True)
     
+    def move(self, dx, dy):
+        
+        newX = self.getX() + dx
+        newY = self.getY() + dy
+        level = self.getLevel()
+        newTile = level.getTile(newX, newY)
+        
+        if level.placeCreature(self, newTile):
+            
+            #Remove self from the old tile
+#            oldTile = self.map.getTile(self.coordinates)
+#            oldTile.removeCreature()
+        
+#            self.setPosition(self.map, newCoords)
+            #self.energy -= self.moveCost
+                        
+            print self.name + " moves to", self.getX(), self.getY()
+            self.getLevel().setNeedToComputeFOV(True)
+            return True
+        
+        else:
+            return False
+    
     
     
         

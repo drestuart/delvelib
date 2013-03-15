@@ -44,6 +44,8 @@ def main():
     
     db.saveDB.save(d1)
 
+    print len(d1.creatures), "creatures"
+
     myUI = ui.UI(level = d1, player = player)
     myUI.createWindow()
     myUI.gameLoop()
