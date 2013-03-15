@@ -8,6 +8,7 @@ from Import import *
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
 from sqlalchemy.types import String, Integer, Boolean
+import Util as U
 import colors
 import database as db
 
@@ -104,6 +105,8 @@ class Tile(Base):
     destinationOfId = Column(Integer, ForeignKey('dungeon_features.id'))
     destinationOf = relationship("DungeonFeature", backref=backref("destination", uselist=False), uselist = False, primaryjoin = "Tile.destinationOfId == DungeonFeature.id")
     
+    goalTileOfId = Column(Integer, ForeignKey('creatures.id'))
+    goalTileOf = relationship("Creature", backref=backref("goalTile", uselist=False), uselist = False, primaryjoin = "Tile.goalTileOfId == Creature.id")
     
     tileType = Column(String)
     
@@ -118,9 +121,9 @@ class Tile(Base):
     def blocksMove(self):
         # Determine whether creatures can see through this square.
         
-#        if self.creature:
-            # Blocked by creature.  All creatures block movement
-#            return True 
+        if self.creature:
+            #Blocked by creature.  All creatures block movement
+            return True 
         
         blocks = self.blockMove
                 
@@ -284,16 +287,19 @@ class Tile(Base):
     def __str__(self):
         return self.baseDescription
     
-    def __eq__(self, other):
-        
-        if self is None and other is None:
-            return True
-        
-        elif (self is None or other is None):
-            return False
-
-        else:
-            return self.x == other.x and self.y == other.y and self.levelId == other.levelId
+#    def __eq__(self, other):
+#        
+#        if self is None and other is None:
+#            return True
+#        
+#        elif (self is None or other is None):
+#            return False
+#        
+#        elif self.__class__.__name__ != other.__class__.__name__:
+#            return False
+#
+#        else:
+#            return self.x == other.x and self.y == other.y and self.levelId == other.levelId
     
     def setLevel(self, level):
         self.level = level
@@ -319,6 +325,22 @@ class Tile(Base):
 
     def setLastSeenSymbol(self, value):
         self.lastSeenSymbol = value
+
+    def getGoalTileOf(self):
+        return self.goalTileOf
+
+    def setGoalTileOf(self, value):
+        self.goalTileOf = value
+
+    def getCreature(self):
+        return self.creature
+
+    def setCreature(self, value):
+        self.creature = value
+        
+    def distance(self, other):
+        return U.ChebyshevDistance(self.getX(), other.getX(), self.getY(), other.getY())
+
 
     
 #    # drawing management stuff. will be moved to the console class?    

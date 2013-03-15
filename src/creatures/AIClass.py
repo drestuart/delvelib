@@ -15,6 +15,21 @@ class AI(object):
     
     def setOwner(self, creature):
         self.owner = creature
+        
+    def wander(self):
+        while True:
+            
+            if random.randint(0, 1) == 1:
+                break
+            
+            randX = random.randint(-1, 1)
+            if randX:
+                randY = random.randint(-1, 1)
+            else:
+                randY = random.choice([-1, 1])
+                
+            if self.owner.move(randX, randY):
+                break
 
 
 class PlayerAI(AI):
@@ -63,43 +78,124 @@ class PlayerAI(AI):
                     if self.owner.move(1, -1):
                         break
                     
-                elif U.get_key(key) == '.':
+                elif key.vk == libtcod.KEY_KPDEC or U.get_key(key) == '.':
                     break
 
 
 class AggressiveAI(AI):
+    
+    def findNewEnemy(self, visibleCreatures):
+        print self.owner.getName(), "is looking for an enemy"
+        nearestEnemy = None
+        nearestEnemyDistance = None
+        
+        for cr in visibleCreatures:
+            if cr.getCreatureType() in self.owner.getHateList():
+                dist = self.owner.distance(cr)
+                
+                if dist < nearestEnemyDistance or nearestEnemyDistance is None:
+                    nearestEnemyDistance = dist
+                    nearestEnemy = cr
+                    self.owner.setGoalEnemy(cr)
+                    self.owner.setGoalTile(cr.getTile())
+                    
+        return nearestEnemy, nearestEnemyDistance
+    
+    def walkPath(self):
+        path = self.owner.getPath()
+        
+        if libtcod.path_is_empty(path):
+            self.wander()
+            return
+        else:
+            x, y = libtcod.path_walk(path, recompute = True)
+            dx = x - self.owner.getX()
+            dy = y - self.owner.getY()
+            
+            if not self.owner.move(dx, dy):
+                print self.owner.getName(), "is stuck!"
+    
+    def getLevel(self):
+        return self.owner.getLevel()
+    
+    def getTile(self):
+        return self.owner.getTile()
+    
+    def attackAdjacent(self):
+        enemy = self.owner.getGoalEnemy()
+        if enemy:
+            if self.owner.distance(enemy) == 1:
+                self.owner.attack(enemy)
+                return True
+            
+        return False
+    
     def takeTurn(self):
 #        print self.owner.name, "moves"
-        while True:
-            if random.randint(0, 1) == 1:
-                break
+
+        if self.attackAdjacent():
+            return
+        else:
+            if self.findEnemy():
+                self.walkPath()
+                return
+            print self.owner.getName(), "gives up and wanders around"
+            self.wander()
             
-            randX = random.randint(-1, 1)
-            if randX:
-                randY = random.randint(-1, 1)
+    def findEnemy(self):
+        
+        visibleCreatures = self.getLevel().getVisibleCreaturesFromTile(self.getTile(), 0)
+        
+        path = self.owner.getPath()
+        enemy = self.owner.getGoalEnemy()
+        
+        # Look around for a new enemy to attack
+        if not enemy:
+            enemy, distance = self.findNewEnemy(visibleCreatures)
+            if distance == 1:
+                self.owner.attack(enemy)
+                return True
+            if not enemy:
+                return False
+        
+        # See if we need to recalculate the path
+        if path and not libtcod.path_is_empty(path) and (enemy.getTile() is self.owner.getGoalTile()):
+            print self.owner.getName(), "follows the path"
+            return True
+            
+        # If we need to recalculate, set up the goal tile
+        if not (enemy.getTile() is self.owner.getGoalTile()):
+            print self.owner.getName(), "needs to recompute a path to the enemy"
+            self.owner.setGoalTile(enemy.getTile())
+            distance = self.owner.distance(enemy)
+            if distance == 1:
+                self.owner.attack(enemy)
+                return True
+        
+        # Calculate the new path
+        print self.owner.getName(), "is computing a path to the enemy"
+        goalTile = self.owner.getGoalTile()
+        if goalTile:
+            path = self.getLevel().getPathToTile(self.getTile(), goalTile)
+            
+#            if path and not libtcod.path_is_empty(path):
+            if not libtcod.path_is_empty(path):
+                self.owner.setPath(path)
+                return True
             else:
-                randY = random.choice([-1, 1])
+                print self.owner.getName(), "can't find a path to the enemy"
+                return False
+    
+        else:
+            print self.owner.getName(), "has no goal tile"
+            return False
                 
-            if self.owner.move(randX, randY):
-                break
 
 
 class NeutralAI(AI):
     def takeTurn(self):
-#        print self.name, "moves"
-        while True:
-            if random.randint(0, 1) == 1:
-                break
-            
-            randX = random.randint(-1, 1)
-            if randX:
-                randY = random.randint(-1, 1)
-            else:
-                randY = random.choice([-1, 1])
-                
-            if self.owner.move(randX, randY):
-                break
-
+        self.wander()
+        
 
 class SedentaryAI(AI):
     def takeTurn(self):

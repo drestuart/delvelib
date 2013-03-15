@@ -170,11 +170,11 @@ class Level(Base):
         self.mapConsole = con
 
     # Test if a square is blocked
-#    def isBlocked(self, x, y):
+#    def isWalkable(self, x, y):
 #        return self.getTile(x, y).blocksMove()
 #    
 #    def blocksMove(self, x, y):
-#        return self.isBlocked(x, y)
+#        return self.isWalkable(x, y)
 #    
 #    def blocksSight(self, x, y):
 #        return self.getTile(x, y).blocksSight()
@@ -282,6 +282,52 @@ class Level(Base):
         assert len(tiles) == 4*radius - 4
         
         return tiles
+    
+    def getVisibleTilesFromTile(self, fromTile, radius = 0):
+        
+        x = fromTile.getX()
+        y = fromTile.getY()
+        
+        self.setNeedToComputeFOV(True)
+        self.computeFOV(x, y, radius)
+        self.setNeedToComputeFOV(True)
+        
+        retArray = []
+        
+        for tile in self.tiles:
+            if libtcod.map_is_in_fov(self.FOVMap, tile.getX(), tile.getY()):
+                retArray.append(tile)
+                
+        return retArray
+    
+    def getVisibleCreaturesFromTile(self, fromTile, radius = 0):
+        
+        tileArr = self.getVisibleTilesFromTile(fromTile, radius)
+        
+        retArray = []
+        
+        for tile in tileArr:
+            creature = tile.getCreature()
+            if creature and creature.isVisible():
+                retArray.append(creature)
+                
+        return retArray
+        
+    def getPathToTile(self, fromTile, toTile):
+        
+        path = libtcod.path_new_using_map(self.FOVMap, dcost=1)
+        libtcod.path_compute(path, fromTile.getX(), fromTile.getY(), toTile.getX(), toTile.getY())
+
+#        path = libtcod.path_new_using_function(C.MAP_WIDTH, C.MAP_HEIGHT, self.isWalkable, userdata=0, dcost=1)
+#        libtcod.path_compute(path, fromTile.getX(), fromTile.getY(), toTile.getX(), toTile.getY())
+
+        return path
+        
+    def isWalkable(self, xFrom, yFrom, xTo, yTo, userData):
+        if self.getTile(xTo, yTo).blocksMove():
+            return 0
+        
+        return 1
     
     def computeFOVProperties(self):
         
@@ -634,7 +680,7 @@ class DungeonLevel(Level):
 #            randx = libtcod.random_get_int(0, 0, self.WIDTH - 1)
 #            randy = libtcod.random_get_int(0, 0, self.HEIGHT - 1)
 #        
-#            if not self.isBlocked(randx, randy):
+#            if not self.isWalkable(randx, randy):
 #                return Coordinates(x = randx, y = randy)
 #                
 #    def getRandOpenSpace_NEW(self):

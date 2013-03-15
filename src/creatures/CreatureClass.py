@@ -5,13 +5,14 @@ Created on Mar 13, 2013
 '''
 
 from Import import *
+from ctypes.wintypes import INT
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
 from sqlalchemy.types import String, Integer, Boolean
+import Util as U
+import AIClass as AI
 import colors
 import database as db
-from ctypes.wintypes import INT
-import AIClass as AI
 
 libtcod = importLibtcod()
 
@@ -46,11 +47,13 @@ class Creature(Base):
         self.damageTaken = kwargs.get('damageTaken', 0)
         
         self.visible = kwargs.get('visible', True)
+        self.path = None
+        
+        self.hateList = kwargs.get('hateList', ['player'])
         
         self.AIClass = kwargs['AIClass']
         self.initializeAI()
-        
-        
+
     id = Column(Integer, primary_key=True, unique=True)
     
     symbol = Column(String(length=1, convert_unicode = False))
@@ -71,6 +74,9 @@ class Creature(Base):
     maxHP = Column(Integer)
     damageTaken = Column(Integer)
     
+    goalEnemy = relationship("Creature", uselist=False)
+    goalEnemyId = Column(Integer, ForeignKey('creatures.id'))
+    
     visible = Column(Boolean)
     
     AIClassName = Column(String)
@@ -85,21 +91,21 @@ class Creature(Base):
         level = self.getLevel()
         newTile = level.getTile(newX, newY)
         
-        if level.placeCreature(self, newTile):
-            
-            #Remove self from the old tile
-#            oldTile = self.map.getTile(self.coordinates)
-#            oldTile.removeCreature()
+        return self.moveToTile(newTile)
         
-#            self.setPosition(self.map, newCoords)
-            #self.energy -= self.moveCost
+        
+    def moveToTile(self, newTile):
+        
+        level = self.getLevel()
+        
+        if level.placeCreature(self, newTile):
                         
             print self.name + " moves to", self.getX(), self.getY()
-#            self.getLevel().setNeedToComputeFOV(True)
             return True
         
         else:
             return False
+        
     
     def getTile(self):
         return self.tile
@@ -274,6 +280,54 @@ class Creature(Base):
         
     def takeTurn(self):
         self.AI.takeTurn()
+        
+    def getGoalTile(self):
+        return self.goalTile
+    
+    def setGoalTile(self, newTile):
+#        oldGoal = self.getGoalTile()
+#        if oldGoal:
+#            oldGoal.setGoalTileOf(None)
+        
+#        self.goalTile = newTile
+        newTile.setGoalTileOf(self)
+        
+    def distance(self, other):
+        return self.getTile().distance(other.getTile())
+
+
+    def getCreatureType(self):
+        return self.creatureType
+
+    def setCreatureType(self, value):
+        self.creatureType = value
+
+    def getGoalEnemy(self):
+        return self.goalEnemy
+
+    def getGoalEnemyId(self):
+        return self.goalEnemyId
+
+    def setGoalEnemy(self, value):
+        self.goalEnemy = value
+
+    def setGoalEnemyId(self, value):
+        self.goalEnemyId = value
+
+    def getPath(self):
+        return self.path
+
+    def setPath(self, value):
+        self.path = value
+
+    def getHateList(self):
+        return self.hateList
+
+    def setHateList(self, value):
+        self.hateList = value
+        
+    def attack(self, enemy):
+        print self.getName(), "attacks", enemy.getName()
 
 
 class Orc(Creature):

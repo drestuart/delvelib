@@ -15,3 +15,9 @@ def get_key(key):
         return chr(key.c)
     else:
         return key.vk
+
+def ManhattanDistance(x1, x2, y1, y2):
+    return abs(x1-x2) + abs(y1-y2)
+
+def ChebyshevDistance(x1, x2, y1, y2):
+    return max(abs(x1-x2), abs(y1-y2))

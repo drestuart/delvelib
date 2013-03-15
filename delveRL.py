@@ -39,8 +39,8 @@ def main():
     orc1 = Cr.Orc()
     d1.placeCreatureInRandomRoom(orc1)
     
-    orc2 = Cr.Orc()
-    d1.placeCreatureInRandomRoom(orc2)
+#    orc2 = Cr.Orc()
+#    d1.placeCreatureInRandomRoom(orc2)
     
     db.saveDB.save(d1)
 
