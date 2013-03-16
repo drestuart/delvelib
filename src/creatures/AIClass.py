@@ -34,7 +34,59 @@ class AI(object):
 
 class PlayerAI(AI):
     
-    def takeTurn(self):
+    def takeTurn(self, key):
+#        print "Waiting for player"
+        
+        
+#        while True:
+#        key = libtcod.console_wait_for_keypress(True)
+        
+        if key.vk == libtcod.KEY_ESCAPE:
+#                exit(0)  #exit game
+            return "exit"
+            
+        elif key.pressed:
+ 
+            if key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8 or U.get_key(key) == 'k':
+                if self.owner.move(0, -1):
+                    return 'took-turn'
+     
+            elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2 or  U.get_key(key) == 'j':
+                if self.owner.move(0, 1):
+                    return 'took-turn'
+     
+            elif key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_KP4 or  U.get_key(key) == 'h':
+                if self.owner.move(-1, 0):
+                    return 'took-turn'
+     
+            elif key.vk == libtcod.KEY_RIGHT or key.vk == libtcod.KEY_KP6 or  U.get_key(key) == 'l':
+                if self.owner.move(1, 0):
+                    return 'took-turn'
+    
+            elif key.vk == libtcod.KEY_KP1 or  U.get_key(key) == 'b':
+                if self.owner.move(-1, 1):
+                    return 'took-turn'
+    
+            elif key.vk == libtcod.KEY_KP3 or  U.get_key(key) == 'n':
+                if self.owner.move(1, 1):
+                    return 'took-turn'
+                
+            elif key.vk == libtcod.KEY_KP7 or  U.get_key(key) == 'y':
+                if self.owner.move(-1, -1):
+                    return 'took-turn'
+            
+            elif key.vk == libtcod.KEY_KP9 or  U.get_key(key) == 'u':
+                if self.owner.move(1, -1):
+                    return 'took-turn'
+                
+            elif key.vk == libtcod.KEY_KPDEC or U.get_key(key) == '.':
+                return 'took-turn'
+            
+        else:
+            return 'didnt-take-turn'
+            
+    
+    def takeTurn1(self):
         print "Waiting for player"
         
         

@@ -63,6 +63,7 @@ class Tile(Base):
         
         self.explored = False
 
+        self.objects = []
         
 #        self.objects = ItemInventory()      # The objects on this tile 
         

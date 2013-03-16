@@ -20,12 +20,7 @@ DEFAULT_FONT = os.path.join(FONTS_DIR, "arial12x12.png")
 key = libtcod.Key()
 mouse = libtcod.Mouse()
 
-def handle_keys():
-     
-    if key.vk == libtcod.KEY_ESCAPE:
-        return 'exit'  #exit game
-    else:
-        return 'didnt-take-turn'
+
 
 class UI(object):
 
@@ -35,6 +30,13 @@ class UI(object):
         self.panel = libtcod.console_new(C.PANEL_WIDTH, C.PANEL_HEIGHT)
 
         self.msgs = []
+        
+    def handleKeys(self, key):
+     
+        if key.vk == libtcod.KEY_ESCAPE:
+            return 'exit'  #exit game
+        else:
+            return self.player.AI.takeTurn(key)
         
     
     def render_bar(self, x, y, totalWidth, name, value, maximum, barColor, backColor):
@@ -89,10 +91,34 @@ class UI(object):
         self.currentLevel = lvl
         self.currentLevel.setMapConsole(self.mapConsole)
         
+    def getTileUnderMouse(self):
+#        global mouse
+     
+        #return a string with the tiles of all objects under the mouse
+        (x, y) = (mouse.cx, mouse.cy)
+     
+#        tiles = [tile for tile in self.currentLevel.getTiles()
+#            if tile.getX() == x and tile.getY() == y and self.currentLevel.isInFOV(x, y)]
+#     
+#        return tiles[0].getDescription()
+        
+        if x >= 0 and x < C.MAP_WIDTH and y >= 0 and y < C.MAP_HEIGHT:
+            print "Reading tile", (x, y)
+            tile = self.currentLevel.getTile(x, y)
+            if self.currentLevel.isInFOV(x, y):
+                return tile.getDescription()
+            else:
+                return ''
+        
+        else:
+            return ''
         
     def gameLoop(self):
         
         while not libtcod.console_is_window_closed():
+            
+            player_action = None
+            
             libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS|libtcod.EVENT_MOUSE,key,mouse)
             libtcod.console_clear(self.mapConsole)
             
@@ -107,9 +133,14 @@ class UI(object):
                 y += 1
          
             #show the player's stats
-#            render_bar(1, 1, BAR_WIDTH, 'HP', player.fighter.hp, player.fighter.max_hp,
-#                libtcod.light_red, libtcod.darker_red)
-         
+            self.render_bar(1, 1, C.BAR_WIDTH, 'HP', 15, 20, libtcod.light_red, libtcod.darker_red)
+            
+            #display description of the tile under the mouse
+            libtcod.console_set_default_foreground(self.panel, libtcod.light_gray)
+            desc = self.getTileUnderMouse()
+            if desc:
+                libtcod.console_print_ex(self.panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, desc)
+                    
             #blit the contents of "panel" to the root console
             libtcod.console_blit(self.panel, 0, 0, C.SCREEN_WIDTH, C.PANEL_HEIGHT, 0, C.PANEL_X, C.PANEL_Y)
             
@@ -122,16 +153,23 @@ class UI(object):
     
             libtcod.console_flush()
             
-            for cr in self.currentLevel.creatures:
-                cr.takeTurn()
+#            for cr in self.currentLevel.creatures:
+#                cr.takeTurn()
+
+            player_action = self.handleKeys(key)
+            if player_action == 'exit':
+                break
+            
+            elif player_action == 'took-turn':
+                for cr in self.currentLevel.creatures:
+                    if cr is not self.player:
+                        cr.takeTurn()
             
 #            self.player.takeTurn()
             
             self.currentLevel.clear()
             
-            player_action = handle_keys()
-            if player_action == 'exit':
-                break
+            
         
     
     

@@ -19,7 +19,7 @@ class Player(Cr.Creature):
 
     def __init__(self, **kwargs):
         super(Player, self).__init__(symbol = '@', baseColor = colors.white, baseBackground = colors.black, name="player",
-                                     description = '', species = 'player', AIClass = AI.PlayerAI, maxHP=10, **kwargs)
+                                     description = 'player', species = 'player', AIClass = AI.PlayerAI, maxHP=10, **kwargs)
         
         
     __mapper_args__ = {'polymorphic_identity': 'player'}

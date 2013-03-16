@@ -169,17 +169,8 @@ class Level(Base):
     def setMapConsole(self, con):
         self.mapConsole = con
 
-    # Test if a square is blocked
-#    def isWalkable(self, x, y):
-#        return self.getTile(x, y).blocksMove()
-#    
-#    def blocksMove(self, x, y):
-#        return self.isWalkable(x, y)
-#    
-#    def blocksSight(self, x, y):
-#        return self.getTile(x, y).blocksSight()
-
-
+    def isInFOV(self, x, y):
+        return libtcod.map_is_in_fov(self.FOVMap, x, y)
                 
     # Draw that map!
     def draw(self, visibility = True):
@@ -192,7 +183,7 @@ class Level(Base):
                 
                 # Determine visibility
                 if visibility:
-                    if libtcod.map_is_in_fov(self.FOVMap, x, y):
+                    if self.isInFOV(x, y):
                         
                         tile.setExplored(True)
                         
