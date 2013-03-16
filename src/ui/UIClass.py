@@ -9,6 +9,7 @@ import Const as C
 import colors
 import os.path
 import textwrap
+import Game as G
 
 libtcod = importLibtcod()
 
@@ -104,6 +105,7 @@ class UI(object):
         
         if x >= 0 and x < C.MAP_WIDTH and y >= 0 and y < C.MAP_HEIGHT:
             print "Reading tile", (x, y)
+            G.game.message( "Reading tile " + str(x) + ", " + str(y) )
             tile = self.currentLevel.getTile(x, y)
             if self.currentLevel.isInFOV(x, y):
                 return tile.getDescription()

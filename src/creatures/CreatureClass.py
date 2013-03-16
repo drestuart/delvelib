@@ -13,6 +13,7 @@ import Util as U
 import AIClass as AI
 import colors
 import database as db
+import Game as G
 
 libtcod = importLibtcod()
 
@@ -327,7 +328,8 @@ class Creature(Base):
         self.hateList = value
         
     def attack(self, enemy):
-        print self.The() + "attacks" + enemy.the()
+        G.game.message(self.The() + " attacks " + enemy.the())
+        print self.The() + " attacks " + enemy.the()
         
     def the(self):
         return "the " + self.getName()
