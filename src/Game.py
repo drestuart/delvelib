@@ -46,7 +46,7 @@ class Game(object):
     #    d1.placeCreatureInRandomRoom(orc2)
         
         db.saveDB.save(d1)
-    
+        
         self.myUI = ui.UI(level = d1, player = player)
         self.myUI.createWindow()
         

@@ -275,7 +275,7 @@ class Creature(Base):
         self.symbol = value
         
     def initializeAI(self):
-        if not self.AIClassName:
+        if self.AIClassName and not self.AIClass:
             # Get AI class by name
             pass
         else:
