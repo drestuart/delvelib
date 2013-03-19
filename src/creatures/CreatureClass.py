@@ -78,6 +78,9 @@ class Creature(Base):
     goalEnemy = relationship("Creature", uselist=False)
     goalEnemyId = Column(Integer, ForeignKey('creatures.id'))
     
+    inventoryId = Column(Integer, ForeignKey("inventories.id"))
+    inventory = relationship("Inventory", backref = backref("creature", uselist = False), uselist = False, primaryjoin = "Creature.inventoryId == Inventory.id")
+    
     visible = Column(Boolean)
     
     AIClassName = Column(String)

@@ -18,7 +18,7 @@ class Player(Cr.Creature):
 
 
     def __init__(self, **kwargs):
-        super(Player, self).__init__(symbol = '@', baseColor = colors.white, baseBackground = colors.black, name="player",
+        super(Player, self).__init__(symbol = '@', color = colors.white, background = colors.black, name="player",
                                      description = 'player', species = 'player', AIClass = AI.PlayerAI, maxHP=10, **kwargs)
         
         

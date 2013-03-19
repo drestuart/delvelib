@@ -36,7 +36,6 @@ class Inventory(Base):
     containingItem = relationship("Item", uselist=False, backref=backref("myInventory", uselist=False), primaryjoin="Inventory.id == Item.myInventoryId")
 
     
-    
     __mapper_args__ = {
         'polymorphic_on':inventoryType,
         'polymorphic_identity':'item'
@@ -69,6 +68,9 @@ class Inventory(Base):
             return None
         itemToPop = self.items[0]
         return self.removeItem(itemToPop)
+    
+    def getItem(self, ind):
+        return self.items[ind]
 
     def getItems(self):
         return self.items
@@ -85,6 +87,8 @@ class Inventory(Base):
     def setContainingItem(self, value):
         self.containingItem = value
 
+    def length(self):
+        return len(self.items)
     
 
 

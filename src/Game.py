@@ -9,6 +9,7 @@ import CreatureClass as Cr
 import DungeonFeatureClass as F
 import LevelClass as L
 import RoomClass as R
+import InventoryClass as I
 import TileClass as T
 import PlayerClass as P
 import UIClass as ui

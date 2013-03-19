@@ -11,11 +11,11 @@ from sqlalchemy.types import String, Integer, Boolean
 import Util as U
 import colors
 import database as db
+import InventoryClass as Inv
 
 libtcod = importLibtcod()
 
 #from DungeonFeatureClass import *
-#from InventoryClass import *
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -40,17 +40,17 @@ class Tile(Base):
         self.baseSymbol = kwargs.get('baseSymbol', ' ')
         self.lastSeenSymbol = kwargs.get('lastSeenSymbol', ' ')
         
-        self.color = kwargs.get('color', None)
+        self.baseColor = kwargs.get('baseColor', None)
         
-        self.colorR = self.color.r
-        self.colorG = self.color.g
-        self.colorB = self.color.b
+        self.baseColorR = self.baseColor.r
+        self.baseColorG = self.baseColor.g
+        self.baseColorB = self.baseColor.b
         
-        self.backgroundColor = kwargs.get('backgroundColor', None)
+        self.baseBackgroundColor = kwargs.get('baseBackgroundColor', None)
         
-        self.backgroundColorR = self.backgroundColor.r
-        self.backgroundColorG = self.backgroundColor.g
-        self.backgroundColorB = self.backgroundColor.b
+        self.baseBackgroundColorR = self.baseBackgroundColor.r
+        self.baseBackgroundColorG = self.baseBackgroundColor.g
+        self.baseBackgroundColorB = self.baseBackgroundColor.b
         
         self.baseDescription = kwargs.get('baseDescription', '')
         
@@ -63,10 +63,8 @@ class Tile(Base):
         
         self.explored = False
 
-        self.objects = []
-        
-#        self.objects = ItemInventory()      # The objects on this tile 
-        
+        self.inventory = None
+                
 
     id = Column(Integer, primary_key=True, unique=True)
     
@@ -81,13 +79,13 @@ class Tile(Base):
     
     lastSeenSymbol = Column(String(length=1, convert_unicode = False))
     
-    colorR = Column(Integer)
-    colorG = Column(Integer)
-    colorB = Column(Integer)
+    baseColorR = Column(Integer)
+    baseColorG = Column(Integer)
+    baseColorB = Column(Integer)
     
-    backgroundColorR = Column(Integer)
-    backgroundColorG = Column(Integer)
-    backgroundColorB = Column(Integer)
+    baseBackgroundColorR = Column(Integer)
+    baseBackgroundColorG = Column(Integer)
+    baseBackgroundColorB = Column(Integer)
     
     baseDescription = Column(String)
     
@@ -109,10 +107,17 @@ class Tile(Base):
     goalTileOfId = Column(Integer, ForeignKey('creatures.id'))
     goalTileOf = relationship("Creature", backref=backref("goalTile", uselist=False), uselist = False, primaryjoin = "Tile.goalTileOfId == Creature.id")
     
+    inventoryId = Column(Integer, ForeignKey("inventories.id"))
+    inventory = relationship("Inventory", backref = backref("tile", uselist = False), uselist = False, primaryjoin = "Tile.inventoryId == Inventory.id")
+    
     tileType = Column(String)
     
     __mapper_args__ = {'polymorphic_on': tileType,
                        'polymorphic_identity': 'tile'}
+    
+    def initializeInventory(self):
+        if not self.inventory:
+            self.inventory = Inv.Inventory()
             
     def toDraw(self):
         # Returns a tuple of the tile's symbol, color, and background for the
@@ -154,21 +159,27 @@ class Tile(Base):
         return blocks
     
     def addObject(self, obj):
+        if self.inventory:
+            self.initializeInventory()
+            
         # Put an obj into this tile, if possible.
         if not self.blockMove:
-            self.objects.add(obj)
+            self.inventory.add(obj)
     
     def addObjects(self, objects):
-        # Put several objects into this tile
+        if self.inventory:
+            self.initializeInventory()
+        
+        # Put several inventory into this tile
         [self.addObject(obj) for obj in objects]
             
     def removeObject(self, index):
         # Take an object from this tile
-        obj = self.objects.pop(index)
+        obj = self.inventory.pop(index)
         return obj
     
     def removeObjects(self, indices):
-        # Take some objects from this tile
+        # Take some inventory from this tile
         return [self.removeObject(ind) for ind in indices]
     
     def placeCreature(self, creature):
@@ -193,8 +204,8 @@ class Tile(Base):
             return False
             
     def passTime(self, turns = 1):
-        '''Pass some time on the objects and creature on this tile'''
-        for obj in self.objects:
+        '''Pass some time on the inventory and creature on this tile'''
+        for obj in self.inventory.getItems():
             obj.passTime(turns)
             
 #        if self.creature is not None:
@@ -219,8 +230,8 @@ class Tile(Base):
         elif self.feature and self.feature.isVisible():
             toReturn = self.feature.getSymbol()
 #        
-#        elif self.objects:
-#            toReturn = self.objects[0].symbol()
+#        elif self.inventory:
+#            toReturn = self.inventory[0].symbol()
 #        
         else:
             toReturn = self.baseSymbol
@@ -237,18 +248,18 @@ class Tile(Base):
         elif self.feature and self.feature.isVisible():
             return self.feature.getColor()
 #        
-#        elif self.objects:
-#            return self.objects[0].color()
+#        elif self.inventory:
+#            return self.inventory[0].color()
 #        
         else:
             return self.getBaseColor()
         
     def getBaseColor(self):        
         if self.__dict__.get('color', None):
-            return self.color
+            return self.baseColor
         else:
-            self.color = libtcod.Color(self.colorR, self.colorG, self.colorB)
-            return self.color
+            self.color = libtcod.Color(self.baseColorR, self.baseColorG, self.baseColorB)
+            return self.baseColor
 
     def getBackground(self):
         # Determine which background to use to draw this tile
@@ -262,11 +273,11 @@ class Tile(Base):
             return self.getBaseBackgroundColor()
         
     def getBaseBackgroundColor(self):
-        if self.__dict__.get('backgroundColor', None):
-            return self.backgroundColor
+        if self.__dict__.get('baseBackgroundColor', None):
+            return self.baseBackgroundColor
         else:
-            self.backgroundColor = libtcod.Color(self.backgroundColorR, self.backgroundColorG, self.backgroundColorB)
-            return self.backgroundColor
+            self.baseBackgroundColor = libtcod.Color(self.baseBackgroundColorR, self.baseBackgroundColorG, self.baseBackgroundColorB)
+            return self.baseBackgroundColor
 
     def getDescription(self):
         # Determine which description to use to draw this tile
@@ -276,8 +287,8 @@ class Tile(Base):
         elif self.feature and self.feature.isVisible():
             return self.feature.description
         
-        elif self.objects:
-            return self.objects[0].description
+        elif self.inventory and self.inventory.length() > 0:
+            return self.inventory.getItem(0).getDescription()
         
         else:
             return self.baseDescription 
@@ -287,20 +298,6 @@ class Tile(Base):
         
     def __str__(self):
         return self.baseDescription
-    
-#    def __eq__(self, other):
-#        
-#        if self is None and other is None:
-#            return True
-#        
-#        elif (self is None or other is None):
-#            return False
-#        
-#        elif self.__class__.__name__ != other.__class__.__name__:
-#            return False
-#
-#        else:
-#            return self.x == other.x and self.y == other.y and self.levelId == other.levelId
     
     def setLevel(self, level):
         self.level = level
@@ -342,19 +339,6 @@ class Tile(Base):
     def distance(self, other):
         return U.ChebyshevDistance(self.getX(), other.getX(), self.getY(), other.getY())
 
-
-    
-#    # drawing management stuff. will be moved to the console class?    
-#    def draw(self, con):
-#        #set the color and then draw the character that represents this object
-#        #at its position
-#        libtcod.console_set_foreground_color(con, self.color())
-#        libtcod.console_put_char(con, self.x, self.y, self.symbol(), self.background)
-# 
-#    def clear(self, con):
-#        #erase the character that represents this object
-#        libtcod.console_put_char(con, self.x, self.y, ' ', libtcod.BKGND_NONE)
-        
 
 # Some classes representing different kinds of tiles
 

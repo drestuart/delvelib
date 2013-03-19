@@ -29,6 +29,7 @@ class Item(Base):
         self.symbol = kwargs['symbol']
         self.color = kwargs['color']
         self.backgroundColor = kwargs.get('baseBackground', colors.black)
+        self.description = kwargs.get('description', 'some item')
         
         self.colorR = self.color.r
         self.colorG = self.color.g
@@ -37,6 +38,7 @@ class Item(Base):
         self.backgroundColorR = self.backgroundColor.r
         self.backgroundColorG = self.backgroundColor.g
         self.backgroundColorB = self.backgroundColor.b
+
         
 
     id = Column(Integer, primary_key=True)
@@ -53,6 +55,8 @@ class Item(Base):
     backgroundColorR = Column(Integer)
     backgroundColorG = Column(Integer)
     backgroundColorB = Column(Integer)
+    
+    description = Column(String)
 
     containerId = Column(Integer, ForeignKey("inventories.id"))
     
@@ -174,7 +178,16 @@ class Item(Base):
 
     def setBackgroundColorB(self, value):
         self.backgroundColorB = value
+    
+    def getDescription(self):
+        return self.description
 
+
+    def setDescription(self, value):
+        self.description = value
+
+    def passTime(self, turns):
+        pass
     
     
     
