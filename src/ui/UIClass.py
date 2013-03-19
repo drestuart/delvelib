@@ -92,7 +92,7 @@ class UI(object):
         self.currentLevel = lvl
         self.currentLevel.setMapConsole(self.mapConsole)
         
-    def getTileUnderMouse(self):
+    def getTileDescUnderMouse(self):
 #        global mouse
      
         #return a string with the tiles of all objects under the mouse
@@ -104,8 +104,8 @@ class UI(object):
 #        return tiles[0].getDescription()
         
         if x >= 0 and x < C.MAP_WIDTH and y >= 0 and y < C.MAP_HEIGHT:
-            print "Reading tile", (x, y)
-            G.game.message( "Reading tile " + str(x) + ", " + str(y) )
+#            print "Reading tile", (x, y)
+#            G.game.message( "Reading tile " + str(x) + ", " + str(y) )
             tile = self.currentLevel.getTile(x, y)
             if self.currentLevel.isInFOV(x, y):
                 return tile.getDescription()
@@ -139,7 +139,7 @@ class UI(object):
             
             #display description of the tile under the mouse
             libtcod.console_set_default_foreground(self.panel, libtcod.light_gray)
-            desc = self.getTileUnderMouse()
+            desc = self.getTileDescUnderMouse()
             if desc:
                 libtcod.console_print_ex(self.panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, desc)
                     
