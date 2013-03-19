@@ -29,16 +29,16 @@ class Creature(Base):
     def __init__(self, **kwargs):
         
         self.symbol = kwargs['symbol']
-        self.baseColor = kwargs['baseColor']
-        self.baseBackgroundColor = kwargs['baseBackground']
+        self.color = kwargs['color']
+        self.backgroundColor = kwargs['background']
         
-        self.baseColorR = self.baseColor.r
-        self.baseColorG = self.baseColor.g
-        self.baseColorB = self.baseColor.b
+        self.colorR = self.color.r
+        self.colorG = self.color.g
+        self.colorB = self.color.b
         
-        self.baseBackgroundColorR = self.baseBackgroundColor.r
-        self.baseBackgroundColorG = self.baseBackgroundColor.g
-        self.baseBackgroundColorB = self.baseBackgroundColor.b
+        self.backgroundColorR = self.backgroundColor.r
+        self.backgroundColorG = self.backgroundColor.g
+        self.backgroundColorB = self.backgroundColor.b
         
         self.name = kwargs['name']
         self.description = kwargs['description']
@@ -59,13 +59,13 @@ class Creature(Base):
     
     symbol = Column(String(length=1, convert_unicode = False))
     
-    baseColorR = Column(Integer)
-    baseColorG = Column(Integer)
-    baseColorB = Column(Integer)
+    colorR = Column(Integer)
+    colorG = Column(Integer)
+    colorB = Column(Integer)
     
-    baseBackgroundColorR = Column(Integer)
-    baseBackgroundColorG = Column(Integer)
-    baseBackgroundColorB = Column(Integer)
+    backgroundColorR = Column(Integer)
+    backgroundColorG = Column(Integer)
+    backgroundColorB = Column(Integer)
     
     description = Column(String)
     name = Column(String)
@@ -138,44 +138,40 @@ class Creature(Base):
         if self.hp <= 0:
             self.deathFunction(self)
 
-    def getBaseColor(self):        
-        if self.__dict__.get('baseColor', None):
-            return self.baseColor
+    def getColor(self):        
+        if self.__dict__.get('color', None):
+            return self.color
         else:
-            self.baseColor = libtcod.Color(self.baseColorR, self.baseColorG, self.baseColorB)
-            return self.baseColor
+            self.color = libtcod.Color(self.colorR, self.colorG, self.colorB)
+            return self.color
 
     
-    def getColor(self):
-        return self.getBaseColor()
+    def getBackgroundColor(self):
+        return self.backgroundColor
 
 
-    def getBaseBackgroundColor(self):
-        return self.baseBackgroundColor
+    def getColorR(self):
+        return self.colorR
 
 
-    def getBaseColorR(self):
-        return self.baseColorR
+    def getColorG(self):
+        return self.colorG
 
 
-    def getBaseColorG(self):
-        return self.baseColorG
+    def getColorB(self):
+        return self.colorB
 
 
-    def getBaseColorB(self):
-        return self.baseColorB
+    def getBackgroundColorR(self):
+        return self.backgroundColorR
 
 
-    def getBaseBackgroundColorR(self):
-        return self.baseBackgroundColorR
+    def getBackgroundColorG(self):
+        return self.backgroundColorG
 
 
-    def getBaseBackgroundColorG(self):
-        return self.baseBackgroundColorG
-
-
-    def getBaseBackgroundColorB(self):
-        return self.baseBackgroundColorB
+    def getBackgroundColorB(self):
+        return self.backgroundColorB
 
 
     def getName(self):
@@ -202,36 +198,42 @@ class Creature(Base):
         return self.AIClass
 
 
-    def setBaseColor(self, value):
-        self.baseColor = value
+    def setColor(self, value):
+        self.color = value
+        self.setColorB(value.b)
+        self.setColorG(value.g)
+        self.setColorR(value.r)
 
 
-    def setBaseBackgroundColor(self, value):
-        self.baseBackgroundColor = value
+    def setBackgroundColor(self, value):
+        self.backgroundColor = value
+        self.setBackgroundColorB(value.b)
+        self.setBackgroundColorG(value.g)
+        self.setBackgroundColorR(value.r)
 
 
-    def setBaseColorR(self, value):
-        self.baseColorR = value
+    def setColorR(self, value):
+        self.colorR = value
 
 
-    def setBaseColorG(self, value):
-        self.baseColorG = value
+    def setColorG(self, value):
+        self.colorG = value
 
 
-    def setBaseColorB(self, value):
-        self.baseColorB = value
+    def setColorB(self, value):
+        self.colorB = value
 
 
-    def setBaseBackgroundColorR(self, value):
-        self.baseBackgroundColorR = value
+    def setBackgroundColorR(self, value):
+        self.backgroundColorR = value
 
 
-    def setBaseBackgroundColorG(self, value):
-        self.baseBackgroundColorG = value
+    def setBackgroundColorG(self, value):
+        self.backgroundColorG = value
 
 
-    def setBaseBackgroundColorB(self, value):
-        self.baseBackgroundColorB = value
+    def setBackgroundColorB(self, value):
+        self.backgroundColorB = value
 
 
     def setName(self, value):
@@ -354,7 +356,7 @@ class Creature(Base):
 class Orc(Creature):
     
     def __init__(self, **kwargs):
-        super(Orc, self).__init__(symbol = 'o', baseColor = colors.red, baseBackground = colors.black, 
+        super(Orc, self).__init__(symbol = 'o', color = colors.red, background = colors.black, 
                                   name = 'orc', description = 'a hideous orc', species = 'orc',
                                   maxHP = 10, AIClass = AI.AggressiveAI, **kwargs)
     

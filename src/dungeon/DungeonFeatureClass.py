@@ -30,17 +30,17 @@ class DungeonFeature(Base):
 #        self.blockMove = kwargs.get('blockMove', False)
         self.symbol = symbol
         
-        self.baseColor = baseColor
+        self.color = baseColor
         
-        self.baseColorR = self.baseColor.r
-        self.baseColorG = self.baseColor.g
-        self.baseColorB = self.baseColor.b
+        self.colorR = self.color.r
+        self.colorG = self.color.g
+        self.colorB = self.color.b
         
-        self.baseBackgroundColor = baseBackgroundColor
+        self.backgroundColor = baseBackgroundColor
         
-        self.baseBackgroundColorR = self.baseBackgroundColor.r
-        self.baseBackgroundColorG = self.baseBackgroundColor.g
-        self.baseBackgroundColorB = self.baseBackgroundColor.b
+        self.backgroundColorR = self.backgroundColor.r
+        self.backgroundColorG = self.backgroundColor.g
+        self.backgroundColorB = self.backgroundColor.b
         
         self.tile = kwargs.get('tile', None)
         
@@ -51,13 +51,13 @@ class DungeonFeature(Base):
     name = Column(String)
     symbol = Column(String(length=1, convert_unicode = False))
     
-    baseColorR = Column(Integer)
-    baseColorG = Column(Integer)
-    baseColorB = Column(Integer)
+    colorR = Column(Integer)
+    colorG = Column(Integer)
+    colorB = Column(Integer)
     
-    baseBackgroundColorR = Column(Integer)
-    baseBackgroundColorG = Column(Integer)
-    baseBackgroundColorB = Column(Integer)
+    backgroundColorR = Column(Integer)
+    backgroundColorG = Column(Integer)
+    backgroundColorB = Column(Integer)
     
     tileId = Column(Integer) #, ForeignKey('tiles.id')
     
@@ -87,11 +87,11 @@ class DungeonFeature(Base):
 
 
     def getBaseColor(self):        
-        if self.__dict__.get('baseColor', None):
-            return self.baseColor
+        if self.__dict__.get('color', None):
+            return self.color
         else:
-            self.baseColor = libtcod.Color(self.baseColorR, self.baseColorG, self.baseColorB)
-            return self.baseColor
+            self.color = libtcod.Color(self.colorR, self.colorG, self.colorB)
+            return self.color
 
     
     def getColor(self):
@@ -99,38 +99,38 @@ class DungeonFeature(Base):
 
 
     def getBaseColorR(self):
-        return self.baseColorR
+        return self.colorR
 
 
     def getBaseColorG(self):
-        return self.baseColorG
+        return self.colorG
 
 
     def getBaseColorB(self):
-        return self.baseColorB
+        return self.colorB
     
     def getBackgroundColor(self):
         return self.getBaseBackgroundColor()
 
 
     def getBaseBackgroundColor(self):
-        if self.__dict__.get('baseBackgroundColor', None):
-            return self.baseBackgroundColor
+        if self.__dict__.get('backgroundColor', None):
+            return self.backgroundColor
         else:
-            self.baseBackgroundColor = libtcod.Color(self.baseBackgroundColorR, self.baseBackgroundColorG, self.baseBackgroundColorB)
-            return self.baseBackgroundColor
+            self.backgroundColor = libtcod.Color(self.backgroundColorR, self.backgroundColorG, self.backgroundColorB)
+            return self.backgroundColor
 
 
     def getBaseBackgroundColorR(self):
-        return self.baseBackgroundColorR
+        return self.backgroundColorR
 
 
     def getBaseBackgroundColorG(self):
-        return self.baseBackgroundColorG
+        return self.backgroundColorG
 
 
     def getBaseBackgroundColorB(self):
-        return self.baseBackgroundColorB
+        return self.backgroundColorB
 
 
     def getTile(self):
@@ -158,35 +158,35 @@ class DungeonFeature(Base):
 
 
     def setBaseColor(self, value):
-        self.baseColor = value
+        self.color = value
 
 
     def setBaseColorR(self, value):
-        self.baseColorR = value
+        self.colorR = value
 
 
     def setBaseColorG(self, value):
-        self.baseColorG = value
+        self.colorG = value
 
 
     def setBaseColorB(self, value):
-        self.baseColorB = value
+        self.colorB = value
 
 
     def setBaseBackgroundColor(self, value):
-        self.baseBackgroundColor = value
+        self.backgroundColor = value
 
 
     def setBaseBackgroundColorR(self, value):
-        self.baseBackgroundColorR = value
+        self.backgroundColorR = value
 
 
     def setBaseBackgroundColorG(self, value):
-        self.baseBackgroundColorG = value
+        self.backgroundColorG = value
 
 
     def setBaseBackgroundColorB(self, value):
-        self.baseBackgroundColorB = value
+        self.backgroundColorB = value
 
 
     def setTile(self, value):
@@ -206,7 +206,7 @@ class Door(DungeonFeature):
     def __init__(self, **kwargs):
         super(Door, self).__init__(symbol = '+', baseColor = colors.colorWood, baseBackgroundColor = colors.black, **kwargs)
         self.closed = True
-        self.baseColor = colors.colorWood
+        self.color = colors.colorWood
 
 
     closed = Column(Boolean)

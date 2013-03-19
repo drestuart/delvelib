@@ -40,17 +40,17 @@ class Tile(Base):
         self.baseSymbol = kwargs.get('baseSymbol', ' ')
         self.lastSeenSymbol = kwargs.get('lastSeenSymbol', ' ')
         
-        self.baseColor = kwargs.get('baseColor', None)
+        self.color = kwargs.get('color', None)
         
-        self.baseColorR = self.baseColor.r
-        self.baseColorG = self.baseColor.g
-        self.baseColorB = self.baseColor.b
+        self.colorR = self.color.r
+        self.colorG = self.color.g
+        self.colorB = self.color.b
         
-        self.baseBackgroundColor = kwargs.get('baseBackgroundColor', None)
+        self.backgroundColor = kwargs.get('backgroundColor', None)
         
-        self.baseBackgroundColorR = self.baseBackgroundColor.r
-        self.baseBackgroundColorG = self.baseBackgroundColor.g
-        self.baseBackgroundColorB = self.baseBackgroundColor.b
+        self.backgroundColorR = self.backgroundColor.r
+        self.backgroundColorG = self.backgroundColor.g
+        self.backgroundColorB = self.backgroundColor.b
         
         self.baseDescription = kwargs.get('baseDescription', '')
         
@@ -81,13 +81,13 @@ class Tile(Base):
     
     lastSeenSymbol = Column(String(length=1, convert_unicode = False))
     
-    baseColorR = Column(Integer)
-    baseColorG = Column(Integer)
-    baseColorB = Column(Integer)
+    colorR = Column(Integer)
+    colorG = Column(Integer)
+    colorB = Column(Integer)
     
-    baseBackgroundColorR = Column(Integer)
-    baseBackgroundColorG = Column(Integer)
-    baseBackgroundColorB = Column(Integer)
+    backgroundColorR = Column(Integer)
+    backgroundColorG = Column(Integer)
+    backgroundColorB = Column(Integer)
     
     baseDescription = Column(String)
     
@@ -244,11 +244,11 @@ class Tile(Base):
             return self.getBaseColor()
         
     def getBaseColor(self):        
-        if self.__dict__.get('baseColor', None):
-            return self.baseColor
+        if self.__dict__.get('color', None):
+            return self.color
         else:
-            self.baseColor = libtcod.Color(self.baseColorR, self.baseColorG, self.baseColorB)
-            return self.baseColor
+            self.color = libtcod.Color(self.colorR, self.colorG, self.colorB)
+            return self.color
 
     def getBackground(self):
         # Determine which background to use to draw this tile
@@ -262,11 +262,11 @@ class Tile(Base):
             return self.getBaseBackgroundColor()
         
     def getBaseBackgroundColor(self):
-        if self.__dict__.get('baseBackgroundColor', None):
-            return self.baseBackgroundColor
+        if self.__dict__.get('backgroundColor', None):
+            return self.backgroundColor
         else:
-            self.baseBackgroundColor = libtcod.Color(self.baseBackgroundColorR, self.baseBackgroundColorG, self.baseBackgroundColorB)
-            return self.baseBackgroundColor
+            self.backgroundColor = libtcod.Color(self.backgroundColorR, self.backgroundColorG, self.backgroundColorB)
+            return self.backgroundColor
 
     def getDescription(self):
         # Determine which description to use to draw this tile
