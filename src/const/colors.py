@@ -9,6 +9,7 @@ libtcod = importLibtcod()
 black = libtcod.black
 white = libtcod.white
 red = libtcod.red
+blue = libtcod.blue
 
 #blankBackground = libtcod.BKGND_NONE
 # Wall and ground colors

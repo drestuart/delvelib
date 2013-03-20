@@ -28,7 +28,7 @@ class Item(Base):
         
         self.symbol = kwargs['symbol']
         self.color = kwargs['color']
-        self.backgroundColor = kwargs.get('baseBackground', colors.black)
+        self.backgroundColor = kwargs.get('backgroundColor', colors.black)
         self.description = kwargs.get('description', 'some item')
         
         self.colorR = self.color.r
@@ -189,7 +189,35 @@ class Item(Base):
     def passTime(self, turns):
         pass
     
+    def the(self):
+        return "the " + self.getDescription()
     
+    def The(self):
+        return "The " + self.getDescription()
+    
+    def a_an(self):
+        if self.getDescription().startswith(('a', 'e', 'i', 'o', 'u')):
+            return "an " + self.getDescription()
+        else:
+            return "a " + self.getDescription()
+    
+    def A_An(self):
+        if self.getDescription().startswith(('a', 'e', 'i', 'o', 'u')):
+            return "An " + self.getDescription()
+        else:
+            return "A " + self.getDescription()
+    
+
+
+class Potion(Item):
+    def __init__(self, **kwargs):
+        super(Potion, self).__init__(symbol = '!', color = colors.blue, description = "potion", **kwargs)
+
+
+
+def getRandomItem():
+    return Potion()
+
     
 def main():
     import InventoryClass as I

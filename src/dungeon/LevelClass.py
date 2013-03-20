@@ -15,6 +15,7 @@ import Const as C
 import RoomClass as R
 import TileClass as T
 import DungeonFeatureClass as F
+import ItemClass as I
 import colors
 import database as db
 import random
@@ -146,11 +147,17 @@ class Level(Base):
         y2 = min(y2, C.MAP_HEIGHT)
         
         
-        randX = random.randint(x1, x2)
-        randY = random.randint(y1, y2)
+#        randX = random.randint(x1, x2)
+        randX = random.randint(min(x1, x2), max(x1, x2))
+        
+#        randY = random.randint(y1, y2)
+
+        randY = random.randint(min(y1, y2), max(y1, y2))
+
         return self.getTile(randX, randY)
     
     def getRandomOpenTileInArea(self, x1, x2, y1, y2):
+#        print "Looking for tile in x=[", x1, x2, "], y=[", y1, y2, "]"
         while True:
             randTile = self.getRandomTileInArea(x1, x2, y1, y2)
             blocked = randTile.blocksMove()
@@ -385,7 +392,7 @@ class DungeonLevel(Level):
     def __init__(self, **kwargs):
         super(DungeonLevel, self).__init__(**kwargs)
     
-    def buildLevel(self):
+    def buildLevelOld(self):
         '''Add some rooms to the level'''
         rooms = []
 
@@ -453,7 +460,7 @@ class DungeonLevel(Level):
         self.computeFOVProperties()
         
 
-    def buildLevelNew(self):
+    def buildLevel(self):
         '''
         Adapted from the dungeon building algorithm by Zack Hovatter (http://roguebasin.roguelikedevelopment.org/index.php?title=User:Zackhovatter)
         
@@ -707,16 +714,16 @@ class DungeonLevel(Level):
         d = dungeon(C.MAP_WIDTH, C.MAP_HEIGHT, C.MAX_ROOMS_AND_CORRIDORS, C.ROOM_CHANCE, self)
         d.addTiles(self)
         
-        print "Placing walls"
-        # Fill in empty spaces
-#        self.fillInSpaces()
-        
         print "Building tile array"    
         self.buildTileArray()    
         
         # Place Stairs
         print "Placing stairs"
         self.placeStairs()
+        
+        # Place items
+        print "Placing items"
+        self.placeItems()
         
         print "Saving open tiles"
         db.saveDB.save(self)
@@ -743,6 +750,15 @@ class DungeonLevel(Level):
                     self.tiles.append(newTile)
                     self.hasTile[x][y] = True
                     
+
+    def placeItems(self):
+        
+        for room in self.rooms:
+            # Just place one random item for now
+            tile = self.getRandomOpenTileInRoom(room)
+            item = I.getRandomItem()
+            tile.addObject(item)
+
                                                
     # Create a room
     def createRoom(self, room):

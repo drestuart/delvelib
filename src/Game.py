@@ -35,7 +35,7 @@ class Game(object):
                           defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
         
     #    d1.buildLevel()
-        d1.buildLevelNew()
+        d1.buildLevel()
         player = P.Player()
         d1.placeCreatureInRandomRoom(player)
         
@@ -52,6 +52,7 @@ class Game(object):
         
     def play(self):
         self.myUI.gameLoop()
+        db.saveDB.save(self.myUI.getCurrentLevel())
         
     def message(self, msg, color = colors.white):
         self.myUI.message(msg, color)

@@ -159,24 +159,25 @@ class Tile(Base):
         return blocks
     
     def addObject(self, obj):
-        if self.inventory:
+        if not self.inventory:
             self.initializeInventory()
             
         # Put an obj into this tile, if possible.
         if not self.blockMove:
-            self.inventory.add(obj)
+            self.inventory.addItem(obj)
     
     def addObjects(self, objects):
-        if self.inventory:
+        if not self.inventory:
             self.initializeInventory()
         
         # Put several inventory into this tile
         [self.addObject(obj) for obj in objects]
             
     def removeObject(self, index):
-        # Take an object from this tile
-        obj = self.inventory.pop(index)
-        return obj
+        if self.inventory:
+            # Take an object from this tile
+            obj = self.inventory.pop(index)
+            return obj
     
     def removeObjects(self, indices):
         # Take some inventory from this tile
@@ -205,8 +206,10 @@ class Tile(Base):
             
     def passTime(self, turns = 1):
         '''Pass some time on the inventory and creature on this tile'''
-        for obj in self.inventory.getItems():
-            obj.passTime(turns)
+        
+        if self.inventory:
+            for obj in self.inventory.getItems():
+                obj.passTime(turns)
             
 #        if self.creature is not None:
 #            self.creature.passTime(turns)
@@ -226,13 +229,13 @@ class Tile(Base):
         
         if self.creature and self.creature.isVisible():
             toReturn = self.creature.getSymbol()
+            
+        elif self.inventory:
+            return self.inventory.getItem(0).getSymbol()
         
         elif self.feature and self.feature.isVisible():
             toReturn = self.feature.getSymbol()
-#        
-#        elif self.inventory:
-#            toReturn = self.inventory[0].symbol()
-#        
+
         else:
             toReturn = self.baseSymbol
         
@@ -245,12 +248,12 @@ class Tile(Base):
         if self.creature and self.creature.isVisible():
             return self.creature.getColor()
         
+        elif self.inventory:
+            return self.inventory.getItem(0).getColor()
+        
         elif self.feature and self.feature.isVisible():
             return self.feature.getColor()
-#        
-#        elif self.inventory:
-#            return self.inventory[0].color()
-#        
+       
         else:
             return self.getBaseColor()
         
@@ -284,11 +287,11 @@ class Tile(Base):
         if self.creature and self.creature.isVisible():
             return self.creature.description
         
-        elif self.feature and self.feature.isVisible():
-            return self.feature.description
-        
         elif self.inventory and self.inventory.length() > 0:
             return self.inventory.getItem(0).getDescription()
+        
+        elif self.feature and self.feature.isVisible():
+            return self.feature.description
         
         else:
             return self.baseDescription 

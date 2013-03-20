@@ -156,7 +156,7 @@ class AggressiveAI(AI):
     def walkPath(self):
         path = self.owner.getPath()
         
-        if libtcod.path_is_empty(path):
+        if path is None or libtcod.path_is_empty(path):
             self.wander()
             return
         else:
