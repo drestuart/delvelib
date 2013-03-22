@@ -10,6 +10,8 @@ import colors
 import os.path
 import textwrap
 import Game as G
+import keys
+import Util as U
 
 libtcod = importLibtcod()
 
@@ -33,6 +35,36 @@ class UI(object):
         self.msgs = []
         
     def handleKeys(self, key):
+     
+        if key.vk == libtcod.KEY_ESCAPE:
+            return "exit"
+            
+        elif key.pressed:
+            
+            direc = keys.getMovementDirection(key)
+            
+            keyStr = U.get_key(key)
+            
+            # Move
+            if direc:
+                dx, dy = direc
+                if self.player.move(dx, dy):
+                    return 'took-turn'
+ 
+            elif key.vk == libtcod.KEY_KPDEC or keyStr == '.': # Wait
+                return 'took-turn'
+            
+            elif keyStr == ',': # Pick up items
+                if self.player.getTile().getInventory():
+                    item = self.player.getTile().getInventory().pop(0)
+                    self.player.pickUpItem(item)
+                    
+                    return 'took-turn'
+            
+        else:
+            return 'didnt-take-turn'
+    
+    def handleKeysOld(self, key):
      
         if key.vk == libtcod.KEY_ESCAPE:
             return 'exit'  #exit game
