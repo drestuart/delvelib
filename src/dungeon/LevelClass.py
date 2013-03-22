@@ -158,11 +158,21 @@ class Level(Base):
     
     def getRandomOpenTileInArea(self, x1, x2, y1, y2):
 #        print "Looking for tile in x=[", x1, x2, "], y=[", y1, y2, "]"
-        while True:
-            randTile = self.getRandomTileInArea(x1, x2, y1, y2)
-            blocked = randTile.blocksMove()
-            if randTile and not blocked:
-                return randTile
+        
+        openTiles = []
+        
+        for x in range(x1, x2):
+            for y in range(y1, y2):
+                tile = self.getTile(x, y)
+                if not tile.blocksMove():
+                    openTiles.append(tile)
+                    
+        if not openTiles:
+            return None
+        
+        else:
+            return random.choice(openTiles)
+                
             
     def getRandomTileInRoom(self, room):
         return self.getRandomTileInArea(room.x1, room.x2, room.y1, room.y2)
