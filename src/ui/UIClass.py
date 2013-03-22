@@ -33,6 +33,130 @@ class UI(object):
         self.panel = libtcod.console_new(C.PANEL_WIDTH, C.PANEL_HEIGHT)
 
         self.msgs = []
+    
+    def singleChoiceMenu(self, header, options, width):
+        
+        #calculate total height for the header (after auto-wrap) and one line per option
+        header_height = libtcod.console_get_height_rect(self.mapConsole, 0, 0, width, C.SCREEN_HEIGHT, header)
+        height = len(options) + header_height
+     
+        #create an off-screen console that represents the singleChoiceMenu's window
+#        window = libtcod.console_new(width, height)
+#     
+#        #print the header, with auto-wrap
+#        libtcod.console_set_default_foreground(window, libtcod.white)
+#        libtcod.console_print_rect_ex(window, 0, 0, width, height, libtcod.BKGND_NONE, libtcod.LEFT, header)
+#     
+#        #print all the options
+#        y = header_height
+#        letter_index = ord('a')
+#        for option_text in options:
+#            text = '(' + chr(letter_index) + ') ' + option_text
+#            libtcod.console_print_ex(window, 0, y, libtcod.BKGND_NONE, libtcod.LEFT, text)
+#            y += 1
+#            letter_index += 1
+#     
+#        #blit the contents of "window" to the root console
+#        x = C.SCREEN_WIDTH/2 - width/2
+#        y = C.SCREEN_HEIGHT/2 - height/2
+#        libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
+#     
+#        #present the root console to the player and wait for a key-press
+#        libtcod.console_flush()
+
+        lines = []
+        letter_index = ord('a')
+        for option in options:
+            text = '(' + chr(letter_index) + ') ' + option
+            lines.append(text)
+            letter_index += 1
+
+        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
+        
+        key = libtcod.console_wait_for_keypress(True)
+     
+        #convert the ASCII code to an index; if it corresponds to an option, return it
+        index = key.c - ord('a')
+        if index >= 0 and index < len(options): 
+            return index
+        
+        return None
+    
+    def displayTextWindow(self, header, x, y, width, height, lines):
+        window = libtcod.console_new(width, height)
+        
+        libtcod.console_set_default_foreground(window, libtcod.white)
+        libtcod.console_print_rect_ex(window, 0, 0, width, height, libtcod.BKGND_NONE, libtcod.LEFT, header)
+        
+        header_height = libtcod.console_get_height_rect(self.mapConsole, 0, 0, width, C.SCREEN_HEIGHT, header)
+        
+        # Print each line
+        y = header_height
+        for line in lines:
+            libtcod.console_print_ex(window, 0, y, libtcod.BKGND_NONE, libtcod.LEFT, line)
+            y += 1
+   
+        libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
+        libtcod.console_flush()
+        
+    
+    def showPlayerInventory(self):
+        header = C.PLAYER_INVENTORY_HEADER
+        inv = self.player.getInventory()
+        
+        header_height = libtcod.console_get_height_rect(self.mapConsole, 0, 0, C.MENU_WIDTH, C.SCREEN_HEIGHT, header)
+        height = inv.length() + header_height
+        
+        lines = []
+        
+        for item in inv.getItems():
+            text = item.getDescription()
+            lines.append(text)
+        
+        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
+        
+        key = libtcod.console_wait_for_keypress(True)
+        
+        # Do nothing
+        return None
+        
+        
+    
+    def pickUpItemMenu(self, inventory):
+        #show a singleChoiceMenu with each item of the inventory as an option
+        if inventory.length() == 0:
+#            options = ['Inventory is empty.']
+            return None
+        else:
+            items = inventory.getItems()
+            options = [item.getDescription() for item in items]
+        
+        header = C.PICK_UP_ITEM_MENU_HEADER
+        index = self.singleChoiceMenu(header, options, C.MENU_WIDTH)
+     
+        #if an item was chosen, return it
+        if index is None or inventory.length() == 0:
+            return None
+        
+        return inventory.pop(index)
+    
+    def selectItemMenu(self, inventory):
+        #show a singleChoiceMenu with each item of the inventory as an option
+        if inventory.length() == 0:
+#            options = ['Inventory is empty.']
+            return None
+        else:
+            items = inventory.getItems()
+            options = [item.getDescription() for item in items]
+        
+        header = C.PICK_UP_ITEM_MENU_HEADER
+        index = self.singleChoiceMenu(header, options, C.MENU_WIDTH)
+     
+        #if an item was chosen, return it
+        if index is None or inventory.length() == 0:
+            return None
+        
+        return inventory.getItem(index)
         
     def handleKeys(self, key):
      
@@ -56,10 +180,19 @@ class UI(object):
             
             elif keyStr == ',': # Pick up items
                 if self.player.getTile().getInventory():
-                    item = self.player.getTile().getInventory().pop(0)
-                    self.player.pickUpItem(item)
+#                    item = self.player.getTile().getInventory().pop(0)
+                    
+                    inv = self.player.getTile().getInventory()
+                    item = self.pickUpItemMenu(inv)
+                    if item:
+#                        inv.removeItem(item)
+                        self.player.pickUpItem(item)
                     
                     return 'took-turn'
+                
+            elif keyStr == 'i':
+                self.showPlayerInventory()
+                return 'didnt-take-turn'
             
         else:
             return 'didnt-take-turn'
