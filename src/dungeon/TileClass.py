@@ -230,7 +230,7 @@ class Tile(Base):
         if self.creature and self.creature.isVisible():
             toReturn = self.creature.getSymbol()
             
-        elif self.inventory:
+        elif self.inventory and self.inventory.length() > 0:
             return self.inventory.getItem(0).getSymbol()
         
         elif self.feature and self.feature.isVisible():
@@ -248,7 +248,7 @@ class Tile(Base):
         if self.creature and self.creature.isVisible():
             return self.creature.getColor()
         
-        elif self.inventory:
+        elif self.inventory and self.inventory.length() > 0:
             return self.inventory.getItem(0).getColor()
         
         elif self.feature and self.feature.isVisible():
@@ -341,6 +341,10 @@ class Tile(Base):
         
     def distance(self, other):
         return U.ChebyshevDistance(self.getX(), other.getX(), self.getY(), other.getY())
+
+    def getInventory(self):
+        return self.inventory
+
 
 
 # Some classes representing different kinds of tiles

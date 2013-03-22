@@ -38,7 +38,7 @@ class Inventory(Base):
     
     __mapper_args__ = {
         'polymorphic_on':inventoryType,
-        'polymorphic_identity':'item'
+        'polymorphic_identity':'inventory'
     }
     
     
@@ -63,10 +63,10 @@ class Inventory(Base):
         
         raise ValueError(itemIn + " does not exist in container " + self)
     
-    def pop(self):
-        if len(self.items) == 0:
+    def pop(self, ind = 0):
+        if len(self.items) <= ind:
             return None
-        itemToPop = self.items[0]
+        itemToPop = self.items[ind]
         return self.removeItem(itemToPop)
     
     def getItem(self, ind):

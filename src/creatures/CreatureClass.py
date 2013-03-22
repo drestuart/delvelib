@@ -14,6 +14,7 @@ import AIClass as AI
 import colors
 import database as db
 import Game as G
+import InventoryClass as I
 
 libtcod = importLibtcod()
 
@@ -54,6 +55,9 @@ class Creature(Base):
         
         self.AIClass = kwargs['AIClass']
         self.initializeAI()
+        
+        self.inventory = I.Inventory()
+
 
     id = Column(Integer, primary_key=True, unique=True)
     
@@ -87,6 +91,9 @@ class Creature(Base):
     
     __mapper_args__ = {'polymorphic_on': creatureType,
                        'polymorphic_identity': 'creature'}
+    
+    def getInventory(self):
+        return self.inventory
     
     def move(self, dx, dy):
         
@@ -353,6 +360,10 @@ class Creature(Base):
             return "An " + self.getName()
         else:
             return "A " + self.getName()
+        
+    def pickUpItem(self, item):
+        self.getInventory().addItem(item)
+        G.game.message(self.The() + " picks up " + item.a_an())
     
     
 
