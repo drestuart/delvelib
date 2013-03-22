@@ -206,6 +206,7 @@ class Level(Base):
                         
                         symbol, color, background = tile.toDraw()
                         background = colors.colorLightWall
+                        tile.setLastSeenSymbol(symbol)
                         
                     
                     else:

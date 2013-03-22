@@ -239,7 +239,7 @@ class Tile(Base):
         else:
             toReturn = self.baseSymbol
         
-        self.setLastSeenSymbol(toReturn)
+#        self.setLastSeenSymbol(toReturn)
         return toReturn
         
     def getColor(self):
