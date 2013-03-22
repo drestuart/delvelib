@@ -10,6 +10,7 @@ libtcod = importLibtcod()
 
 import Util as U
 import random
+import keys
 
 class AI(object):
     
@@ -46,38 +47,45 @@ class PlayerAI(AI):
             return "exit"
             
         elif key.pressed:
- 
-            if key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8 or U.get_key(key) == 'k':
-                if self.owner.move(0, -1):
-                    return 'took-turn'
-     
-            elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2 or  U.get_key(key) == 'j':
-                if self.owner.move(0, 1):
-                    return 'took-turn'
-     
-            elif key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_KP4 or  U.get_key(key) == 'h':
-                if self.owner.move(-1, 0):
-                    return 'took-turn'
-     
-            elif key.vk == libtcod.KEY_RIGHT or key.vk == libtcod.KEY_KP6 or  U.get_key(key) == 'l':
-                if self.owner.move(1, 0):
-                    return 'took-turn'
-    
-            elif key.vk == libtcod.KEY_KP1 or  U.get_key(key) == 'b':
-                if self.owner.move(-1, 1):
-                    return 'took-turn'
-    
-            elif key.vk == libtcod.KEY_KP3 or  U.get_key(key) == 'n':
-                if self.owner.move(1, 1):
-                    return 'took-turn'
-                
-            elif key.vk == libtcod.KEY_KP7 or  U.get_key(key) == 'y':
-                if self.owner.move(-1, -1):
-                    return 'took-turn'
             
-            elif key.vk == libtcod.KEY_KP9 or  U.get_key(key) == 'u':
-                if self.owner.move(1, -1):
+            direc = keys.getMovementDirection(key)
+            
+            if direc:
+                dx, dy = direc
+                if self.owner.move(dx, dy):
                     return 'took-turn'
+ 
+#            if key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_KP8 or U.get_key(key) == 'k':
+#                if self.owner.move(0, -1):
+#                    return 'took-turn'
+#     
+#            elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_KP2 or  U.get_key(key) == 'j':
+#                if self.owner.move(0, 1):
+#                    return 'took-turn'
+#     
+#            elif key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_KP4 or  U.get_key(key) == 'h':
+#                if self.owner.move(-1, 0):
+#                    return 'took-turn'
+#     
+#            elif key.vk == libtcod.KEY_RIGHT or key.vk == libtcod.KEY_KP6 or  U.get_key(key) == 'l':
+#                if self.owner.move(1, 0):
+#                    return 'took-turn'
+#    
+#            elif key.vk == libtcod.KEY_KP1 or  U.get_key(key) == 'b':
+#                if self.owner.move(-1, 1):
+#                    return 'took-turn'
+#    
+#            elif key.vk == libtcod.KEY_KP3 or  U.get_key(key) == 'n':
+#                if self.owner.move(1, 1):
+#                    return 'took-turn'
+#                
+#            elif key.vk == libtcod.KEY_KP7 or  U.get_key(key) == 'y':
+#                if self.owner.move(-1, -1):
+#                    return 'took-turn'
+#            
+#            elif key.vk == libtcod.KEY_KP9 or  U.get_key(key) == 'u':
+#                if self.owner.move(1, -1):
+#                    return 'took-turn'
                 
             elif key.vk == libtcod.KEY_KPDEC or U.get_key(key) == '.':
                 return 'took-turn'
