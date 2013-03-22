@@ -161,13 +161,13 @@ class Level(Base):
         
         openTiles = []
         
-        for x in range(x1, x2):
-            for y in range(y1, y2):
+        for x in range(min(x1, x2), max(x1, x2) + 1):
+            for y in range(min(y1, y2), max(y1, y2) + 1):
                 tile = self.getTile(x, y)
-                if not tile.blocksMove():
+                if tile and not tile.blocksMove():
                     openTiles.append(tile)
                     
-        if not openTiles:
+        if len(openTiles) == 0:
             return None
         
         else:
@@ -382,9 +382,12 @@ class Level(Base):
         return success
     
     def placeCreatureInRandomRoom(self, creature):
-        room = random.choice(self.rooms)
-        tile = self.getRandomOpenTileInRoom(room)
-        self.placeCreature(creature, tile)
+        while True:
+            room = random.choice(self.rooms)
+            tile = self.getRandomOpenTileInRoom(room)
+            if tile:
+                self.placeCreature(creature, tile)
+                break
         
     def placeCreatureInRandomTile(self, creature):
         tile = self.getRandomOpenTile()
@@ -766,8 +769,9 @@ class DungeonLevel(Level):
         for room in self.rooms:
             # Just place one random item for now
             tile = self.getRandomOpenTileInRoom(room)
-            item = I.getRandomItem()
-            tile.addObject(item)
+            if tile:
+                item = I.getRandomItem()
+                tile.addObject(item)
 
                                                
     # Create a room
@@ -902,31 +906,27 @@ class DungeonLevel(Level):
 
     def placeStairs(self):
         
-        # Choose rooms
-        upRoom = random.choice(self.rooms)
-        
         while True:
-            downRoom = random.choice(self.rooms)
-            if len(self.rooms) == 1 or downRoom is not upRoom:
-                break
-        
-        # Place stairs
-        
-        while True:
+            # Choose rooms
+            upRoom = random.choice(self.rooms)
+            
+            while True:
+                downRoom = random.choice(self.rooms)
+                if len(self.rooms) == 1 or downRoom is not upRoom:
+                    break
+            
+            # Place stairs
+            
             upTile = self.getRandomOpenTileInRoom(upRoom)
-            feature = upTile.getFeature()
-            if feature is None:
+            downTile = self.getRandomOpenTileInRoom(downRoom)
+            
+            if upTile and downTile and not (upTile.getFeature() or downTile.getFeature()):
+            
                 upStair = F.upStair()
                 upTile.setFeature(upStair)
                 
                 # Set destination
-                
-                break
-        
-        while True:
-            downTile = self.getRandomOpenTileInRoom(downRoom)
-            feature = downTile.getFeature()
-            if feature is None:
+            
                 downStair = F.downStair()
                 downTile.setFeature(downStair)
                 
