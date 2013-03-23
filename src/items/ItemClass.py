@@ -21,6 +21,13 @@ class Item(Base):
     __tablename__ = "items"
     __table_args__ = {'extend_existing': True}
 
+    # Default class variables
+    drinkable = False
+    edible = False
+    readable = False
+    wearable = False
+    wieldable = False
+    zappable = False
 
     def __init__(self, **kwargs):
         self.weight = kwargs.get('weight', 0)
@@ -209,9 +216,60 @@ class Item(Base):
     
 
 
+class Amulet(Item):
+    wearable = True
+    def __init__(self, **kwargs):
+        super(Potion, self).__init__(symbol = '"', **kwargs)
+
+class Armor(Item):
+    wearable = True
+    def __init__(self, **kwargs):
+        super(Potion, self).__init__(symbol = '[', **kwargs)
+        
+class Coins(Item):
+    def __init__(self, **kwargs):
+        super(Potion, self).__init__(symbol = '$', **kwargs)
+
+class Food(Item):
+    edible = True
+    def __init__(self, **kwargs):
+        super(Potion, self).__init__(symbol = '%', **kwargs)
+
+class Gem(Item):
+    def __init__(self, **kwargs):
+        super(Potion, self).__init__(symbol = '*', **kwargs)
+
 class Potion(Item):
+    drinkable = True
     def __init__(self, **kwargs):
         super(Potion, self).__init__(symbol = '!', color = colors.blue, description = "potion", **kwargs)
+
+class Ring(Item):
+    wearable = True
+    def __init__(self, **kwargs):
+        super(Potion, self).__init__(symbol = '=', **kwargs)
+
+class Scroll(Item):
+    readable = True
+    def __init__(self, **kwargs):
+        super(Potion, self).__init__(symbol = '?', **kwargs)
+        
+class Spellbook(Item):
+    readable = True
+    def __init__(self, **kwargs):
+        super(Potion, self).__init__(symbol = '+', **kwargs)
+        
+class Wand(Item):
+    zappable = True
+    def __init__(self, **kwargs):
+        super(Potion, self).__init__(symbol = '/', **kwargs)
+
+class Weapon(Item):
+    wieldable = True
+    def __init__(self, **kwargs):
+        super(Potion, self).__init__(symbol = ')', **kwargs)
+
+
 
 
 
