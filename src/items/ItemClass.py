@@ -221,65 +221,84 @@ class Item(Base):
 class Amulet(Item):
     wearable = True
     def __init__(self, **kwargs):
-        super(Potion, self).__init__(symbol = '"', **kwargs)
+        super(Amulet, self).__init__(symbol = '"', **kwargs)
 
 class Armor(Item):
     wearable = True
     def __init__(self, **kwargs):
-        super(Potion, self).__init__(symbol = '[', **kwargs)
+        super(Armor, self).__init__(symbol = '[', **kwargs)
         
 class Coins(Item):
     def __init__(self, **kwargs):
-        super(Potion, self).__init__(symbol = '$', **kwargs)
+        super(Coins, self).__init__(symbol = '$', **kwargs)
 
 class Food(Item):
     edible = True
     def __init__(self, **kwargs):
-        super(Potion, self).__init__(symbol = '%', **kwargs)
+        super(Food, self).__init__(symbol = '%', **kwargs)
 
 class Gem(Item):
     def __init__(self, **kwargs):
-        super(Potion, self).__init__(symbol = '*', **kwargs)
+        super(Gem, self).__init__(symbol = '*', **kwargs)
 
 class Potion(Item):
     drinkable = True
     def __init__(self, **kwargs):
-        super(Potion, self).__init__(symbol = '!', color = colors.blue, description = "potion", **kwargs)
+        super(Potion, self).__init__(symbol = '!', **kwargs)
 
 class Ring(Item):
     wearable = True
     def __init__(self, **kwargs):
-        super(Potion, self).__init__(symbol = '=', **kwargs)
+        super(Ring, self).__init__(symbol = '=', **kwargs)
 
 class Scroll(Item):
     readable = True
     def __init__(self, **kwargs):
-        super(Potion, self).__init__(symbol = '?', **kwargs)
+        super(Scroll, self).__init__(symbol = '?', color = colors.white, **kwargs)
         
 class Spellbook(Item):
     readable = True
     def __init__(self, **kwargs):
-        super(Potion, self).__init__(symbol = '+', **kwargs)
+        super(Spellbook, self).__init__(symbol = '+', **kwargs)
         
 class Wand(Item):
     zappable = True
     def __init__(self, **kwargs):
-        super(Potion, self).__init__(symbol = '/', **kwargs)
+        super(Wand, self).__init__(symbol = '/', **kwargs)
 
 class Weapon(Item):
     wieldable = True
     def __init__(self, **kwargs):
-        super(Potion, self).__init__(symbol = ')', **kwargs)
+        super(Weapon, self).__init__(symbol = ')', **kwargs)
 
 
 
 
 
 def getRandomItem():
+    
+    import Armors
+    import Coins
+    import Foods
+    import Gems
     import Potions
+    import Rings
+    import Scrolls
+    import Spellbooks
+    import Wands
+    import Weapons
     
     weights = {
-               Potions.getRandomPotion : 10
+               Armors.getRandomArmor : 9,
+               Coins.getRandomCoins : 15,
+               Foods.getRandomFood : 15,
+               Gems.getRandomGem : 5,
+               Potions.getRandomPotion : 10,
+               Rings.getRandomRing : 5,
+               Scrolls.getRandomScroll : 10,
+               Spellbooks.getRandomSpellbook : 6,
+               Wands.getRandomWand : 7,
+               Weapons.getRandomWeapon : 12
                }
     
     itemFunc = weightedChoice(weights)

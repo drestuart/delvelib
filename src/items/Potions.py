@@ -15,22 +15,22 @@ def getRandomPotion():
 
 class PettyHealingPotion(I.Potion):
     def __init__(self, **kwargs):
-        super(I.Potion, self).__init__(symbol = '!', color = colors.lightBlue, description = "potion of petty healing", **kwargs)
+        super(PettyHealingPotion, self).__init__(color = colors.lightBlue, description = "potion of petty healing", **kwargs)
         
         
 class ModerateHealingPotion(I.Potion):
     def __init__(self, **kwargs):
-        super(I.Potion, self).__init__(symbol = '!', color = colors.blue, description = "potion of moderate healing", **kwargs)
+        super(ModerateHealingPotion, self).__init__(color = colors.blue, description = "potion of moderate healing", **kwargs)
         
 
 class ColossalHealingPotion(I.Potion):
     def __init__(self, **kwargs):
-        super(I.Potion, self).__init__(symbol = '!', color = colors.darkBlue, description = "potion of colossal healing", **kwargs)
+        super(ColossalHealingPotion, self).__init__(color = colors.darkBlue, description = "potion of colossal healing", **kwargs)
         
         
 class PoisonPotion(I.Potion):
     def __init__(self, **kwargs):
-        super(I.Potion, self).__init__(symbol = '!', color = colors.red, description = "potion of poison", **kwargs)
+        super(PoisonPotion, self).__init__(color = colors.red, description = "potion of poison", **kwargs)
         
         
 weights = {

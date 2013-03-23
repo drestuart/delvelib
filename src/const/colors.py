@@ -12,6 +12,8 @@ red = libtcod.red
 blue = libtcod.blue
 lightBlue = libtcod.light_blue
 darkBlue = libtcod.darker_blue
+green = libtcod.green
+darkMagenta = libtcod.dark_magenta
 
 #blankBackground = libtcod.BKGND_NONE
 # Wall and ground colors
@@ -27,3 +29,8 @@ colorStone = libtcod.lighter_grey
 colorGrass = libtcod.darker_green
 
 colorNotInFOV = libtcod.grey
+
+colorSteel = libtcod.light_sky
+colorGold = libtcod.gold
+colorMeat = libtcod.darker_sepia
+colorLeather = libtcod.darkest_sepia
