@@ -10,6 +10,8 @@ black = libtcod.black
 white = libtcod.white
 red = libtcod.red
 blue = libtcod.blue
+lightBlue = libtcod.light_blue
+darkBlue = libtcod.darker_blue
 
 #blankBackground = libtcod.BKGND_NONE
 # Wall and ground colors

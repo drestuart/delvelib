@@ -9,6 +9,8 @@ from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer, Float
 import colors
 import database as db
+from randomChoice import weightedChoice
+
 
 libtcod = importLibtcod()
 
@@ -274,7 +276,18 @@ class Weapon(Item):
 
 
 def getRandomItem():
-    return Potion()
+    import Potions
+    
+    weights = {
+               Potions.getRandomPotion : 10
+               }
+    
+    itemFunc = weightedChoice(weights)
+    item = itemFunc()
+    return item
+
+
+
 
     
 def main():
