@@ -2,6 +2,8 @@
 Some methods from the RogueBasin libtcod tutorial for choosing things by probability
 '''
 
+import libtcodpy as libtcod
+
 def random_choice_index(chances):  #choose one option from list of chances, returning its index
     #the dice will land on some number between 1 and the sum of the chances
     dice = libtcod.random_get_int(0, 1, sum(chances))
@@ -17,12 +19,12 @@ def random_choice_index(chances):  #choose one option from list of chances, retu
             return choice
         choice += 1
  
-def random_choice(chances_dict):
+def weightedChoice(chances_dict):
     #choose one option from dictionary of chances, returning its key
     chances = chances_dict.values()
-    strings = chances_dict.keys()
+    choices = chances_dict.keys()
  
-    return strings[random_choice_index(chances)]
+    return choices[random_choice_index(chances)]
  
 def from_dungeon_level(dungeon_level, table):
     #returns a value that depends on level. the table specifies what value occurs after each level, default is 0.
