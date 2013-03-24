@@ -15,16 +15,16 @@ def getRandomGem():
 
 class Ruby(I.Gem):
     def __init__(self, **kwargs):
-        super(Ruby, self).__init__(color = colors.red, description = "a ruby", **kwargs)
+        super(Ruby, self).__init__(color = colors.red, description = "ruby", **kwargs)
         
 class Emerald(I.Gem):
     def __init__(self, **kwargs):
-        super(Emerald, self).__init__(color = colors.green, description = "an emerald", **kwargs)
+        super(Emerald, self).__init__(color = colors.green, description = "emerald", **kwargs)
         
         
 class Diamond(I.Gem):
     def __init__(self, **kwargs):
-        super(Diamond, self).__init__(color = colors.white, description = "a diamond", **kwargs)
+        super(Diamond, self).__init__(color = colors.white, description = "diamond", **kwargs)
         
         
 weights = {
