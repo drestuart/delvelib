@@ -56,14 +56,14 @@ class Inventory(Base):
         
         if not itemIn in self.items:
             if not type(itemIn).getStackable():
-                print itemIn.getDescription() + " is not stackable"
+#                print itemIn.getDescription() + " is not stackable"
                 self.items.append(itemIn)
                 
             else:
                 stacked = False
                 for item in self.items:
                     if item.canStackWith(itemIn):
-                        print "Stacking " + itemIn.getDescription() + " and " + item.getDescription()
+#                        print "Stacking " + itemIn.getDescription() + " and " + item.getDescription()
                         item.stackWith(itemIn)
                         stacked = True
                         del itemIn

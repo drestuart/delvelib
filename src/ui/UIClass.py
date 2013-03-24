@@ -101,13 +101,105 @@ class UI(object):
         header = C.WEAR_MENU_HEADER
         inv = self.player.getInventory()
         
-        header_height = libtcod.console_get_height_rect(self.mapConsole, 0, 0, C.MENU_WIDTH, C.SCREEN_HEIGHT, header)
-        height = inv.length() + header_height
-        
         lines = []
         
         for item in inv.getItems():
             if type(item).getWearable():
+                text = item.getDescription()
+                lines.append(text)
+        
+#        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
+        index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
+        
+#        key = libtcod.console_wait_for_keypress(True)
+        
+        # Do nothing... yet
+        return None
+    
+    def wieldMenu(self):
+        header = C.WIELD_MENU_HEADER
+        inv = self.player.getInventory()
+        
+        lines = []
+        
+        for item in inv.getItems():
+            if type(item).getWieldable():
+                text = item.getDescription()
+                lines.append(text)
+        
+#        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
+        index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
+        
+#        key = libtcod.console_wait_for_keypress(True)
+        
+        # Do nothing... yet
+        return None
+    
+    def quaffMenu(self):
+        header = C.QUAFF_MENU_HEADER
+        inv = self.player.getInventory()
+        
+        lines = []
+        
+        for item in inv.getItems():
+            if type(item).getDrinkable():
+                text = item.getDescription()
+                lines.append(text)
+        
+#        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
+        index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
+        
+#        key = libtcod.console_wait_for_keypress(True)
+        
+        # Do nothing... yet
+        return None
+    
+    def readMenu(self):
+        header = C.READ_MENU_HEADER
+        inv = self.player.getInventory()
+        
+        lines = []
+        
+        for item in inv.getItems():
+            if type(item).getReadable():
+                text = item.getDescription()
+                lines.append(text)
+        
+#        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
+        index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
+        
+#        key = libtcod.console_wait_for_keypress(True)
+        
+        # Do nothing... yet
+        return None
+    
+    def eatMenu(self):
+        header = C.EAT_MENU_HEADER
+        inv = self.player.getInventory()
+        
+        lines = []
+        
+        for item in inv.getItems():
+            if type(item).getEdible():
+                text = item.getDescription()
+                lines.append(text)
+        
+#        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
+        index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
+        
+#        key = libtcod.console_wait_for_keypress(True)
+        
+        # Do nothing... yet
+        return None
+    
+    def zapMenu(self):
+        header = C.ZAP_MENU_HEADER
+        inv = self.player.getInventory()
+        
+        lines = []
+        
+        for item in inv.getItems():
+            if type(item).getZappable():
                 text = item.getDescription()
                 lines.append(text)
         
@@ -190,6 +282,26 @@ class UI(object):
                 
             elif keyStr == 'W':  # Wear something
                 self.wearMenu()                
+                return 'didnt-take-turn'
+            
+            elif keyStr == 'w':  # Wield something
+                self.wieldMenu()                
+                return 'didnt-take-turn'
+            
+            elif keyStr == 'q':  # Quaff something
+                self.quaffMenu()                
+                return 'didnt-take-turn'
+            
+            elif keyStr == 'r':  # Read something
+                self.readMenu()                
+                return 'didnt-take-turn'
+            
+            elif keyStr == 'e':  # Eat something
+                self.eatMenu()                
+                return 'didnt-take-turn'
+            
+            elif keyStr == 'z':  # Zap something
+                self.zapMenu()                
                 return 'didnt-take-turn'
                 
             elif keyStr == 'i':
