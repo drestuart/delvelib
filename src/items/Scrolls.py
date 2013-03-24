@@ -13,6 +13,11 @@ def getRandomScroll():
     return scrollClass()
 
 class TeleportationScroll(I.Scroll):
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'teleportation_scroll'
+    }
+    
     def __init__(self, **kwargs):
         super(TeleportationScroll, self).__init__(description = "scroll of teleportation", **kwargs)
         

@@ -14,6 +14,11 @@ def getRandomArmor():
     return armClass()
 
 class Breastplate(I.Armor):
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'breastplate'
+    }
+    
     def __init__(self, **kwargs):
         super(Breastplate, self).__init__(color = colors.colorSteel, description = "breastplate", **kwargs)
         

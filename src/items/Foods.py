@@ -14,8 +14,13 @@ def getRandomFood():
     return foodClass()
 
 class Kebab(I.Food):
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'kebab'
+    }
+    
     def __init__(self, **kwargs):
-        super(Kebab, self).__init__(color = colors.colorMeat, description = "a kebab", **kwargs)
+        super(Kebab, self).__init__(color = colors.colorMeat, description = "kebab", **kwargs)
         
         
 weights = {

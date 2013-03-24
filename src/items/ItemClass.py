@@ -259,7 +259,30 @@ class Item(Base):
     @classmethod
     def getStackable(cls):
         return cls.stackable
-
+    
+    @classmethod
+    def getDrinkable(cls):
+        return cls.drinkable
+    
+    @classmethod
+    def getEdible(cls):
+        return cls.edible
+    
+    @classmethod
+    def getReadable(cls):
+        return cls.readable
+    
+    @classmethod
+    def getWearable(cls):
+        return cls.wearable
+    
+    @classmethod
+    def getWieldable(cls):
+        return cls.wieldable
+    
+    @classmethod
+    def getZappable(cls):
+        return cls.zappable
 
 
 class Amulet(Item):
