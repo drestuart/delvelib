@@ -43,14 +43,35 @@ class Inventory(Base):
     
     
     def printContents(self):
-        print self.items
+        for item in self.items:
+            print item.getDescription()
     
     def addItem(self, itemIn):
         if self.items is None:
             self.items = []
-        if not itemIn in self.items:
+        
+        if self.items == []:
             self.items.append(itemIn)
-#            itemIn.setContainer(self)
+            return self
+        
+        if not itemIn in self.items:
+            if not type(itemIn).getStackable():
+                print itemIn.getDescription() + " is not stackable"
+                self.items.append(itemIn)
+                
+            else:
+                stacked = False
+                for item in self.items:
+                    if item.canStackWith(itemIn):
+                        print "Stacking " + itemIn.getDescription() + " and " + item.getDescription()
+                        item.stackWith(itemIn)
+                        stacked = True
+                        del itemIn
+                        break
+                
+                if not stacked:
+                    self.items.append(itemIn)
+                
             return self
         
         raise ValueError(itemIn + " already exists in container " + self)
@@ -93,18 +114,21 @@ class Inventory(Base):
 
 
 def main():
-    db.saveDB.start(True)
     
-    item1 = I.Item(symbol = '!', color = colors.white)
-    item2 = I.Item(symbol = '!', color = colors.red)
+    coins1 = I.Coins(quantity = 5)
+    coins2 = I.Coins(quantity = 10)
     
-    inv1 = Inventory()
-    inv1.addItem(item1)
-    inv1.addItem(item2)
-    
-    db.saveDB.save(inv1)
+    print coins1.canStackWith(coins2)
+    coins1.stackWith(coins2)
+    print coins1.quantity
 
+    coins2 = I.Coins(quantity = 10)
 
+    inv = Inventory()
+    inv.addItem(coins1)
+    inv.addItem(coins2)
+    
+    inv.printContents()
 
 
     

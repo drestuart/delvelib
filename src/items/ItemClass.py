@@ -18,7 +18,7 @@ Base = db.saveDB.getDeclarativeBase()
 
 class Item(Base):
     '''
-    The abstract item baseclass
+    The abstract item (stack) baseclass
     '''
     __tablename__ = "items"
     __table_args__ = {'extend_existing': True}
@@ -30,6 +30,8 @@ class Item(Base):
     wearable = False
     wieldable = False
     zappable = False
+    
+    stackable = False
 
     def __init__(self, **kwargs):
         self.weight = kwargs.get('weight', 0)
@@ -39,6 +41,7 @@ class Item(Base):
         self.color = kwargs['color']
         self.backgroundColor = kwargs.get('backgroundColor', colors.black)
         self.description = kwargs.get('description', 'some item')
+        self.pluralDescription = kwargs.get('plural description', self.description + 's')
         
         self.colorR = self.color.r
         self.colorG = self.color.g
@@ -47,6 +50,8 @@ class Item(Base):
         self.backgroundColorR = self.backgroundColor.r
         self.backgroundColorG = self.backgroundColor.g
         self.backgroundColorB = self.backgroundColor.b
+        
+        self.quantity = kwargs.get('quantity', 1)
 
         
 
@@ -66,6 +71,9 @@ class Item(Base):
     backgroundColorB = Column(Integer)
     
     description = Column(String)
+    pluralDescription = Column(String)
+
+    quantity = Column(Integer)
 
     containerId = Column(Integer, ForeignKey("inventories.id"))
     
@@ -189,7 +197,10 @@ class Item(Base):
         self.backgroundColorB = value
     
     def getDescription(self):
-        return self.description
+        if self.quantity == 1:
+            return self.description
+        else:
+            return str(self.quantity) + " " + self.pluralDescription
 
 
     def setDescription(self, value):
@@ -205,69 +216,159 @@ class Item(Base):
         return "The " + self.getDescription()
     
     def a_an(self):
-        if self.getDescription().startswith(('a', 'e', 'i', 'o', 'u')):
-            return "an " + self.getDescription()
+        if self.quantity == 1:
+            if self.getDescription().startswith(('a', 'e', 'i', 'o', 'u')):
+                return "an " + self.getDescription()
+            else:
+                return "a " + self.getDescription()
         else:
-            return "a " + self.getDescription()
+            return self.getDescription()
     
     def A_An(self):
-        if self.getDescription().startswith(('a', 'e', 'i', 'o', 'u')):
-            return "An " + self.getDescription()
+        if self.quantity == 1:
+            if self.getDescription().startswith(('a', 'e', 'i', 'o', 'u')):
+                return "An " + self.getDescription()
+            else:
+                return "A " + self.getDescription()
         else:
-            return "A " + self.getDescription()
-    
+            return self.getDescription()
+
+    def getQuantity(self):
+        return self.quantity
+
+    def setQuantity(self, value):
+        self.quantity = value
+        
+    def canStackWith(self, other):
+#        print "Determining stacking for " + self.getDescription() + " and " + other.getDescription()
+        if not (self.stackable and other.stackable):
+#            print "Not stackable!"
+            return False
+        
+        elif self.__class__ != other.__class__:
+#            print "Items incompatible!"
+            return False
+        
+        return True
+
+    def stackWith(self, other):
+        if self.canStackWith(other):
+            self.quantity += other.getQuantity()
+            other.setQuantity(0)
+
+    @classmethod
+    def getStackable(cls):
+        return cls.stackable
+
 
 
 class Amulet(Item):
     wearable = True
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'amulet'
+    }
+    
     def __init__(self, **kwargs):
         super(Amulet, self).__init__(symbol = '"', **kwargs)
 
 class Armor(Item):
     wearable = True
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'armor'
+    }
+    
     def __init__(self, **kwargs):
         super(Armor, self).__init__(symbol = '[', **kwargs)
         
 class Coins(Item):
+    stackable = True
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'coins'
+    }
+    
     def __init__(self, **kwargs):
-        super(Coins, self).__init__(symbol = '$', **kwargs)
+        super(Coins, self).__init__(symbol = '$', color = colors.colorGold, description = "gold coin", **kwargs)
+    
 
 class Food(Item):
     edible = True
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'food'
+    }
+    
     def __init__(self, **kwargs):
         super(Food, self).__init__(symbol = '%', **kwargs)
 
 class Gem(Item):
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'gem'
+    }
+    
     def __init__(self, **kwargs):
         super(Gem, self).__init__(symbol = '*', **kwargs)
 
 class Potion(Item):
     drinkable = True
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'potion'
+    }
+    
     def __init__(self, **kwargs):
         super(Potion, self).__init__(symbol = '!', **kwargs)
 
 class Ring(Item):
     wearable = True
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'ring'
+    }
+    
     def __init__(self, **kwargs):
         super(Ring, self).__init__(symbol = '=', **kwargs)
 
 class Scroll(Item):
     readable = True
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'scroll'
+    }
+    
     def __init__(self, **kwargs):
         super(Scroll, self).__init__(symbol = '?', color = colors.white, **kwargs)
         
 class Spellbook(Item):
     readable = True
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'spellbook'
+    }
+    
     def __init__(self, **kwargs):
         super(Spellbook, self).__init__(symbol = '+', **kwargs)
         
 class Wand(Item):
     zappable = True
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'wand'
+    }
+    
     def __init__(self, **kwargs):
         super(Wand, self).__init__(symbol = '/', **kwargs)
 
 class Weapon(Item):
     wieldable = True
+    
+    __mapper_args__ = {
+        'polymorphic_identity':'weapon'
+    }
+    
     def __init__(self, **kwargs):
         super(Weapon, self).__init__(symbol = ')', **kwargs)
 
@@ -310,18 +411,23 @@ def getRandomItem():
 
     
 def main():
-    import InventoryClass as I
-    
-    db.saveDB.start(True)
-    
-    
-    item1 = Item(symbol = '!', color = colors.white)
-    item2 = Item(symbol = '!', color = colors.red)
-    
-    db.saveDB.save(item1)
-    db.saveDB.save(item2)
+#    import InventoryClass as I
+#    
+#    db.saveDB.start(True)
+#    
+#    
+#    item1 = Item(symbol = '!', color = colors.white)
+#    item2 = Item(symbol = '!', color = colors.red)
+#    
+#    db.saveDB.save(item1)
+#    db.saveDB.save(item2)
 
-
+    coins1 = Coins(quantity = 5)
+    coins2 = Coins(quantity = 10)
+    
+    print coins1.canStackWith(coins2)
+    coins1.stackWith(coins2)
+    print coins1.quantity
 
     
 if __name__ == '__main__':

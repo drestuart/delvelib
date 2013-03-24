@@ -111,7 +111,7 @@ class Creature(Base):
         
         if level.placeCreature(self, newTile):
                         
-            print self.name + " moves to", self.getX(), self.getY()
+#            print self.name + " moves to", self.getX(), self.getY()
             return True
         
         else:
@@ -362,8 +362,9 @@ class Creature(Base):
             return "A " + self.getName()
         
     def pickUpItem(self, item):
-        self.getInventory().addItem(item)
+        
         G.game.message(self.The() + " picks up " + item.a_an())
+        self.getInventory().addItem(item)
     
     
 

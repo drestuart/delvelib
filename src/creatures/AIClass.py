@@ -70,7 +70,7 @@ class PlayerAI(AI):
 class AggressiveAI(AI):
     
     def findNewEnemy(self, visibleCreatures):
-        print self.owner.The(), "is looking for an enemy"
+#        print self.owner.The(), "is looking for an enemy"
         nearestEnemy = None
         nearestEnemyDistance = None
         
@@ -124,7 +124,7 @@ class AggressiveAI(AI):
             if self.findEnemy():
                 self.walkPath()
                 return
-            print self.owner.The(), "gives up and wanders around"
+#            print self.owner.The(), "gives up and wanders around"
             self.wander()
             
     def findEnemy(self):
@@ -145,12 +145,12 @@ class AggressiveAI(AI):
         
         # See if we need to recalculate the path
         if path and not libtcod.path_is_empty(path) and (enemy.getTile() is self.owner.getGoalTile()):
-            print self.owner.The(), "follows the path"
+#            print self.owner.The(), "follows the path"
             return True
             
         # If we need to recalculate, set up the goal tile
         if not (enemy.getTile() is self.owner.getGoalTile()):
-            print self.owner.The(), "needs to recompute a path to the enemy"
+#            print self.owner.The(), "needs to recompute a path to the enemy"
             self.owner.setGoalTile(enemy.getTile())
             distance = self.owner.distance(enemy)
             if distance == 1:
@@ -158,7 +158,7 @@ class AggressiveAI(AI):
                 return True
         
         # Calculate the new path
-        print self.owner.The(), "is computing a path to the enemy"
+#        print self.owner.The(), "is computing a path to the enemy"
         goalTile = self.owner.getGoalTile()
         if goalTile:
             path = self.getLevel().getPathToTile(self.getTile(), goalTile)
@@ -168,11 +168,11 @@ class AggressiveAI(AI):
                 self.owner.setPath(path)
                 return True
             else:
-                print self.owner.The(), "can't find a path to the enemy"
+#                print self.owner.The(), "can't find a path to the enemy"
                 return False
     
         else:
-            print self.owner.The(), "has no goal tile"
+#            print self.owner.The(), "has no goal tile"
             return False
                 
 
