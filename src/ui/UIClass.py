@@ -59,20 +59,34 @@ class UI(object):
         return None
     
     def displayTextWindow(self, header, x, y, width, height, lines):
-        window = libtcod.console_new(width, height)
+        window = libtcod.console_new(width, height + 2)
         
         libtcod.console_set_default_foreground(window, libtcod.white)
-        libtcod.console_print_rect_ex(window, 0, 0, width, height, libtcod.BKGND_NONE, libtcod.LEFT, header)
+        
+        def addBorder(line):
+            line = line.ljust(width - 4)
+            line = "= " + line + " ="
+            return line
+        
+        header = addBorder(header)
+        
+        libtcod.console_print_ex(window, 0, 0, libtcod.BKGND_NONE, libtcod.LEFT, "="*width)
+        libtcod.console_print_rect_ex(window, 0, 1, width, height + 2, libtcod.BKGND_NONE, libtcod.LEFT, header)
         
         header_height = libtcod.console_get_height_rect(self.mapConsole, 0, 0, width, C.SCREEN_HEIGHT, header)
         
         # Print each line
-        y = header_height
+        y = header_height + 1
         for line in lines:
+            # Formatting
+            line = addBorder(line)
+            
             libtcod.console_print_ex(window, 0, y, libtcod.BKGND_NONE, libtcod.LEFT, line)
             y += 1
-   
-        libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
+        
+        libtcod.console_print_ex(window, 0, height + 1 , libtcod.BKGND_NONE, libtcod.LEFT, "="*width)
+        
+        libtcod.console_blit(window, 0, 0, width, height + 2, 0, C.MENU_X, C.MENU_Y, 1.0, 0.7)
         libtcod.console_flush()
         
     
