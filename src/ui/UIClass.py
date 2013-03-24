@@ -40,30 +40,6 @@ class UI(object):
         header_height = libtcod.console_get_height_rect(self.mapConsole, 0, 0, width, C.SCREEN_HEIGHT, header)
         height = len(options) + header_height
      
-        #create an off-screen console that represents the singleChoiceMenu's window
-#        window = libtcod.console_new(width, height)
-#     
-#        #print the header, with auto-wrap
-#        libtcod.console_set_default_foreground(window, libtcod.white)
-#        libtcod.console_print_rect_ex(window, 0, 0, width, height, libtcod.BKGND_NONE, libtcod.LEFT, header)
-#     
-#        #print all the options
-#        y = header_height
-#        letter_index = ord('a')
-#        for option_text in options:
-#            text = '(' + chr(letter_index) + ') ' + option_text
-#            libtcod.console_print_ex(window, 0, y, libtcod.BKGND_NONE, libtcod.LEFT, text)
-#            y += 1
-#            letter_index += 1
-#     
-#        #blit the contents of "window" to the root console
-#        x = C.SCREEN_WIDTH/2 - width/2
-#        y = C.SCREEN_HEIGHT/2 - height/2
-#        libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
-#     
-#        #present the root console to the player and wait for a key-press
-#        libtcod.console_flush()
-
         lines = []
         letter_index = ord('a')
         for option in options:
@@ -117,22 +93,44 @@ class UI(object):
         
         key = libtcod.console_wait_for_keypress(True)
         
-        # Do nothing
+        # Do nothing... yet
         return None
         
+    
+    def wearMenu(self):
+        header = C.WEAR_MENU_HEADER
+        inv = self.player.getInventory()
         
+        header_height = libtcod.console_get_height_rect(self.mapConsole, 0, 0, C.MENU_WIDTH, C.SCREEN_HEIGHT, header)
+        height = inv.length() + header_height
+        
+        lines = []
+        
+        for item in inv.getItems():
+            if type(item).getWearable():
+                text = item.getDescription()
+                lines.append(text)
+        
+#        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
+        index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
+        
+#        key = libtcod.console_wait_for_keypress(True)
+        
+        # Do nothing... yet
+        return None
+    
     
     def pickUpItemMenu(self, inventory):
         #show a singleChoiceMenu with each item of the inventory as an option
         if inventory.length() == 0:
-#            options = ['Inventory is empty.']
+#            lines = ['Inventory is empty.']
             return None
         else:
             items = inventory.getItems()
-            options = [item.getDescription() for item in items]
+            lines = [item.getDescription() for item in items]
         
         header = C.PICK_UP_ITEM_MENU_HEADER
-        index = self.singleChoiceMenu(header, options, C.MENU_WIDTH)
+        index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
      
         #if an item was chosen, return it
         if index is None or inventory.length() == 0:
@@ -189,6 +187,10 @@ class UI(object):
                         self.player.pickUpItem(item)
                     
                     return 'took-turn'
+                
+            elif keyStr == 'W':  # Wear something
+                self.wearMenu()                
+                return 'didnt-take-turn'
                 
             elif keyStr == 'i':
                 self.showPlayerInventory()
