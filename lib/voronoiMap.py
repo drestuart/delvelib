@@ -1,7 +1,7 @@
 '''
 ##########################################################
 #
-# Voronoi diagram library.
+# Voronoi map library.
 # Adapted from: http://rosettacode.org/wiki/Voronoi_diagram#Python
 # Retrieved 1/15/2014
 # Modified by Dan Stuart
@@ -9,20 +9,17 @@
 ##########################################################
 '''
 
-from PIL import Image
 import random
 import math
 
-def generate_voronoi_diagram(width, height, num_cells):
-	image = Image.new("RGB", (width, height))
-	putpixel = image.putpixel
-	imgx, imgy = image.size
+def generate_voronoi_map(width, height, num_cells, use_symbols = False):
+	imgx, imgy = width, height
 	nx = []
 	ny = []
-	nr = []
-	ng = []
-	nb = []
+	symbols = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')',
+			   '.', ',', '<', '>', '?', ':', '|', '{', ']', '+']
 	points = []
+	vmap = ""
 	for i in range(num_cells):
 		randx = random.randrange(imgx)
 		randy = random.randrange(imgy)
@@ -31,9 +28,6 @@ def generate_voronoi_diagram(width, height, num_cells):
 		ny.append(randy)
 		points.append((randx,randy))
 		
-		nr.append(random.randrange(256))
-		ng.append(random.randrange(256))
-		nb.append(random.randrange(256))
 	for y in range(imgy):
 		for x in range(imgx):
 			dmin = math.hypot(imgx-1, imgy-1)
@@ -43,10 +37,23 @@ def generate_voronoi_diagram(width, height, num_cells):
 				if d < dmin:
 					dmin = d
 					j = i
-			putpixel((x, y), (nr[j], ng[j], nb[j]))
-	image.save("VoronoiDiagram.png", "PNG")
-	#image.show()
+			if use_symbols:
+				vmap += symbols[j] + " "
+			else:
+				vmap += str(j) + " "
+				
+		vmap += "\n"
+	return points, vmap
+
+def main():
+	
+	points, vmap = generate_voronoi_map(50, 50, 20, True)
+	
 	print "Done!\n"
 	print points
+	print "\n"
+	print vmap
 
-generate_voronoi_diagram(500, 500, 20)
+
+if __name__ == '__main__':
+	main()
