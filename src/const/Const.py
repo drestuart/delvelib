@@ -20,7 +20,7 @@ TITLE = "delveRL"
 SCREEN_WIDTH = 100
 SCREEN_HEIGHT = 70
 
-LIMIT_FPS = 10
+LIMIT_FPS = 30
 
 # Map dimensions
 MAP_WIDTH = 80
