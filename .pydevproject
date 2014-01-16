@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?eclipse-pydev version="1.0"?>
-
-<pydev_project>
+<?eclipse-pydev version="1.0"?><pydev_project>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
 <path>/delveRL</path>
 <path>/delveRL/src</path>
@@ -17,7 +15,8 @@
 <path>/delveRL/src/items</path>
 <path>/delveRL/src/ui</path>
 <path>/delveRL/src/damage</path>
+<path>/${PROJECT_DIR_NAME}/lib/pygcurse</path>
 </pydev_pathproperty>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.7</pydev_property>
-<pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
+<pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">python 2.7 32bit</pydev_property>
 </pydev_project>
