@@ -5,12 +5,9 @@ Created on Mar 13, 2013
 '''
 
 
-from Import import *
-#libtcod = importLibtcod()
-
-import Util as U
 import random
 import keys
+from pygame.locals import *
 
 class AI(object):
     
@@ -38,33 +35,27 @@ class PlayerAI(AI):
     def takeTurn(self, key):
 #        print "Waiting for player"
         
+        key, keyStr = keys.waitForInput()
         
-#        while True:
-#        key = libtcod.console_wait_for_keypress(True)
-        
-        if key.vk == libtcod.KEY_ESCAPE:
-#                exit(0)  #exit game
+        if key == keys.K_ESCAPE:
             return "exit"
             
-        elif key.pressed:
-            
-            direc = keys.getMovementDirection(key)
-            
-            keyStr = U.get_key(key)
-            
+        else:
+            direc = keys.getMovementDirection(keyStr)
+
             if direc:
                 dx, dy = direc
                 if self.owner.move(dx, dy):
                     return 'took-turn'
  
-            elif key.vk == libtcod.KEY_KPDEC or keyStr == '.':
+            elif key == K_KP_PERIOD or keyStr == '.':
                 return 'took-turn'
             
             elif keyStr == ',':
                 return 'took-turn'
             
-        else:
-            return 'didnt-take-turn'
+            else:
+                return 'didnt-take-turn'
             
     
 class AggressiveAI(AI):
@@ -89,6 +80,7 @@ class AggressiveAI(AI):
     def walkPath(self):
         path = self.owner.getPath()
         
+        # TODO get pathing lib in here
         if path is None or libtcod.path_is_empty(path):
             self.wander()
             return

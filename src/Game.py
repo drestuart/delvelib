@@ -18,6 +18,7 @@ import random
 import colors
 
 game = 0
+UI = 0
 
 class Game(object):
 
@@ -47,8 +48,9 @@ class Game(object):
         
         db.saveDB.save(d1)
         
-        self.myUI = ui.UI(level = d1, player = player)
-        self.myUI.createWindow()
+        global UI
+        UI = self.myUI = ui.UI(level = d1, player = player)
+        UI.createWindow()
         
     def play(self):
         self.myUI.gameLoop()

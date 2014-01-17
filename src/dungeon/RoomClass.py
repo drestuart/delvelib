@@ -10,8 +10,6 @@ from sqlalchemy.types import String, Integer, Boolean
 import database as db
 import TileClass as T
 
-#libtcod = importLibtcod()
-
 Base = db.saveDB.getDeclarativeBase()
 
 # The Rectangle class

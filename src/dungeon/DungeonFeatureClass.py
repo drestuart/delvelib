@@ -13,9 +13,6 @@ import TileClass as T
 import colors
 import database as db
 
-#libtcod = importLibtcod()
-
-
 Base = db.saveDB.getDeclarativeBase()
 
 class DungeonFeature(Base):
@@ -313,30 +310,3 @@ class downStair(Stair):
     def getBlockMove(self):
         return self.blockMove
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    

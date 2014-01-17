@@ -4,9 +4,6 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
-#from Import import *
-#libtcod = importLibtcod()
-
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer
@@ -19,7 +16,7 @@ import ItemClass as I
 import colors
 import database as db
 import random
-
+from Game import UI
 
 #from CreatureClass import *
 
@@ -47,7 +44,7 @@ class Level(Base):
         self.previousLevel = kwargs.get('previousLevel', None)
         
         # TODO instantiate FOV map
-#        self.FOVMap = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
+        self.FOVMap = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
         self.needToComputeFOV = True
         
         self.tiles = []
@@ -88,8 +85,6 @@ class Level(Base):
     rooms = relationship("Room", backref = "level")
     
     levelType = Column(String)
-    
-    mapConsole = None
     
     __mapper_args__ = {'polymorphic_on': levelType,
                        'polymorphic_identity': 'level'}
@@ -181,16 +176,10 @@ class Level(Base):
     def getRandomOpenTileInRoom(self, room):
         return self.getRandomOpenTileInArea(room.x1, room.x2, room.y1, room.y2)
         
-    def getMapConsole(self):
-        return self.mapConsole
-
-    def setMapConsole(self, con):
-        self.mapConsole = con
-
     def isInFOV(self, x, y):
         pass
         #TODO return FOV status
-#        return libtcod.map_is_in_fov(self.FOVMap, x, y)
+        return libtcod.map_is_in_fov(self.FOVMap, x, y)
                 
     # Draw that map!
     def draw(self, visibility = True):
@@ -228,17 +217,13 @@ class Level(Base):
                     background = colors.colorLightWall
                     
                 symbol = symbol.encode('ascii', 'ignore')
-                # TODO blit symbol to console
-#                libtcod.console_put_char_ex(self.mapConsole, x, y, symbol, color, background)
+                UI.putChar(x, y, symbol, color, background)
+        #TODO return a big ol' array of tile positions and symbols to UI
                 
     # Erase that map!
     def clear(self):
-        for x in range(C.MAP_WIDTH):
-            for y in range(C.MAP_HEIGHT):
-                pass
-                # TODO erase map
-#                libtcod.console_put_char_ex(self.mapConsole, x, y, ' ', colors.black, libtcod.BKGND_NONE)
-                
+        UI.clearMap()
+#         
             
     def getTilesInRadius(self, radius, centerX, centerY):
         
@@ -297,7 +282,7 @@ class Level(Base):
         
         for tile in self.tiles:
             #TODO get FOV status
-#            if libtcod.map_is_in_fov(self.FOVMap, tile.getX(), tile.getY()):
+            if libtcod.map_is_in_fov(self.FOVMap, tile.getX(), tile.getY()):
                 retArray.append(tile)
                 
         return retArray
@@ -318,10 +303,10 @@ class Level(Base):
     def getPathToTile(self, fromTile, toTile):
         pass
         # TODO compute path
-#        path = libtcod.path_new_using_map(self.FOVMap, dcost=1)
-#        libtcod.path_compute(path, fromTile.getX(), fromTile.getY(), toTile.getX(), toTile.getY())
+        path = libtcod.path_new_using_map(self.FOVMap, dcost=1)
+        libtcod.path_compute(path, fromTile.getX(), fromTile.getY(), toTile.getX(), toTile.getY())
 
-#        return path
+        return path
         
     def isWalkable(self, xFrom, yFrom, xTo, yTo, userData):
         if self.getTile(xTo, yTo).blocksMove():
@@ -334,7 +319,7 @@ class Level(Base):
         if not self.FOVMap:
             pass
         # TODO: Create FOV map
-#            self.FOVMap = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
+            self.FOVMap = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
         
         for tile in self.tiles:
             x = tile.x
@@ -343,7 +328,7 @@ class Level(Base):
             blocksSight = tile.blocksSight()
             
             # TODO: Fill in FOV map
-#            libtcod.map_set_properties(self.FOVMap, x, y, not blocksMove, not blocksSight)
+            libtcod.map_set_properties(self.FOVMap, x, y, not blocksMove, not blocksSight)
                 
     def computeFOV(self, x, y, radius = 0):
         '''Compute the field of view of this map with respect to a particular position'''
@@ -354,7 +339,7 @@ class Level(Base):
             self.setNeedToComputeFOV(False)
             
             # TODO Compute FOV
-#            libtcod.map_compute_fov(self.FOVMap, x, y, radius, C.FOV_LIGHT_WALLS, C.FOV_ALGO)
+            libtcod.map_compute_fov(self.FOVMap, x, y, radius, C.FOV_LIGHT_WALLS, C.FOV_ALGO)
 
     def getNeedToComputeFOV(self):
         return self.needToComputeFOV

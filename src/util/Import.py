@@ -6,8 +6,7 @@ Created on May 29, 2012
 
 __all__ = ['importLibtcod']
 
-import os
-import sys
+raise Exception("Don't import Import!  Why did I name it that anyway?")
 
 #__LTCOD_DIR_MAC = "/Users/dstu/Documents/workspace/delveRL/lib/libtcod"
 #__LTCOD_DIR_WIN = "C:\\Users\\dstu\\workspace\\delveRL\\lib\\libtcod"

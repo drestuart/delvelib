@@ -4,7 +4,6 @@ Created on Mar 13, 2013
 @author: dstu
 '''
 
-from Import import *
 from ctypes.wintypes import INT
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
@@ -15,8 +14,6 @@ import colors
 import database as db
 import Game as G
 import InventoryClass as I
-
-#libtcod = importLibtcod()
 
 Base = db.saveDB.getDeclarativeBase()
 

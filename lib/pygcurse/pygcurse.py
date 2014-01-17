@@ -693,7 +693,7 @@ def pygprint(self, obj='', *objs, sep=' ', end='\n', fgcolor=None, bgcolor=None,
         - bgcolor is the color to set the background to.
         """
         if region == None:
-            self._fgcolor = fgcolor
+            self._bgcolor = bgcolor
             return
 
         regionx, regiony, regionwidth, regionheight = self.getregion(region)
@@ -1948,7 +1948,7 @@ class PygcurseInput():
             if self.eraseBufferSize is not None:
                 # need to blank out the previous drawn, longer string.
                 tempcursorx = self.startx
-                while tempcursorx < pygsurfObj.width and tempcursorx < self.startx + len(self.prompt) + eraseBufferSize:
+                while tempcursorx < pygsurfObj.width and tempcursorx < self.startx + len(self.prompt) + self.eraseBufferSize:
                     pygsurfObj.putchar(' ', tempcursorx, self.starty)
                     tempcursorx += 1
                 self.eraseBufferSize = None
@@ -2153,9 +2153,9 @@ class PygcurseTextbox:
             # left/right side
             for iy in range(y+1, y + height-1):
                 if pygsurf.isonscreen(x, iy):
-                    pygsurf._screenchar[x][iy] = border
+                    pygsurf._screenchar[x][iy] = self.border
                 if pygsurf.isonscreen(x + width - 1, iy):
-                    pygsurf._screenchar[x + width - 1][iy] = border
+                    pygsurf._screenchar[x + width - 1][iy] = self.border
 
         # draw caption:
         if self.caption:

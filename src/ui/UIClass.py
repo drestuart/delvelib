@@ -12,8 +12,9 @@ import textwrap
 import Game as G
 import keys
 import Util as U
-
-#libtcod = importLibtcod()
+import pygcurse
+import pygame
+from pygame.locals import *
 
 
 #FONTS_DIR = os.path.join("..", "..", "fonts")
@@ -31,11 +32,13 @@ class UI(object):
     def __init__(self, **kwargs):
         self.currentLevel = kwargs.get('level', None)
         self.player = kwargs.get('player', None)
-        self.panel = libtcod.console_new(C.PANEL_WIDTH, C.PANEL_HEIGHT)
+#         self.panel = libtcod.console_new(C.PANEL_WIDTH, C.PANEL_HEIGHT)
+        self.panel = pygame.Rect(C.PANEL_X, C.PANEL_Y, C.PANEL_WIDTH, C.PANEL_HEIGHT)
 
         self.msgs = []
     
     def singleChoiceMenu(self, header, options, width):
+        # TODO implement with pygcurse textbox
         
         #calculate total height for the header (after auto-wrap) and one line per option
         header_height = libtcod.console_get_height_rect(self.mapConsole, 0, 0, width, C.SCREEN_HEIGHT, header)
@@ -126,7 +129,7 @@ class UI(object):
 #        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
         index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
         
-#        key = libtcod.console_wait_for_keypress(True)
+        key = libtcod.console_wait_for_keypress(True)
         
         # Do nothing... yet
         return None
@@ -265,14 +268,14 @@ class UI(object):
         
     def handleKeys(self, key):
      
-        if key.vk == libtcod.KEY_ESCAPE:
+        if key == K_ESCAPE:
             return "exit"
             
         elif key.pressed:
             
             direc = keys.getMovementDirection(key)
             
-            keyStr = U.get_key(key)
+            keyStr = pygame.key.name(key)
             
             # Move
             if direc:
@@ -280,7 +283,7 @@ class UI(object):
                 if self.player.move(dx, dy):
                     return 'took-turn'
  
-            elif key.vk == libtcod.KEY_KPDEC or keyStr == '.': # Wait
+            elif key.vk == K_KP_PERIOD or keyStr == '.': # Wait
                 return 'took-turn'
             
             elif keyStr == ',': # Pick up items
@@ -327,11 +330,11 @@ class UI(object):
             return 'didnt-take-turn'
     
     def handleKeysOld(self, key):
-     
-        if key.vk == libtcod.KEY_ESCAPE:
-            return 'exit'  #exit game
-        else:
-            return self.player.AI.takeTurn(key)
+        raise Exception("Deprecated UI.handleKeysOld")
+#         if key.vk == libtcod.KEY_ESCAPE:
+#             return 'exit'  #exit game
+#         else:
+#             return self.player.AI.takeTurn(key)
         
     
     def render_bar(self, x, y, totalWidth, name, value, maximum, barColor, backColor):
@@ -366,17 +369,21 @@ class UI(object):
     
     
     def createWindow(self):
-        libtcod.console_set_custom_font(DEFAULT_FONT, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
-        libtcod.console_init_root(C.SCREEN_WIDTH, C.SCREEN_HEIGHT, C.TITLE, False)
-        libtcod.sys_set_fps(C.LIMIT_FPS)
+#         libtcod.console_set_custom_font(DEFAULT_FONT, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+        self.win = pygcurse.PygcurseWindow(C.SCREEN_WIDTH, C.SCREEN_HEIGHT, C.TITLE)
+
+#         libtcod.sys_set_fps(C.LIMIT_FPS)
         
-        self.mapConsole = libtcod.console_new(C.MAP_WIDTH, C.MAP_HEIGHT)
-        self.currentLevel.setMapConsole(self.mapConsole)
+#         self.mapConsole = libtcod.console_new(C.MAP_WIDTH, C.MAP_HEIGHT)
+        self.mapConsole = pygame.Rect(C.MAP_X, C.MAP_Y, C.MAP_WIDTH, C.MAP_HEIGHT)
+        # TODO let the currentLevel call some functions and we'll handle the actual drawing
         
-        libtcod.console_set_default_background(0, libtcod.BKGND_NONE)
-        libtcod.console_set_default_background(self.mapConsole, libtcod.BKGND_NONE)
+#         libtcod.console_set_default_background(0, libtcod.BKGND_NONE)
+#         libtcod.console_set_default_background(self.mapConsole, libtcod.BKGND_NONE)
         
-        libtcod.console_set_keyboard_repeat(500, 250)
+#         libtcod.console_set_keyboard_repeat(500, 250)
+        pygame.key.set_repeat(500, 250)
+
         
         
     def getCurrentLevel(self):
@@ -385,6 +392,18 @@ class UI(object):
     def setCurrentLevel(self, lvl):
         self.currentLevel = lvl
         self.currentLevel.setMapConsole(self.mapConsole)
+        
+    def clearMap(self):
+        # TODO clear map pane with pygcurse
+        raise Exception("NYI UIClass.clearMap()")
+    
+    def putChar(self, x, y, symbol, color, background):
+        # TODO
+        raise Exception("NYI UIClass.putChar()")
+    
+    def drawLevel(self):
+        # TODO
+        raise Exception("NYI UIClass.drawLevel()")
         
     def getTileDescUnderMouse(self):
 #        global mouse

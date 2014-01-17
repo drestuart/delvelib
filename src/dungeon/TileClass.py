@@ -12,8 +12,6 @@ import colors
 import database as db
 import InventoryClass as Inv
 
-#libtcod = importLibtcod()
-
 #from DungeonFeatureClass import *
 
 Base = db.saveDB.getDeclarativeBase()
