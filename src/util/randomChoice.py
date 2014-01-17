@@ -1,12 +1,9 @@
-'''
-Some methods from the RogueBasin libtcod tutorial for choosing things by probability
-'''
 
-import libtcodpy as libtcod
+import random
 
 def random_choice_index(chances):  #choose one option from list of chances, returning its index
     #the dice will land on some number between 1 and the sum of the chances
-    dice = libtcod.random_get_int(0, 1, sum(chances))
+    dice = random.randint(0, sum(chances))
  
     #go through all chances, keeping the sum so far
     running_sum = 0

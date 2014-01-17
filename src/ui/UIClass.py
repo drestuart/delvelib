@@ -13,15 +13,16 @@ import Game as G
 import keys
 import Util as U
 
-libtcod = importLibtcod()
+#libtcod = importLibtcod()
 
 
 #FONTS_DIR = os.path.join("..", "..", "fonts")
 FONTS_DIR = os.path.join("fonts")
 DEFAULT_FONT = os.path.join(FONTS_DIR, "arial12x12.png")
 
-key = libtcod.Key()
-mouse = libtcod.Mouse()
+# TODO get keyboard and mouse input 
+#key = libtcod.Key()
+#mouse = libtcod.Mouse()
 
 
 

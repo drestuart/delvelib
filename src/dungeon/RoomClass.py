@@ -4,14 +4,13 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
-from Import import *
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer, Boolean
 import database as db
 import TileClass as T
 
-libtcod = importLibtcod()
+#libtcod = importLibtcod()
 
 Base = db.saveDB.getDeclarativeBase()
 

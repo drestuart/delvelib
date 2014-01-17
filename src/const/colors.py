@@ -1,36 +1,32 @@
-# A constants module for holding color objects
-
-from Import import *
-
-libtcod = importLibtcod()
-
+# A constants module for holding color tuples
 
 # Common colors
-black = libtcod.black
-white = libtcod.white
-red = libtcod.red
-blue = libtcod.blue
-lightBlue = libtcod.light_blue
-darkBlue = libtcod.darker_blue
-green = libtcod.green
-darkMagenta = libtcod.dark_magenta
+black = (0,0,0)
+white = (255,255,255)
+red = (255,0,0)
+green = (0,255,0)
+blue = (0,0,255)
+lightBlue = (173,216,230)
+darkBlue = (0,0,139)
+darkMagenta = (139,0,139)
 
-#blankBackground = libtcod.BKGND_NONE
+blankBackground = (0,0,0)
+
 # Wall and ground colors
 
-colorWallNotInFOV = libtcod.darker_grey # libtcod.Color(0, 0, 100)
-colorLightWall = libtcod.Color(130, 110, 50)
-colorDarkGround = libtcod.Color(50, 50, 150)
-colorLightGround = libtcod.Color(200, 180, 50)
+colorWallNotInFOV = (105,105,105)
+colorLightWall = (130, 110, 50)
+colorDarkGround = (50, 50, 150)
+colorLightGround = (200, 180, 50)
 
-colorWood = libtcod.darkest_sepia
-colorRock = libtcod.light_grey
-colorStone = libtcod.lighter_grey
-colorGrass = libtcod.darker_green
+colorSienna = colorWood = (160,82,45)
+colorRock = colorLightGrey = (192,192,192)
+colorStone = colorLighterGrey = (211,211,211)
+colorGrass = colorDarkerGreen = (0,100,0)
 
-colorNotInFOV = libtcod.grey
+colorNotInFOV = colorGrey = (128,128,128)
 
-colorSteel = libtcod.light_sky
-colorGold = libtcod.gold
-colorMeat = libtcod.darker_sepia
-colorLeather = libtcod.darkest_sepia
+colorSteel = colorLightSkyBlue = (135,206,250)
+colorGold = (255,215,0)
+colorMeat = colorBrown = (165,42,42)
+colorLeather = colorDarkBrown = (139,69,19)

@@ -6,7 +6,7 @@ Created on Mar 13, 2013
 
 
 from Import import *
-libtcod = importLibtcod()
+#libtcod = importLibtcod()
 
 import Util as U
 import random

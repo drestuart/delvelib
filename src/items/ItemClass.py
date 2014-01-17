@@ -12,7 +12,7 @@ import database as db
 from randomChoice import weightedChoice
 
 
-libtcod = importLibtcod()
+#libtcod = importLibtcod()
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -126,14 +126,14 @@ class Item(Base):
         if self.__dict__.get('color', None):
             return self.color
         else:
-            self.color = libtcod.Color(self.colorR, self.colorG, self.colorB)
+            self.color = (self.colorR, self.colorG, self.colorB)
             return self.color
 
     def getBackgroundColor(self):        
         if self.__dict__.get('backgroundColor', None):
             return self.backgroundColor
         else:
-            self.backgroundColor = libtcod.Color(self.backgroundColorR, self.backgroundColorG, self.backgroundColorB)
+            self.backgroundColor = (self.backgroundColorR, self.backgroundColorG, self.backgroundColorB)
             return self.backgroundColor
         
     def setColor(self, value):

@@ -4,8 +4,6 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
-import libtcodpy as libtcod
-
 # Global constants
 
 TITLE = "delveRL"
@@ -59,7 +57,7 @@ MSG_HEIGHT = PANEL_HEIGHT - 1
 #MAP_HEIGHT = 10
 
 # Field of view constants
-FOV_ALGO = libtcod.FOV_BASIC  #default FOV algorithm
+#FOV_ALGO = libtcod.FOV_BASIC  #default FOV algorithm
 FOV_LIGHT_WALLS = True
 
 

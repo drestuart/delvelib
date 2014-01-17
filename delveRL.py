@@ -4,8 +4,7 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
-from Import import *
-libtcod = importLibtcod()
+#libtcod = importLibtcod()
 
 import Game as G
 

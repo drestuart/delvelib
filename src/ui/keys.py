@@ -4,9 +4,9 @@ Created on Mar 21, 2013
 @author: dstu
 '''
 
-import libtcodpy as libtcod
 import Util as U
 
+# TODO Rewrite for pygame
 movementKeys = {
                 libtcod.KEY_UP : (0, -1),
                 libtcod.KEY_KP8 : (0, -1),

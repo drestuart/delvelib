@@ -4,7 +4,6 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
-from Import import *
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
 from sqlalchemy.types import String, Integer, Boolean
@@ -13,7 +12,7 @@ import colors
 import database as db
 import InventoryClass as Inv
 
-libtcod = importLibtcod()
+#libtcod = importLibtcod()
 
 #from DungeonFeatureClass import *
 
@@ -261,7 +260,7 @@ class Tile(Base):
         if self.__dict__.get('color', None):
             return self.baseColor
         else:
-            self.color = libtcod.Color(self.baseColorR, self.baseColorG, self.baseColorB)
+            self.color = (self.baseColorR, self.baseColorG, self.baseColorB)
             return self.baseColor
 
     def getBackground(self):
@@ -279,7 +278,7 @@ class Tile(Base):
         if self.__dict__.get('baseBackgroundColor', None):
             return self.baseBackgroundColor
         else:
-            self.baseBackgroundColor = libtcod.Color(self.baseBackgroundColorR, self.baseBackgroundColorG, self.baseBackgroundColorB)
+            self.baseBackgroundColor = (self.baseBackgroundColorR, self.baseBackgroundColorG, self.baseBackgroundColorB)
             return self.baseBackgroundColor
 
     def getDescription(self):

@@ -16,7 +16,7 @@ import database as db
 import Game as G
 import InventoryClass as I
 
-libtcod = importLibtcod()
+#libtcod = importLibtcod()
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -152,7 +152,7 @@ class Creature(Base):
         if self.__dict__.get('color', None):
             return self.color
         else:
-            self.color = libtcod.Color(self.colorR, self.colorG, self.colorB)
+            self.color = (self.colorR, self.colorG, self.colorB)
             return self.color
 
     
