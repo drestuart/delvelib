@@ -18,68 +18,11 @@ from pygame.locals import *
 from string import join
 import sys
 from pygcurse import PygcurseWindow
+import re
+from PanelClass import *
 
 
 # TODO Abstract out all pygcurse calls into an interface class
-
-class Panel(object):
-    def __init__(self, dims, window, margin = 0):
-        (self.x, self.y, self.width, self.height) = dims
-        self.window = window
-        self.margin = margin
-        
-        # TODO handle margin
-        
-    def putChars(self, chars, x, y, fgcolor = None, bgcolor = None, indent = False):
-        # Add offset for this window
-        cellx = x + self.x
-        celly = y + self.y
-        
-        self.window.putChars(chars, cellx, celly, fgcolor, bgcolor, indent)
-        
-    def putChar(self, char, x, y, fgcolor = None, bgcolor = None, indent = False):
-        # Add offset for this window
-        cellx = x + self.x
-        celly = y + self.y
-        
-        self.window.putChar(char, cellx, celly, fgcolor, bgcolor, indent)
-        
-
-class MessagePanel(Panel):
-    # TODO implement multi-color messages
-    def __init__(self, *args):
-        super(MessagePanel, self).__init__(*args)
-        self.messages = []
-    
-    def addMessage(self, message, color = colors.colorMessagePanelFG):
-        #split the message if necessary, among multiple lines
-        messageLines = textwrap.wrap(message, self.width)
-     
-        for line in messageLines:
-            #if the buffer is full, remove the first line to make room for the new one
-            if len(self.msgs) == self.height:
-                del self.msgs[0]
-     
-            #add the new line as a tuple, with the text and the color
-            self.messages.append( (line, color) )
-            
-            # TODO indent multiline messages
-        
-    def displayMessages(self):
-        y = 0
-        for (line, color) in self.messages:
-            self.putChars(line, 0, y, color)
-            y += 1
-        
-class CharacterPanel(Panel):
-    def __init__(self, *args):
-        super(CharacterPanel, self).__init__(*args)
-        
-    # TODO implement character panel rendering
-    def render(self):
-        pass
-
-
 
 class UI(object):
 
