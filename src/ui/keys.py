@@ -10,7 +10,7 @@ import sys
 
 def waitForInput():
     while True:
-        for event in pygame.event.get([KEYDOWN, KEYUP, QUIT]):
+        for event in pygame.event.get([KEYDOWN, KEYUP, QUIT]):  # TODO what do the event types do here?
             if event.type == KEYDOWN:
                 continue
             elif event.type == QUIT:
@@ -21,6 +21,7 @@ def waitForInput():
                 key = event.key
                 keyStr = pygame.key.name(key)
 #                 print key, "=>", keyStr
+                # key is the integer key code, keyStr is the string representation
                 return key, keyStr
 
 movementKeys = {

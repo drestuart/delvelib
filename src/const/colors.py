@@ -3,14 +3,31 @@
 # Common colors
 black = (0,0,0)
 white = (255,255,255)
-red = (255,0,0)
-green = (0,255,0)
+
 blue = (0,0,255)
 lightBlue = (173,216,230)
 darkBlue = (0,0,139)
+
+red = (255,0,0)
+lightRed = (205,92,92)
+darkRed = (139,0,0)
 darkMagenta = (139,0,139)
 
-blankBackground = (0,0,0)
+green = (0,255,0)
+
+blankBackground = black
+
+colorDefaultFG = white
+colorDefaultBG = black
+
+colorMapPanelFG = white
+colorMapPanelBG = black
+
+colorMessagePanelFG = white
+colorMessagePanelBG = black
+
+colorCharPanelFG = white
+colorCharPanelBG = black
 
 # Wall and ground colors
 
