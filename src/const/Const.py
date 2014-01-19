@@ -101,3 +101,11 @@ MAX_ROOM_ITEMS = 2
 #MAX_ROOMS = 3
 #DUNGEON_MARGIN = 0
 
+########################
+#
+# Pathfinding
+#
+########################
+
+HVCOST = 10
+DIAGONALCOST = 10

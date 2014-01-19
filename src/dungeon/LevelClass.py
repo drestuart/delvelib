@@ -18,7 +18,7 @@ import database as db
 import random
 from Game import UI
 import FOVMap as fov
-
+import astar
 #from CreatureClass import *
 
 
@@ -50,6 +50,11 @@ class Level(Base):
         self.rooms = []
         
         self.creatures = []
+        
+        self.moveGraph = None
+        self.moveGraphNodes = None
+        self.movePaths = None
+        
         
 ##########################################################################
 #
@@ -210,10 +215,9 @@ class Level(Base):
                     symbol, color, background = tile.toDraw()
                     background = colors.colorLightWall
                     
-                symbol = symbol.encode('ascii', 'ignore')
+#                symbol = symbol.encode('ascii', 'ignore')
                 tileArray.append((x, y, symbol, color, background))
 #                UI.putChar(x, y, symbol, color, background)
-        #TODO return a big ol' array of tile positions and symbols to UI
         return tileArray
                 
     def clear(self):
@@ -289,21 +293,38 @@ class Level(Base):
                 retArray.append(creature)
                 
         return retArray
+    
+    def setupPathing(self):
+        blocked = []
+        width = C.MAP_WIDTH
+        height = C.MAP_HEIGHT
         
+        for dummyx in range(width):
+            newCol = []
+            for dummyy in range(height):
+                newCol.append(False)
+            blocked.append(newCol)
+        
+        for tile in self.tiles:
+            if tile.blocksMove():
+                blocked[tile.getX()][tile.getY()] = True
+        
+        self.moveGraph, self.moveGraphNodes = astar.make_graph({"width": width, "height": height}, blocked)
+        self.movePaths = astar.AStarGrid(self.moveGraph)
+        
+    
     def getPathToTile(self, fromTile, toTile):
-        pass
-        # TODO compute path
-        path = libtcod.path_new_using_map(self.FOVMap, dcost=1)
-        libtcod.path_compute(path, fromTile.getX(), fromTile.getY(), toTile.getX(), toTile.getY())
+        
+        if self.moveGraph is None or self.moveGraphNodes is None or self.movePaths is None:
+            self.setupPathing()
+
+        start, end = self.moveGraphNodes[fromTile.getX()][fromTile.getY()], self.moveGraphNodes[toTile.getX()][toTile.getY()]
+        path = self.movePaths.search(start, end)
+        
+        path = [(node.x, node.y) for node in path]
 
         return path
         
-    def isWalkable(self, xFrom, yFrom, xTo, yTo, userData):
-        if self.getTile(xTo, yTo).blocksMove():
-            return 0
-        
-        return 1
-    
     def isInFOV(self, fromx, fromy, tox, toy):
         self.computeFOV(fromx, fromy)
         return self.FOVMap.lit(tox, toy)

@@ -4,6 +4,8 @@ Created on Jan 18, 2014
 @author: dstu
 '''
 
+#TODO implement infinite-radius fov
+
 class FOVMap(object):
 
     # Multipliers for transforming coordinates to other octants:

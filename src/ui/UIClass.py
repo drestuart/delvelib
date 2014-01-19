@@ -35,10 +35,6 @@ class UI(object):
         self.messagePanel = MessagePanel(C.MESSAGE_PANEL_DIMS, self.window)
         self.charPanel = CharacterPanel(C.CHAR_PANEL_DIMS, self.window)
 
-        # TODO let the currentLevel call some functions and we'll handle the actual drawing
-        
-        # TODO set FPS limit
-        
         pygame.key.set_repeat(500, 250)
         
     def gameLoop(self):
@@ -50,7 +46,6 @@ class UI(object):
                 
                 redrawMap = False
                 
-                # TODO check event type
                 if event.type == MOUSEMOTION:
                     desc = self.getTileDescUnderMouse()
                     if desc:
@@ -78,7 +73,6 @@ class UI(object):
                     self.charPanel.draw()
                     self.messagePanel.displayMessages()
                     
-                    # TODO Draw the level map
                     self.currentLevel.computeFOV(self.player.getX(), self.player.getY(), 0)
                     self.clearMap()
                     self.drawLevel()
@@ -96,11 +90,7 @@ class UI(object):
         self.window.update()
     
     def singleChoiceMenu(self, title, options, width):
-        # TODO implement with pygcurse textbox
-        
-        #calculate total height for the title (after auto-wrap) and one line per option
-#        header_height = libtcod.console_get_height_rect(self.mapConsole, 0, 0, width, C.SCREEN_HEIGHT, title)
-#        height = len(options) + header_height
+
         height = len(options)
         
         lines = []
@@ -421,12 +411,11 @@ class UI(object):
     def drawLevel(self):
         # Get all tiles to draw from level class
         # TODO implement windowing for larger maps
-        tiles = self.currentLevel.getTilesToDraw()
+        tilesToDraw = self.currentLevel.getTilesToDraw()
         
-        for (x, y, symbol, color, background) in tiles:
+        for (x, y, symbol, color, background) in tilesToDraw:
             self.mapConsole.putChar(symbol, x, y, color, background)
         
-#        raise Exception("NYI UIClass.drawLevel()")
         
     def getTileDescUnderMouse(self):
      
