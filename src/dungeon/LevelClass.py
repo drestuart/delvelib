@@ -325,7 +325,9 @@ class Level(Base):
         return path
         
     def isInFOV(self, fromx, fromy, tox, toy):
-        self.computeFOV(fromx, fromy)
+        if fromx == tox and fromy == toy:
+            return True
+#        self.computeFOV(fromx, fromy)
         return self.FOVMap.lit(tox, toy)
     
     def computeFOVProperties(self):

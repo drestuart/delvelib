@@ -28,6 +28,8 @@ class UI(object):
                                               fgcolor = colors.colorDefaultFG, bgcolor = colors.colorDefaultBG,
                                               fullscreen = self.fullscreen)
         self.window.autoblit = False
+        self.window.autoupdate = False
+        self.window.autodisplayupdate = False
         
         # Set up UI panels
         self.mapConsole = Panel(C.MAP_PANEL_DIMS, self.window)
@@ -38,21 +40,36 @@ class UI(object):
         
     def gameLoop(self):
         
-#        self.clock = pygame.time.Clock()
+        self.clock = pygame.time.Clock()
         self.charPanel.draw()
         self.messagePanel.displayMessages()
         
         self.currentLevel.computeFOV(self.player.getX(), self.player.getY())
         self.clearMap()
         self.drawLevel()
+        
+        self.window.update()
+        self.window.blittowindow()
+        
         num = 0
         
+        pygame.event.set_allowed([QUIT, MOUSEMOTION, KEYDOWN, KEYUP])
+        
         while True:
+            # Handle framerate
+            self.clock.tick(C.LIMIT_FPS)
+            
+            # get framerate with:
+                #self.clock.get_fps()
+
+#            print "Loop"
+
             for event in pygame.event.get():
                 
-                redrawMap = False
+                redrawScreen = False
                 
                 if event.type == QUIT:
+                    print "Got a QUIT event"
                     pygame.quit()
                     sys.exit()
                 
@@ -63,8 +80,9 @@ class UI(object):
                         # TODO print tile description to screen
 
 #                elif event.type in (KEYDOWN, KEYUP):
-                elif event.type == KEYUP:
-                    redrawMap = True
+#                elif event.type == KEYUP:
+                elif event.type == KEYDOWN:
+                    redrawScreen = True
                     
                     player_action = None
                     key = event.key
@@ -79,7 +97,7 @@ class UI(object):
                             if cr is not self.player:
                                 cr.takeTurn() 
                 
-                if redrawMap:
+                if redrawScreen:
     
                     self.charPanel.draw()
                     self.messagePanel.displayMessages()
@@ -88,19 +106,14 @@ class UI(object):
                     self.clearMap()
                     self.drawLevel()
                 
-                
                 # Draw everything
-                #print "Drawing"
                 self.window.update()
                 self.window.blittowindow()
                 
-                # Handle framerate
-#                self.clock.tick(C.LIMIT_FPS)
                 num += 1
                 print num
                 
-                # get framerate with:
-                #self.clock.get_fps()
+                
             
     
     def singleChoiceMenu(self, title, options, width):
@@ -340,7 +353,9 @@ class UI(object):
         if key == K_ESCAPE:
             return "exit"
             
+#        elif event.type == KEYUP:
         elif event.type == KEYDOWN:
+
             
             keyStr = pygame.key.name(key)
             direc = keys.getMovementDirection(key, keyStr)
@@ -349,6 +364,7 @@ class UI(object):
             if direc:
                 dx, dy = direc
                 if self.player.move(dx, dy):
+                    print "moved", dx, dy
                     return 'took-turn'
  
 #            elif key == K_KP_PERIOD or keyStr == '.': # Wait
@@ -429,8 +445,8 @@ class UI(object):
         tilesToDraw = self.currentLevel.getTilesToDraw(playerx, playery)
         
         for (x, y, symbol, color, background) in tilesToDraw:
+#            print '.'
             self.mapConsole.putChar(symbol, x, y, color, background)
-        
         
     def getTileDescUnderMouse(self):
         return ''
