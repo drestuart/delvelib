@@ -43,7 +43,7 @@ class Player(Cr.Creature):
             #self.energy -= self.moveCost
                         
 #            print self.name + " moves to", self.getX(), self.getY()
-            self.getLevel().setNeedToComputeFOV(True)
+#            self.getLevel().setNeedToComputeFOV(True)
             return True
         
         else:

@@ -4,8 +4,6 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
-#libtcod = importLibtcod()
-
 import Game as G
 
 def main():

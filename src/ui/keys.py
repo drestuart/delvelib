@@ -54,10 +54,12 @@ movementKeys = {
                 'u' : (1, -1)
                 }
 
-def getMovementDirection(keyStr):
+def getMovementDirection(key, keyStr):
     
     if keyStr in movementKeys.keys():
-        return movementKeys[keyStr.vk]
+        return movementKeys[keyStr]
+    elif key in movementKeys.keys():
+        return movementKeys[key]
     else:
         return None
         return None

@@ -16,7 +16,6 @@ import ItemClass as I
 import colors
 import database as db
 import random
-from Game import UI
 import FOVMap as fov
 import astar
 #from CreatureClass import *
@@ -180,7 +179,7 @@ class Level(Base):
     def getRandomOpenTileInRoom(self, room):
         return self.getRandomOpenTileInArea(room.x1, room.x2, room.y1, room.y2)
         
-    def getTilesToDraw(self, visibility = True):
+    def getTilesToDraw(self, playerx, playery, visibility = True):
         tileArray = []
         
         for tile in self.tiles:
@@ -191,7 +190,7 @@ class Level(Base):
                 
                 # Determine visibility
                 if visibility:
-                    if self.isInFOV(x, y):
+                    if self.isInFOV(playerx, playery, x, y):
                         
                         tile.setExplored(True)
                         
@@ -215,7 +214,7 @@ class Level(Base):
                     symbol, color, background = tile.toDraw()
                     background = colors.colorLightWall
                     
-#                symbol = symbol.encode('ascii', 'ignore')
+                symbol = symbol.encode('ascii', 'ignore')
                 tileArray.append((x, y, symbol, color, background))
 #                UI.putChar(x, y, symbol, color, background)
         return tileArray

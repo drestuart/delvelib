@@ -25,15 +25,18 @@ class Panel(object):
         cellx = x + self.x
         celly = y + self.y
         
-        self.window.putChars(chars, cellx, celly, fgcolor, bgcolor, indent)
+        self.window.putchars(chars, cellx, celly, fgcolor, bgcolor)
         
     def putChar(self, char, x, y, fgcolor = None, bgcolor = None, indent = False):
         # Add offset for this window
         cellx = x + self.x
         celly = y + self.y
         
-        self.window.putChar(char, cellx, celly, fgcolor, bgcolor, indent)
+        self.window.putchar(char, cellx, celly, fgcolor, bgcolor)
         
+    def containsPoint(self, x, y):
+        return (x >= self.x) and (x <= self.x + self.width) and \
+                (y >= self.y) and (y <= self.y + self.height)
 
 class MessagePanel(Panel):
     # TODO implement multi-color messages
@@ -125,7 +128,7 @@ class MessagePanel(Panel):
         y = self.y
 
         # Only show the last (height) messages
-        for line in self.messages[-self.height]:
+        for line in self.messages[-self.height:]:
             charsPrinted = 0
             wordsPrinted = 0
             wordsInLine = 0

@@ -4,7 +4,6 @@ Created on Mar 12, 2013
 @author: dstu
 '''
 
-from Import import *
 import Const as C
 import colors
 import Game as G
@@ -39,25 +38,37 @@ class UI(object):
         
     def gameLoop(self):
         
-        self.clock = pygame.time.Clock()
-#        while not libtcod.console_is_window_closed():
+#        self.clock = pygame.time.Clock()
+        self.charPanel.draw()
+        self.messagePanel.displayMessages()
+        
+        self.currentLevel.computeFOV(self.player.getX(), self.player.getY())
+        self.clearMap()
+        self.drawLevel()
+        num = 0
+        
         while True:
             for event in pygame.event.get():
                 
                 redrawMap = False
                 
-                if event.type == MOUSEMOTION:
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                
+                elif event.type == MOUSEMOTION:
                     desc = self.getTileDescUnderMouse()
                     if desc:
                         pass
                         # TODO print tile description to screen
 
-                elif event.type in (KEYDOWN, KEYUP):
+#                elif event.type in (KEYDOWN, KEYUP):
+                elif event.type == KEYUP:
                     redrawMap = True
                     
                     player_action = None
                     key = event.key
-                    player_action = self.handleKeys(key)
+                    player_action = self.handleKeys(key, event)
                     if player_action == 'exit':
                         print "Got a QUIT command"
                         pygame.quit()
@@ -73,21 +84,24 @@ class UI(object):
                     self.charPanel.draw()
                     self.messagePanel.displayMessages()
                     
-                    self.currentLevel.computeFOV(self.player.getX(), self.player.getY(), 0)
+                    self.currentLevel.computeFOV(self.player.getX(), self.player.getY())
                     self.clearMap()
                     self.drawLevel()
                 
                 
                 # Draw everything
                 #print "Drawing"
+                self.window.update()
                 self.window.blittowindow()
                 
                 # Handle framerate
-                self.clock.tick(C.LIMIT_FPS)
+#                self.clock.tick(C.LIMIT_FPS)
+                num += 1
+                print num
                 
                 # get framerate with:
                 #self.clock.get_fps()
-        self.window.update()
+            
     
     def singleChoiceMenu(self, title, options, width):
 
@@ -321,16 +335,15 @@ class UI(object):
         
         return inventory.getItem(index)
         
-    def handleKeys(self, key):
+    def handleKeys(self, key, event):
      
         if key == K_ESCAPE:
             return "exit"
             
-        elif key.pressed:
-            
-            direc = keys.getMovementDirection(key)
+        elif event.type == KEYDOWN:
             
             keyStr = pygame.key.name(key)
+            direc = keys.getMovementDirection(key, keyStr)
             
             # Move
             if direc:
@@ -338,7 +351,8 @@ class UI(object):
                 if self.player.move(dx, dy):
                     return 'took-turn'
  
-            elif key.vk == K_KP_PERIOD or keyStr == '.': # Wait
+#            elif key == K_KP_PERIOD or keyStr == '.': # Wait
+            elif keyStr == '.': # Wait
                 return 'took-turn'
             
             elif keyStr == ',': # Pick up items
@@ -411,19 +425,22 @@ class UI(object):
     def drawLevel(self):
         # Get all tiles to draw from level class
         # TODO implement windowing for larger maps
-        tilesToDraw = self.currentLevel.getTilesToDraw()
+        playerx, playery = self.player.getX(), self.player.getY()
+        tilesToDraw = self.currentLevel.getTilesToDraw(playerx, playery)
         
         for (x, y, symbol, color, background) in tilesToDraw:
             self.mapConsole.putChar(symbol, x, y, color, background)
         
         
     def getTileDescUnderMouse(self):
-     
+        return ''
+    
+        #TODO fixme!
         #return a string with the tiles of all objects under the mouse
         (mousex, mousey) = pygame.mouse.get_pos()
         
         # get cell coords
-        (x, y) = self.window.getcoordinatesatpixel(mousex, mousey, withinBoundaries=True)
+        (x, y) = self.window.getcoordinatesatpixel(mousex, mousey, onscreen=True)
      
 #        tiles = [tile for tile in self.currentLevel.getTiles()
 #            if tile.getX() == x and tile.getY() == y and self.currentLevel.isInFOV(x, y)]
@@ -432,11 +449,11 @@ class UI(object):
         
 #        if x >= 0 and x < C.MAP_WIDTH and y >= 0 and y < C.MAP_HEIGHT:
         # Check if the mouse is inside the map pane
-        if self.mapConsole.collidepoint(mousex, mousey):
+        if self.mapConsole.containsPoint(x, y):
 #            print "Reading tile", (x, y)
 #            G.game.message( "Reading tile " + str(x) + ", " + str(y) )
             tile = self.currentLevel.getTile(x, y)
-            if self.currentLevel.isInFOV(x, y):
+            if self.currentLevel.isInFOV(self.player.getX(), self.player.getY(), x, y):
                 return tile.getDescription()
             else:
                 return ''

@@ -23,6 +23,7 @@ class AStar(object):
         raise NotImplementedError
         
     def search(self, start, end):
+        print "Finding path"
         openset = set()
         closedset = set()
         current = start
@@ -76,6 +77,7 @@ class AStarGridNode(AStarNode):
         return C.DIAGONALCOST if diagonal else C.HVCOST
 
 def make_graph(mapinfo, blocked):
+    print "Building A* grid"
     nodes = [[AStarGridNode(x, y) for y in range(mapinfo["height"])] for x in range(mapinfo["width"])]
     graph = {}
     for x, y in product(range(mapinfo["width"]), range(mapinfo["height"])):

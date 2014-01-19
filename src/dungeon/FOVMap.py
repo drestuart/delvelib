@@ -87,6 +87,8 @@ class FOVMap(object):
         if x == self.lastx and y == self.lasty:
             return
         
+        print "Computing FOV"
+        
         self.lastx, self.lasty = x, y
         
         self.flag += 1

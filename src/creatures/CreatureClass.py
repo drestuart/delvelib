@@ -30,13 +30,17 @@ class Creature(Base):
         self.color = kwargs['color']
         self.backgroundColor = kwargs['background']
         
-        self.colorR = self.color.r
-        self.colorG = self.color.g
-        self.colorB = self.color.b
+#        self.colorR = self.color.r
+#        self.colorG = self.color.g
+#        self.colorB = self.color.b
         
-        self.backgroundColorR = self.backgroundColor.r
-        self.backgroundColorG = self.backgroundColor.g
-        self.backgroundColorB = self.backgroundColor.b
+        self.colorR, self.colorG, self.colorB = self.color
+        
+#        self.backgroundColorR = self.backgroundColor.r
+#        self.backgroundColorG = self.backgroundColor.g
+#        self.backgroundColorB = self.backgroundColor.b
+        
+        self.backgroundColorR, self.backgroundColorG, self.backgroundColorB = self.backgroundColor
         
         self.name = kwargs['name']
         self.description = kwargs['description']

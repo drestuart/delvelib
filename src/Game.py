@@ -18,7 +18,7 @@ import random
 import colors
 
 game = 0
-UI = 0
+myUI = 0
 
 class Game(object):
 
@@ -35,26 +35,25 @@ class Game(object):
         d1 = L.DungeonLevel(name = "Test", depth = 1, defaultFloorType = T.StoneFloor,
                           defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
         
-    #    d1.buildLevel()
         d1.buildLevel()
         player = P.Player()
         d1.placeCreatureInRandomRoom(player)
         
-        orc1 = Cr.Orc()
-        d1.placeCreatureInRandomRoom(orc1)
+#        orc1 = Cr.Orc()
+#        d1.placeCreatureInRandomRoom(orc1)
         
     #    orc2 = Cr.Orc()
     #    d1.placeCreatureInRandomRoom(orc2)
         
         db.saveDB.save(d1)
         
-        global UI
-        UI = self.myUI = ui.UI(level = d1, player = player)
-        UI.createWindow()
+        global myUI
+        myUI = ui.UI(level = d1, player = player)
+#        myUI.createWindow()
         
     def play(self):
-        self.myUI.gameLoop()
-        db.saveDB.save(self.myUI.getCurrentLevel())
+        myUI.gameLoop()
+        db.saveDB.save(myUI.getCurrentLevel())
         
     def message(self, msg, color = colors.white):
         self.myUI.message(msg, color)

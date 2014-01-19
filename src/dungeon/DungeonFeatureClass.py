@@ -28,15 +28,19 @@ class DungeonFeature(Base):
         
         self.color = baseColor
         
-        self.colorR = self.color.r
-        self.colorG = self.color.g
-        self.colorB = self.color.b
+#        self.colorR = self.color.r
+#        self.colorG = self.color.g
+#        self.colorB = self.color.b
+        
+        self.colorR, self.colorG, self.colorB = self.color
         
         self.backgroundColor = baseBackgroundColor
         
-        self.backgroundColorR = self.backgroundColor.r
-        self.backgroundColorG = self.backgroundColor.g
-        self.backgroundColorB = self.backgroundColor.b
+#        self.backgroundColorR = self.backgroundColor.r
+#        self.backgroundColorG = self.backgroundColor.g
+#        self.backgroundColorB = self.backgroundColor.b
+        
+        self.backgroundColorR, self.backgroundColorG, self.backgroundColorB = self.backgroundColor        
         
         self.tile = kwargs.get('tile', None)
         

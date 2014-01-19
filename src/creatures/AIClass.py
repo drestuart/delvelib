@@ -41,7 +41,7 @@ class PlayerAI(AI):
             return "exit"
             
         else:
-            direc = keys.getMovementDirection(keyStr)
+            direc = keys.getMovementDirection(key, keyStr)
 
             if direc:
                 dx, dy = direc

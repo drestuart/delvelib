@@ -39,15 +39,19 @@ class Tile(Base):
         
         self.baseColor = kwargs.get('baseColor', None)
         
-        self.baseColorR = self.baseColor.r
-        self.baseColorG = self.baseColor.g
-        self.baseColorB = self.baseColor.b
+#        self.baseColorR = self.baseColor.r
+#        self.baseColorG = self.baseColor.g
+#        self.baseColorB = self.baseColor.b
+        
+        self.baseColorR, self.baseColorG, self.baseColorB = self.baseColor
         
         self.baseBackgroundColor = kwargs.get('baseBackgroundColor', None)
         
-        self.baseBackgroundColorR = self.baseBackgroundColor.r
-        self.baseBackgroundColorG = self.baseBackgroundColor.g
-        self.baseBackgroundColorB = self.baseBackgroundColor.b
+#        self.baseBackgroundColorR = self.baseBackgroundColor.r
+#        self.baseBackgroundColorG = self.baseBackgroundColor.g
+#        self.baseBackgroundColorB = self.baseBackgroundColor.b
+        
+        self.baseBackgroundColorR, self.baseBackgroundColorG, self.baseBackgroundColorB = self.baseBackgroundColor
         
         self.baseDescription = kwargs.get('baseDescription', '')
         
