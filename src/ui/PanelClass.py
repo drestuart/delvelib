@@ -49,21 +49,34 @@ class MessagePanel(Panel):
         
         else:
             chunks = re.split(colorpat, message)
-            msglist = []
+            lines = [[]]
             fg = fgdefault
             bg = bgdefault
-    
+            charsAdded = 0
     
             while len(chunks) > 0:
                 chunk = chunks.pop(0)
                 colorspecpat = re.compile(r'^<(.*)>$')
                 cm = re.search(colorspecpat, chunk)
                 
-                if cm:
+                # If it's a normal word, add it to the message list
+                if not cm:
+                    if len(chunk) > 0:
+                        words = chunk.split()
+                        for word in words:
+                            if len(word) + charsAdded > self.width:
+                                charsAdded = 0
+                                lines.append([])
+                        
+                            lines[-1].append( (word, fg, bg) )
+                            charsAdded += len(word)
+                
+                else:
                     text = cm.groups()
-                    # Set fg and bg variables
+                    
                     words = text[0].split()
                     
+                    # Set fg and bg variables
                     fgpat = re.compile(r'fg=(.*)')
                     bgpat = re.compile(r'bg=(.*)')
                     tuplepat = re.compile(r'^\(.+\)$')
@@ -74,7 +87,6 @@ class MessagePanel(Panel):
                         if word == 'default':
                             fg = fgdefault
                             bg = bgdefault
-                            print "Setting foreground: default"
                             continue
                         
                         fgm = re.match(fgpat, word)
@@ -82,15 +94,12 @@ class MessagePanel(Panel):
                             fgStr = fgm.group(1)
                             
                             if re.match(tuplepat, fgStr):
-                                print "found a tuple"
                                 # Convert to tuple
-                                print re.split(commapat, fgStr[1:-1])
                                 fg = tuple(int(s) for s in re.split(commapat, fgStr[1:-1]))
                             else:
-                                print "no tuple"
+                                # no tuple
                                 fg = fgStr
                             
-                            print "Setting foreground: " + str(fg)
                             continue
                         
                         
@@ -99,32 +108,45 @@ class MessagePanel(Panel):
                             bgStr = bgm.group(1)
                             
                             if re.match(tuplepat, bgStr):
-                                print "found a tuple"
                                 # Convert to tuple
-                                print re.split(commapat, bgStr[1:-1])
                                 bg = tuple(int(s) for s in re.split(commapat, bgStr[1:-1]))
                             else:
-                                print "no tuple"
+                                # no tuple
                                 bg = bgStr
                             
-                            print "Setting background: " + str(bg)
                             continue
                             
-                    
-                else:
-                    if len(chunk) > 0:
-                        msglist.append( (chunk, fg, bg) )
-                    
-            self.messages.append(msglist)
+            self.messages += lines
     
         
     def displayMessages(self):
         y = self.y
-        
+
         # Only show the last (height) messages
         for line in self.messages[-self.height]:
+            charsPrinted = 0
+            wordsPrinted = 0
+            wordsInLine = 0
             for (text, fg, bg) in line:
-                self.window.write(text, y=y, fgcolor=fg, bgcolor=bg)
+                wordsInLine += len(text.split())
+            
+            for (text, fg, bg) in line:
+                words = text.split()
+                
+                # TODO Maybe don't need this if the word-wrap code in addMessage() is working?
+                for word in words:
+                    if len(word) + charsPrinted > self.width:
+                        self.window.write("\n")
+                        y += 1
+                        charsPrinted = 0
+                    
+                    if wordsPrinted < wordsInLine - 1:
+                        word = word + ' '
+                        
+                    self.window.write(word, y=y, fgcolor=fg, bgcolor=bg)
+                    charsPrinted += len(word)
+                    wordsPrinted += 1
+                    
             self.window.write("\n")
             y += 1
         
