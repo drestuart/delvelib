@@ -181,9 +181,9 @@ class Level(Base):
         #TODO return FOV status
         return libtcod.map_is_in_fov(self.FOVMap, x, y)
                 
-    # Draw that map!
-    def draw(self, visibility = True):
-
+    def getTilesToDraw(self, visibility = True):
+        tileArray = []
+        
         for tile in self.tiles:
             if tile:
                 x = tile.x
@@ -217,14 +217,15 @@ class Level(Base):
                     background = colors.colorLightWall
                     
                 symbol = symbol.encode('ascii', 'ignore')
-                UI.putChar(x, y, symbol, color, background)
+                tileArray.append((x, y, symbol, color, background))
+#                UI.putChar(x, y, symbol, color, background)
         #TODO return a big ol' array of tile positions and symbols to UI
+        return tileArray
                 
-    # Erase that map!
     def clear(self):
-        UI.clearMap()
-#         
-            
+        raise Exception("Level.clear() is deprecated")
+#        UI.clearMap()
+
     def getTilesInRadius(self, radius, centerX, centerY):
         
         assert radius >= 0 and radius == int(radius) #Do better error checking here.

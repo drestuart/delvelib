@@ -10,6 +10,8 @@ import colors
 fgdefault = colors.colorMessagePanelFG
 bgdefault = colors.colorMessagePanelBG
 
+__all__ = ["Panel", "MessagePanel", "CharacterPanel"]
+
 class Panel(object):
     def __init__(self, dims, window, margin = 0):
         (self.x, self.y, self.width, self.height) = dims
@@ -154,6 +156,43 @@ class CharacterPanel(Panel):
     def __init__(self, *args):
         super(CharacterPanel, self).__init__(*args)
         
-    # TODO implement character panel rendering
-    def render(self):
-        pass
+    def draw(self):
+        self.render_bar(1, 1, 18, "HP", 15, 20, colors.darkBlue, colors.darkRed)
+    
+    def render_bar(self, barx, bary, totalWidth, name, value, maximum, barColor, backColor):
+        #draw a bar (HP, experience, etc). first calculate the width of the bar
+        barWidth = min( int(float(value) / maximum * totalWidth), totalWidth)
+     
+        # Draw bar
+        for x in range(self.x + barx, self.x + barx + totalWidth):
+            if x < self.x + barx + barWidth:
+                bg = barColor
+            else:
+                bg = backColor
+
+            self.window.putchar(' ', x, self.y + bary, fgcolor = None, bgcolor = bg)
+            
+        # Add text
+        text = name + ' ' + str(value) + '/' + str(maximum)
+        textx = self.x + barx + (totalWidth - len(text)) / 2
+        
+        self.window.putchars(text, textx, self.y + bary)
+        
+def main():
+    
+    import pygcurse
+    import pygame
+    import sys
+    
+    window = pygcurse.PygcurseWindow(40, 25)
+    charPanel = CharacterPanel((5, 5, 20, 15), window)
+    for h in range(5, 18):
+        charPanel.render_bar(1, 1, 18, "HP", h, 20, colors.darkBlue, colors.darkRed)
+        pygcurse.waitforkeypress()
+    
+    pygame.quit()
+    sys.exit()
+
+
+if __name__ == '__main__':
+    main()

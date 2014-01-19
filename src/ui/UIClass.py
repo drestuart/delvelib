@@ -7,20 +7,13 @@ Created on Mar 12, 2013
 from Import import *
 import Const as C
 import colors
-import os.path
-import textwrap
 import Game as G
 import keys
-import Util as U
 import pygcurse
 import pygame
 from pygame.locals import *
-from string import join
 import sys
-from pygcurse import PygcurseWindow
-import re
 from PanelClass import *
-
 
 # TODO Abstract out all pygcurse calls into an interface class
 
@@ -64,9 +57,6 @@ class UI(object):
                         pass
                         # TODO print tile description to screen
 
-    #            libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS|libtcod.EVENT_MOUSE,key,mouse)
-    #            libtcod.console_clear(self.mapConsole)
-    
                 elif event.type in (KEYDOWN, KEYUP):
                     redrawMap = True
                     
@@ -84,26 +74,13 @@ class UI(object):
                                 cr.takeTurn() 
                 
                 if redrawMap:
-                    self.clearMap()
-    #                self.currentLevel.clear()
     
+                    self.charPanel.draw()
+                    self.messagePanel.displayMessages()
                     
-                    #prepare to render the GUI panel
-                    libtcod.console_set_default_background(self.panel, libtcod.black)
-                    libtcod.console_clear(self.panel)
-                    
-                    y = 1
-                    for (line, color) in self.msgs:
-                        libtcod.console_set_default_foreground(self.panel, color)
-                        libtcod.console_print_ex(self.panel, C.MSG_X, y, libtcod.BKGND_NONE, libtcod.LEFT, line)
-                        y += 1
-                 
-                    #show the player's stats
-#                    self.render_bar(1, 1, C.BAR_WIDTH, 'HP', 15, 20, colors.lightRed, colors.darkRed)
-                    self.charPanel.render()
-                    
-                    self.currentLevel.computeFOV(self.player.getX(), self.player.getY(), 0)
                     # TODO Draw the level map
+                    self.currentLevel.computeFOV(self.player.getX(), self.player.getY(), 0)
+                    self.clearMap()
                     self.drawLevel()
                 
                 
@@ -116,8 +93,7 @@ class UI(object):
                 
                 # get framerate with:
                 #self.clock.get_fps()
-                
-                
+        self.window.update()
     
     def singleChoiceMenu(self, title, options, width):
         # TODO implement with pygcurse textbox
@@ -426,57 +402,33 @@ class UI(object):
 #             return self.player.AI.takeTurn(key)
         
     
-    def render_bar(self, x, y, totalWidth, name, value, maximum, barColor, backColor):
-        #render a bar (HP, experience, etc). first calculate the width of the bar
-        barWidth = max( int(float(value) / maximum * totalWidth), totalWidth)
-        raise Exception("NYI UIClass.renderBar")
-     
-#        #render the background first
-#        libtcod.console_set_default_background(self.panel, backColor)
-#        libtcod.console_rect(self.panel, x, y, totalWidth, 1, False, libtcod.BKGND_SCREEN)
-#     
-#        #now render the bar on top
-#        libtcod.console_set_default_background(self.panel, barColor)
-#        if barWidth > 0:
-#            libtcod.console_rect(self.panel, x, y, barWidth, 1, False, libtcod.BKGND_SCREEN)
-#            
-#        #finally, some centered text with the values
-#        libtcod.console_set_default_foreground(self.panel, libtcod.white)
-#        libtcod.console_print_ex(self.panel, x + totalWidth / 2, y, libtcod.BKGND_NONE, libtcod.CENTER,
-#            name + ': ' + str(value) + '/' + str(maximum))
-        
-    def message(self, newMsg, color = colors.white):
-        # TODO Implement message bar in pygcurse
-        
-        self.messagePanel.addMessage(newMsg)
-        
-    
-    
-    
 
         
+    def message(self, newMsg):
+        self.messagePanel.addMessage(newMsg)
         
     def getCurrentLevel(self):
         return self.currentLevel
     
     def setCurrentLevel(self, lvl):
         self.currentLevel = lvl
-#        self.currentLevel.setMapConsole(self.mapConsole)
         
     def clearMap(self):
         # TODO clear map pane with pygcurse
-        raise Exception("NYI UIClass.clearMap()")
-    
-    def putChar(self, x, y, symbol, color, background):
-        # TODO
-        raise Exception("NYI UIClass.putChar()")
+#        raise Exception("NYI UIClass.clearMap()")
+        pass # Is this a thing we need?
     
     def drawLevel(self):
-        # TODO
-        raise Exception("NYI UIClass.drawLevel()")
+        # Get all tiles to draw from level class
+        # TODO implement windowing for larger maps
+        tiles = self.currentLevel.getTilesToDraw()
+        
+        for (x, y, symbol, color, background) in tiles:
+            self.mapConsole.putChar(symbol, x, y, color, background)
+        
+#        raise Exception("NYI UIClass.drawLevel()")
         
     def getTileDescUnderMouse(self):
-#        global mouse
      
         #return a string with the tiles of all objects under the mouse
         (mousex, mousey) = pygame.mouse.get_pos()
