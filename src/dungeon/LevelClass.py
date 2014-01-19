@@ -17,6 +17,7 @@ import colors
 import database as db
 import random
 from Game import UI
+import FOVMap as fov
 
 #from CreatureClass import *
 
@@ -43,9 +44,7 @@ class Level(Base):
         self.nextLevel = kwargs.get('nextLevel', None)
         self.previousLevel = kwargs.get('previousLevel', None)
         
-        # TODO instantiate FOV map
-        self.FOVMap = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
-        self.needToComputeFOV = True
+        self.FOVMap = None
         
         self.tiles = []
         self.rooms = []
@@ -176,11 +175,6 @@ class Level(Base):
     def getRandomOpenTileInRoom(self, room):
         return self.getRandomOpenTileInArea(room.x1, room.x2, room.y1, room.y2)
         
-    def isInFOV(self, x, y):
-        pass
-        #TODO return FOV status
-        return libtcod.map_is_in_fov(self.FOVMap, x, y)
-                
     def getTilesToDraw(self, visibility = True):
         tileArray = []
         
@@ -275,15 +269,10 @@ class Level(Base):
         x = fromTile.getX()
         y = fromTile.getY()
         
-        self.setNeedToComputeFOV(True)
-        self.computeFOV(x, y, radius)
-        self.setNeedToComputeFOV(True)
-        
         retArray = []
         
         for tile in self.tiles:
-            #TODO get FOV status
-            if libtcod.map_is_in_fov(self.FOVMap, tile.getX(), tile.getY()):
+            if self.isInFOV(x, y, tile.getX(), tile.getY()):
                 retArray.append(tile)
                 
         return retArray
@@ -315,38 +304,33 @@ class Level(Base):
         
         return 1
     
+    def isInFOV(self, fromx, fromy, tox, toy):
+        self.computeFOV(fromx, fromy)
+        return self.FOVMap.lit(tox, toy)
+    
     def computeFOVProperties(self):
         
-        if not self.FOVMap:
-            pass
-        # TODO: Create FOV map
-            self.FOVMap = libtcod.map_new(C.MAP_WIDTH, C.MAP_HEIGHT)
+        fovArray = []
+        
+        # Initialize fovArray
+        for dummyy in range(C.MAP_HEIGHT):
+            newCol = []
+            for dummyx in range(C.MAP_WIDTH):
+                newCol.append(False)
+            fovArray.append(newCol)
         
         for tile in self.tiles:
             x = tile.x
             y = tile.y
-            blocksMove = tile.blocksMove()
             blocksSight = tile.blocksSight()
             
-            # TODO: Fill in FOV map
-            libtcod.map_set_properties(self.FOVMap, x, y, not blocksMove, not blocksSight)
-                
-    def computeFOV(self, x, y, radius = 0):
+            fovArray[y][x] = blocksSight
+            
+        self.FOVMap = fov.FOVMap(fovArray)
+        
+    def computeFOV(self, x, y):
         '''Compute the field of view of this map with respect to a particular position'''
-        if self.getNeedToComputeFOV() == False:
-            return
-        else:
-            
-            self.setNeedToComputeFOV(False)
-            
-            # TODO Compute FOV
-            libtcod.map_compute_fov(self.FOVMap, x, y, radius, C.FOV_LIGHT_WALLS, C.FOV_ALGO)
-
-    def getNeedToComputeFOV(self):
-        return self.needToComputeFOV
-
-    def setNeedToComputeFOV(self, value):
-        self.needToComputeFOV = value
+        self.FOVMap.do_fov(x, y, C.FOV_RADIUS)
         
     def findCreatures(self):
         self.creatures = []
@@ -386,6 +370,7 @@ class DungeonLevel(Level):
     
     def buildLevelOld(self):
         '''Add some rooms to the level'''
+        raise Exception("Deprecated buildLevelOld")
         rooms = []
 
         # Make some rooms

@@ -64,9 +64,9 @@ ZAP_MENU_HEADER = "Zap what?"
 
 BAR_WIDTH = 20
 
-MSG_X = BAR_WIDTH + 2
-MSG_WIDTH = SCREEN_WIDTH - BAR_WIDTH - 2
-MSG_HEIGHT = PANEL_HEIGHT - 1
+#MSG_X = BAR_WIDTH + 2
+#MSG_WIDTH = SCREEN_WIDTH - BAR_WIDTH - 2
+#MSG_HEIGHT = PANEL_HEIGHT - 1
 
 #MAP_WIDTH = 10
 #MAP_HEIGHT = 10
@@ -74,7 +74,7 @@ MSG_HEIGHT = PANEL_HEIGHT - 1
 # Field of view constants
 #FOV_ALGO = libtcod.FOV_BASIC  #default FOV algorithm
 FOV_LIGHT_WALLS = True
-
+FOV_RADIUS = 10
 
 ########################
 #
