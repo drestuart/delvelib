@@ -80,12 +80,13 @@ class AggressiveAI(AI):
     def walkPath(self):
         path = self.owner.getPath()
         
-        # TODO get pathing lib in here
-        if path is None or libtcod.path_is_empty(path):
+        if path is None or len(path) == 0:
             self.wander()
             return
         else:
-            x, y = libtcod.path_walk(path, recompute = True)
+            print self.owner.getX(), self.owner.getY(), path
+#            x, y = libtcod.path_walk(path, recompute = True)
+            x, y = path.pop(0)
             dx = x - self.owner.getX()
             dy = y - self.owner.getY()
             
@@ -136,7 +137,7 @@ class AggressiveAI(AI):
                 return False
         
         # See if we need to recalculate the path
-        if path and not libtcod.path_is_empty(path) and (enemy.getTile() is self.owner.getGoalTile()):
+        if path and not len(path) > 0 and (enemy.getTile() is self.owner.getGoalTile()):
 #            print self.owner.The(), "follows the path"
             return True
             
@@ -156,7 +157,7 @@ class AggressiveAI(AI):
             path = self.getLevel().getPathToTile(self.getTile(), goalTile)
             
 #            if path and not libtcod.path_is_empty(path):
-            if not libtcod.path_is_empty(path):
+            if len(path) > 0:
                 self.owner.setPath(path)
                 return True
             else:

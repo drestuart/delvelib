@@ -18,6 +18,7 @@ import database as db
 import random
 import FOVMap as fov
 import astar
+import Util as U
 #from CreatureClass import *
 
 
@@ -113,6 +114,9 @@ class Level(Base):
             return None
         
         return self.tileArray[x][y]
+    
+    def distance(self, tilea, tileb):
+        return U.ChebyshevDistance(tilea.getX(), tileb.getX(), tilea.getY(), tileb.getY())
     
     
     def getTileFromDB(self, x, y, level):
@@ -275,7 +279,7 @@ class Level(Base):
         retArray = []
         
         for tile in self.tiles:
-            if self.isInFOV(x, y, tile.getX(), tile.getY()):
+            if (radius == 0 or self.distance(fromTile, tile) <= radius) and self.isInFOV(x, y, tile.getX(), tile.getY()):
                 retArray.append(tile)
                 
         return retArray
@@ -321,6 +325,9 @@ class Level(Base):
         path = self.movePaths.search(start, end)
         
         path = [(node.x, node.y) for node in path]
+        
+        if fromTile.getX() == path[0][0] and fromTile.getY() == path[0][1]:
+            path.pop(0)
 
         return path
         
@@ -390,75 +397,6 @@ class DungeonLevel(Level):
     def __init__(self, **kwargs):
         super(DungeonLevel, self).__init__(**kwargs)
     
-    def buildLevelOld(self):
-        '''Add some rooms to the level'''
-        raise Exception("Deprecated buildLevelOld")
-        rooms = []
-
-        # Make some rooms
-        for dummy in range(C.MAX_ROOMS):
-            #random width and height
-            
-            w = random.randint(C.ROOM_MIN_SIZE, C.ROOM_MAX_SIZE)
-            h = random.randint(C.ROOM_MIN_SIZE, C.ROOM_MAX_SIZE)
-    
-            #random position without going out of the boundaries of the map
-            
-            x = random.randint(C.DUNGEON_MARGIN, C.MAP_WIDTH - w - 1 - C.DUNGEON_MARGIN)
-            y = random.randint(C.DUNGEON_MARGIN, C.MAP_HEIGHT - h - 1 - C.DUNGEON_MARGIN)
-    
-            newRoom = R.Room(x = x, y = y, width = w, height = h,
-                             defaultFloorType = self.defaultFloorType, defaultWallType = self.defaultWallType)
-     
-            #run through the other rooms and see if they intersect with this one
-            failed = False
-            for otherRoom in rooms:
-                if newRoom.intersect(otherRoom):
-                    failed = True
-                    del newRoom
-                    break
-            
-            if not failed:
-                #print "No room intersection detected"
-                #this means there are no intersections, so this room is valid
-                #"paint" it to the map's tiles
-                self.createRoom(newRoom)
-                
-                #self.placeObjects(newRoom)
-                
-                rooms.append(newRoom)
-                self.rooms.append(newRoom)
-
-        # Connect rooms with tunnels
-        if len(self.rooms) >= 1:
-            for rn in range(len(self.rooms) - 1):
-                thisRoom, nextRoom = self.rooms[rn], self.rooms[rn + 1]
-                
-                self.createTunnel(thisRoom, nextRoom)
-            
-            lastRoom = self.rooms[-1]
-            firstRoom = self.rooms[0]
-            self.createTunnel(lastRoom, firstRoom)
-        
-        
-        print "Placing walls"
-        # Fill in empty spaces
-        self.fillInSpaces()
-        
-        print "Building tile array"    
-        self.buildTileArray()    
-        
-        # Place Stairs
-        print "Placing stairs"
-        self.placeStairs()
-        
-        print "Saving open tiles"
-        db.saveDB.save(self)
-        
-        print "Setting up FOV"
-        self.computeFOVProperties()
-        
-
     def buildLevel(self):
         '''
         Adapted from the dungeon building algorithm by Zack Hovatter (http://roguebasin.roguelikedevelopment.org/index.php?title=User:Zackhovatter)

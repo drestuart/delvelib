@@ -39,8 +39,8 @@ class Game(object):
         player = P.Player()
         d1.placeCreatureInRandomRoom(player)
         
-#        orc1 = Cr.Orc()
-#        d1.placeCreatureInRandomRoom(orc1)
+        orc1 = Cr.Orc()
+        d1.placeCreatureInRandomRoom(orc1)
         
     #    orc2 = Cr.Orc()
     #    d1.placeCreatureInRandomRoom(orc2)

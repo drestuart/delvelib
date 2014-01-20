@@ -51,8 +51,6 @@ class UI(object):
         self.window.update()
         self.window.blittowindow()
         
-        num = 0
-        
         pygame.event.set_allowed([QUIT, MOUSEMOTION, KEYDOWN, KEYUP])
         
         while True:
@@ -108,9 +106,6 @@ class UI(object):
                 # Draw everything
                 self.window.update()
                 self.window.blittowindow()
-                
-                num += 1
-                print num
                 
                 
             
@@ -363,7 +358,6 @@ class UI(object):
             if direc:
                 dx, dy = direc
                 if self.player.move(dx, dy):
-                    print "moved", dx, dy
                     return 'took-turn'
  
 #            elif key == K_KP_PERIOD or keyStr == '.': # Wait
