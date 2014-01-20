@@ -16,6 +16,7 @@ import UIClass as ui
 import database as db
 import random
 import colors
+import pygame
 
 game = 0
 myUI = 0
@@ -25,6 +26,9 @@ class Game(object):
     def __init__(self, **kwargs):
         global game
         game = self
+        
+        if pygame.init() != (6,0):
+            print "Error starting pygame"
         
         db.saveDB.start(True)
     

@@ -4,11 +4,9 @@ Created on Mar 13, 2013
 @author: dstu
 '''
 
-from ctypes.wintypes import INT
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
 from sqlalchemy.types import String, Integer, Boolean
-import Util as U
 import AIClass as AI
 import colors
 import database as db
