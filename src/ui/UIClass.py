@@ -75,9 +75,8 @@ class UI(object):
                 
                 elif event.type == MOUSEMOTION:
                     desc = self.getTileDescUnderMouse()
-                    if desc:
-                        pass
-                        # TODO print tile description to screen
+                    self.messagePanel.setSingleMessage(desc)
+                    redrawScreen = self.messagePanel.messageChanged
 
 #                elif event.type in (KEYDOWN, KEYUP):
 #                elif event.type == KEYUP:
@@ -449,7 +448,6 @@ class UI(object):
             self.mapConsole.putChar(symbol, x, y, color, background)
         
     def getTileDescUnderMouse(self):
-        return ''
     
         #TODO fixme!
         #return a string with the tiles of all objects under the mouse

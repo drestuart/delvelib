@@ -24,25 +24,31 @@ class Panel(object):
         # Add offset for this window
         cellx = x + self.x
         celly = y + self.y
-        
+        chars = chars.encode('ascii', 'ignore')
         self.window.putchars(chars, cellx, celly, fgcolor, bgcolor)
         
     def putChar(self, char, x, y, fgcolor = None, bgcolor = None, indent = False):
         # Add offset for this window
         cellx = x + self.x
         celly = y + self.y
-        
+        char = char.encode('ascii', 'ignore')
         self.window.putchar(char, cellx, celly, fgcolor, bgcolor)
         
     def containsPoint(self, x, y):
-        return (x >= self.x) and (x <= self.x + self.width) and \
-                (y >= self.y) and (y <= self.y + self.height)
+#        return (x >= self.x) and (x <= self.x + self.width) and \
+#                (y >= self.y) and (y <= self.y + self.height)
+        
+        return (x >= self.x) and (x < self.x + self.width) and \
+                (y >= self.y) and (y < self.y + self.height)
 
 class MessagePanel(Panel):
     # TODO implement multi-color messages
     def __init__(self, *args):
         super(MessagePanel, self).__init__(*args)
         self.messages = []
+        self.singleMessage = ''
+        self.messageWindowHeight = self.height - 2
+        self.messageChanged = False
     
     def addMessage(self, message):
 
@@ -123,12 +129,28 @@ class MessagePanel(Panel):
                             
             self.messages += lines
     
+    
+    def setSingleMessage(self, message=''):
+        if message != self.singleMessage:
+#            self.singleMessageClear()
+            self.singleMessage = message.ljust(self.width)
+            self.messageChanged = True
+        else:
+            self.messageChanged = False
+            
+    def singleMessageClear(self):
+        clearst = ' ' * self.width
+        self.putChars(clearst, 0, 0, colors.blankBackground, colors.blankBackground)
+        
         
     def displayMessages(self):
-        y = self.y
+        # Show single-line message
+        self.putChars(self.singleMessage, 0, 0)
+        
+        y = self.y + 1
 
         # Only show the last (height) messages
-        for line in self.messages[-self.height:]:
+        for line in self.messages[-self.messageWindowHeight:]:
             charsPrinted = 0
             wordsPrinted = 0
             wordsInLine = 0
@@ -148,6 +170,7 @@ class MessagePanel(Panel):
                     if wordsPrinted < wordsInLine - 1:
                         word = word + ' '
                         
+                    # TODO convert to use putChars() so we don't have to handle the x-y offset twice
                     self.window.write(word, y=y, fgcolor=fg, bgcolor=bg)
                     charsPrinted += len(word)
                     wordsPrinted += 1
