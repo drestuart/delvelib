@@ -6,6 +6,7 @@ Created on Jan 18, 2014
 
 import re
 import colors
+import Const as C
 
 fgdefault = colors.colorMessagePanelFG
 bgdefault = colors.colorMessagePanelBG
@@ -24,14 +25,14 @@ class Panel(object):
         # Add offset for this window
         cellx = x + self.x
         celly = y + self.y
-        chars = chars.encode('ascii', 'ignore')
+        chars = chars.encode(C.ENCODING, C.ENCODING_MODE)
         self.window.putchars(chars, cellx, celly, fgcolor, bgcolor)
         
     def putChar(self, char, x, y, fgcolor = None, bgcolor = None, indent = False):
         # Add offset for this window
         cellx = x + self.x
         celly = y + self.y
-        char = char.encode('ascii', 'ignore')
+        char = char.encode(C.ENCODING, C.ENCODING_MODE)
         self.window.putchar(char, cellx, celly, fgcolor, bgcolor)
         
     def containsPoint(self, x, y):
