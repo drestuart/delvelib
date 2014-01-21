@@ -12,7 +12,7 @@ from randomChoice import weightedChoice
 
 Base = db.saveDB.getDeclarativeBase()
 
-class Item(Base):
+class Item(colors.withColor, Base):
     '''
     The abstract item (stack) baseclass
     '''
@@ -30,27 +30,14 @@ class Item(Base):
     stackable = False
 
     def __init__(self, **kwargs):
+        super(Item, self).__init__(**kwargs)
+        
         self.weight = kwargs.get('weight', 0)
         self.material = kwargs.get('material', None)
         
         self.symbol = kwargs['symbol']
-        self.color = kwargs['color']
-        self.backgroundColor = kwargs.get('backgroundColor', colors.black)
         self.description = kwargs.get('description', 'some item')
         self.pluralDescription = kwargs.get('plural description', self.description + 's')
-        
-#        self.colorR = self.color.r
-#        self.colorG = self.color.g
-#        self.colorB = self.color.b
-        
-        self.colorR, self.colorG, self.colorB = self.color
-        
-#        self.backgroundColorR = self.backgroundColor.r
-#        self.backgroundColorG = self.backgroundColor.g
-#        self.backgroundColorB = self.backgroundColor.b
-        
-        self.backgroundColorR, self.backgroundColorG, self.backgroundColorB = self.backgroundColor
-        
         
         self.quantity = kwargs.get('quantity', 1)
 
@@ -62,14 +49,6 @@ class Item(Base):
     material = Column(String)
     
     symbol = Column(String(length=1, convert_unicode = False))
-    
-    colorR = Column(Integer)
-    colorG = Column(Integer)
-    colorB = Column(Integer)
-    
-    backgroundColorR = Column(Integer)
-    backgroundColorG = Column(Integer)
-    backgroundColorB = Column(Integer)
     
     description = Column(String)
     pluralDescription = Column(String)
@@ -119,83 +98,8 @@ class Item(Base):
     def setMaterial(self, value):
         self.material = value
 
-
     def setSymbol(self, value):
         self.symbol = value
-
-    def getColor(self):        
-        if self.__dict__.get('color', None):
-            return self.color
-        else:
-            self.color = (self.colorR, self.colorG, self.colorB)
-            return self.color
-
-    def getBackgroundColor(self):        
-        if self.__dict__.get('backgroundColor', None):
-            return self.backgroundColor
-        else:
-            self.backgroundColor = (self.backgroundColorR, self.backgroundColorG, self.backgroundColorB)
-            return self.backgroundColor
-        
-    def setColor(self, value):
-        self.color = value
-        self.setColorB(value.b)
-        self.setColorG(value.g)
-        self.setColorR(value.r)
-
-
-    def setBackgroundColor(self, value):
-        self.backgroundColor = value
-        self.setBackgroundColorB(value.b)
-        self.setBackgroundColorG(value.g)
-        self.setBackgroundColorR(value.r)
-
-    def getColorR(self):
-        return self.colorR
-
-
-    def getColorG(self):
-        return self.colorG
-
-
-    def getColorB(self):
-        return self.colorB
-
-
-    def getBackgroundColorR(self):
-        return self.backgroundColorR
-
-
-    def getBackgroundColorG(self):
-        return self.backgroundColorG
-
-
-    def getBackgroundColorB(self):
-        return self.backgroundColorB
-
-
-    def setColorR(self, value):
-        self.colorR = value
-
-
-    def setColorG(self, value):
-        self.colorG = value
-
-
-    def setColorB(self, value):
-        self.colorB = value
-
-
-    def setBackgroundColorR(self, value):
-        self.backgroundColorR = value
-
-
-    def setBackgroundColorG(self, value):
-        self.backgroundColorG = value
-
-
-    def setBackgroundColorB(self, value):
-        self.backgroundColorB = value
     
     def getDescription(self):
         if self.quantity == 1:

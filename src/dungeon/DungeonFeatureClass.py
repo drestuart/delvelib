@@ -15,32 +15,17 @@ import database as db
 
 Base = db.saveDB.getDeclarativeBase()
 
-class DungeonFeature(Base):
+class DungeonFeature(colors.withBackgroundColor, Base):
     # Dummy class right now.  Will eventually represent dungeon features like traps, altars and stairs
     
     __tablename__ = "dungeon_features"
     __table_args__ = {'extend_existing': True}
     
-    def __init__(self, symbol, baseColor, baseBackgroundColor, **kwargs):
+    def __init__(self, symbol, **kwargs):
+        super(DungeonFeature, self).__init__(**kwargs)
 #        self.blockSight = kwargs.get('blockSight', False)
 #        self.blockMove = kwargs.get('blockMove', False)
         self.symbol = symbol
-        
-        self.color = baseColor
-        
-#        self.colorR = self.color.r
-#        self.colorG = self.color.g
-#        self.colorB = self.color.b
-        
-        self.colorR, self.colorG, self.colorB = self.color
-        
-        self.backgroundColor = baseBackgroundColor
-        
-#        self.backgroundColorR = self.backgroundColor.r
-#        self.backgroundColorG = self.backgroundColor.g
-#        self.backgroundColorB = self.backgroundColor.b
-        
-        self.backgroundColorR, self.backgroundColorG, self.backgroundColorB = self.backgroundColor        
         
         self.tile = kwargs.get('tile', None)
         
@@ -52,14 +37,6 @@ class DungeonFeature(Base):
     name = Column(String)
     description = Column(String)
     symbol = Column(String(length=1, convert_unicode = False))
-    
-    colorR = Column(Integer)
-    colorG = Column(Integer)
-    colorB = Column(Integer)
-    
-    backgroundColorR = Column(Integer)
-    backgroundColorG = Column(Integer)
-    backgroundColorB = Column(Integer)
     
     tileId = Column(Integer) #, ForeignKey('tiles.id')
     
@@ -87,54 +64,6 @@ class DungeonFeature(Base):
     def getSymbol(self):
         return self.symbol
 
-
-    def getBaseColor(self):        
-        if self.__dict__.get('color', None):
-            return self.color
-        else:
-            self.color = (self.colorR, self.colorG, self.colorB)
-            return self.color
-
-    
-    def getColor(self):
-        return self.getBaseColor()
-
-
-    def getBaseColorR(self):
-        return self.colorR
-
-
-    def getBaseColorG(self):
-        return self.colorG
-
-
-    def getBaseColorB(self):
-        return self.colorB
-    
-    def getBackgroundColor(self):
-        return self.getBaseBackgroundColor()
-
-
-    def getBaseBackgroundColor(self):
-        if self.__dict__.get('backgroundColor', None):
-            return self.backgroundColor
-        else:
-            self.backgroundColor = (self.backgroundColorR, self.backgroundColorG, self.backgroundColorB)
-            return self.backgroundColor
-
-
-    def getBaseBackgroundColorR(self):
-        return self.backgroundColorR
-
-
-    def getBaseBackgroundColorG(self):
-        return self.backgroundColorG
-
-
-    def getBaseBackgroundColorB(self):
-        return self.backgroundColorB
-
-
     def getTile(self):
         return self.tile
 
@@ -159,38 +88,6 @@ class DungeonFeature(Base):
         self.symbol = value
 
 
-    def setBaseColor(self, value):
-        self.color = value
-
-
-    def setBaseColorR(self, value):
-        self.colorR = value
-
-
-    def setBaseColorG(self, value):
-        self.colorG = value
-
-
-    def setBaseColorB(self, value):
-        self.colorB = value
-
-
-    def setBaseBackgroundColor(self, value):
-        self.backgroundColor = value
-
-
-    def setBaseBackgroundColorR(self, value):
-        self.backgroundColorR = value
-
-
-    def setBaseBackgroundColorG(self, value):
-        self.backgroundColorG = value
-
-
-    def setBaseBackgroundColorB(self, value):
-        self.backgroundColorB = value
-
-
     def setTile(self, value):
         self.tile = value
 
@@ -206,7 +103,7 @@ class DungeonFeature(Base):
 class Door(DungeonFeature):
     
     def __init__(self, **kwargs):
-        super(Door, self).__init__(symbol = '+', description = 'a door', baseColor = colors.colorWood, baseBackgroundColor = colors.black, **kwargs)
+        super(Door, self).__init__(symbol = '+', description = 'a door', color = colors.colorWood, backgroundColor = colors.black, **kwargs)
         self.closed = True
         self.color = colors.colorWood
 
@@ -273,7 +170,7 @@ class upStair(Stair):
     
     def __init__(self, **kwargs):
         
-        super(upStair, self).__init__(symbol = '<', description = 'a stairway leading up', baseColor = colors.colorStone, baseBackgroundColor = colors.black, **kwargs)
+        super(upStair, self).__init__(symbol = '<', description = 'a stairway leading up', color = colors.colorStone, backgroundColor = colors.black, **kwargs)
         
         self.destination = kwargs.get('destination', None)
         
@@ -296,7 +193,7 @@ class upStair(Stair):
 class downStair(Stair):
     
     def __init__(self, **kwargs):
-        super(downStair, self).__init__(symbol = '>', description = 'a stairway leading down', baseColor = colors.colorStone, baseBackgroundColor = colors.black, **kwargs)
+        super(downStair, self).__init__(symbol = '>', description = 'a stairway leading down', color = colors.colorStone, backgroundColor = colors.black, **kwargs)
         
         self.destination = kwargs.get('destination', None)
         

@@ -1,5 +1,51 @@
 # A constants module for holding color tuples
 
+from sqlalchemy.schema import Column
+from sqlalchemy.types import Integer
+
+# Helper class for objects with color
+class withColor(object):
+    def __init__(self, **kwargs):
+        super(withColor, self).__init__()
+        self.color = kwargs['color']
+        self.colorR, self.colorG, self.colorB = self.color
+        
+    colorR = Column(Integer)
+    colorG = Column(Integer)
+    colorB = Column(Integer)
+
+    def getColor(self):        
+        if self.__dict__.get('color', None):
+            return self.color
+        else:
+            self.color = (self.colorR, self.colorG, self.colorB)
+            return self.color
+    
+    def setColor(self, value):
+        self.color = value
+
+
+# Helper class for objects with a background color
+class withBackgroundColor(withColor):
+    def __init__(self, **kwargs):
+        super(withBackgroundColor, self).__init__(**kwargs)
+        self.backgroundColor = kwargs['backgroundColor']
+        self.backgroundColorR, self.backgroundColorG, self.backgroundColorB = self.backgroundColor
+        
+    backgroundColorR = Column(Integer)
+    backgroundColorG = Column(Integer)
+    backgroundColorB = Column(Integer)
+
+    def getBackgroundColor(self):        
+        if self.__dict__.get('backgroundColor', None):
+            return self.backgroundColor
+        else:
+            self.backgroundColor = (self.backgroundColorR, self.backgroundColorG, self.backgroundColorB)
+            return self.backgroundColor
+    
+    def setBackgroundColor(self, value):
+        self.backgroundColor = value
+
 # Common colors
 black = (0,0,0)
 white = (255,255,255)

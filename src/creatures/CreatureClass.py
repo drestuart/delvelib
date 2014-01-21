@@ -16,29 +16,16 @@ import InventoryClass as I
 Base = db.saveDB.getDeclarativeBase()
 
 
-class Creature(Base):
+class Creature(colors.withColor, Base):
     
     __tablename__ = "creatures"
     __table_args__ = {'extend_existing': True}
     
     
     def __init__(self, **kwargs):
+        super(Creature, self).__init__(**kwargs)
         
         self.symbol = kwargs['symbol']
-        self.color = kwargs['color']
-        self.backgroundColor = kwargs['background']
-        
-#        self.colorR = self.color.r
-#        self.colorG = self.color.g
-#        self.colorB = self.color.b
-        
-        self.colorR, self.colorG, self.colorB = self.color
-        
-#        self.backgroundColorR = self.backgroundColor.r
-#        self.backgroundColorG = self.backgroundColor.g
-#        self.backgroundColorB = self.backgroundColor.b
-        
-        self.backgroundColorR, self.backgroundColorG, self.backgroundColorB = self.backgroundColor
         
         self.name = kwargs['name']
         self.description = kwargs['description']
@@ -61,14 +48,6 @@ class Creature(Base):
     id = Column(Integer, primary_key=True, unique=True)
     
     symbol = Column(String(length=1, convert_unicode = False))
-    
-    colorR = Column(Integer)
-    colorG = Column(Integer)
-    colorB = Column(Integer)
-    
-    backgroundColorR = Column(Integer)
-    backgroundColorG = Column(Integer)
-    backgroundColorB = Column(Integer)
     
     description = Column(String)
     name = Column(String)
@@ -109,13 +88,11 @@ class Creature(Base):
         level = self.getLevel()
         
         if newTile is not None and level.placeCreature(self, newTile):
-                        
 #            print self.name + " moves to", self.getX(), self.getY()
             return True
         
         else:
             return False
-        
     
     def getTile(self):
         return self.tile
@@ -147,41 +124,6 @@ class Creature(Base):
         if self.hp <= 0:
             self.deathFunction(self)
 
-    def getColor(self):        
-        if self.__dict__.get('color', None):
-            return self.color
-        else:
-            self.color = (self.colorR, self.colorG, self.colorB)
-            return self.color
-
-    
-    def getBackgroundColor(self):
-        return self.backgroundColor
-
-
-    def getColorR(self):
-        return self.colorR
-
-
-    def getColorG(self):
-        return self.colorG
-
-
-    def getColorB(self):
-        return self.colorB
-
-
-    def getBackgroundColorR(self):
-        return self.backgroundColorR
-
-
-    def getBackgroundColorG(self):
-        return self.backgroundColorG
-
-
-    def getBackgroundColorB(self):
-        return self.backgroundColorB
-
 
     def getName(self):
         return self.name
@@ -205,45 +147,6 @@ class Creature(Base):
 
     def getAIClass(self):
         return self.AIClass
-
-
-    def setColor(self, value):
-        self.color = value
-        self.setColorB(value.b)
-        self.setColorG(value.g)
-        self.setColorR(value.r)
-
-
-    def setBackgroundColor(self, value):
-        self.backgroundColor = value
-        self.setBackgroundColorB(value.b)
-        self.setBackgroundColorG(value.g)
-        self.setBackgroundColorR(value.r)
-
-
-    def setColorR(self, value):
-        self.colorR = value
-
-
-    def setColorG(self, value):
-        self.colorG = value
-
-
-    def setColorB(self, value):
-        self.colorB = value
-
-
-    def setBackgroundColorR(self, value):
-        self.backgroundColorR = value
-
-
-    def setBackgroundColorG(self, value):
-        self.backgroundColorG = value
-
-
-    def setBackgroundColorB(self, value):
-        self.backgroundColorB = value
-
 
     def setName(self, value):
         self.name = value
@@ -370,7 +273,7 @@ class Creature(Base):
 class Orc(Creature):
     
     def __init__(self, **kwargs):
-        super(Orc, self).__init__(symbol = 'o', color = colors.red, background = colors.black, 
+        super(Orc, self).__init__(symbol = 'o', color = colors.red, 
                                   name = 'orc', description = 'a hideous orc', species = 'orc',
                                   maxHP = 10, AIClass = AI.AggressiveAI, **kwargs)
     
