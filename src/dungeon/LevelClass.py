@@ -280,18 +280,51 @@ class Level(Base):
         
         return tiles
     
+    def isInFOV(self, fromx, fromy, tox, toy):
+        if fromx == tox and fromy == toy:
+            return True
+        
+        fromTile = self.getTile(fromx, fromy)
+        toTile = self.getTile(tox, toy)
+#         if fromTile.getVisibleTiles() is not None:
+#             toTile = self.getTile(tox, toy)
+#             return toTile in fromTile.getVisibleTiles()
+#         
+#         else:
+# #             visibleTiles = self.getVisibleTilesFromTile(fromTile, radius)
+#             self.computeFOV(fromx, fromy)
+#             return self.FOVMap.isVisible(tox, toy)
+
+        if fromTile.getVisibleTiles() is None:
+            visibleTiles = self.getVisibleTilesFromTile(fromTile)
+        
+        else:
+            visibleTiles = fromTile.getVisibleTiles()
+        
+        return toTile in visibleTiles
+    
     def getVisibleTilesFromTile(self, fromTile, radius = 0):
         
-        x = fromTile.getX()
-        y = fromTile.getY()
+        retArray = fromTile.getVisibleTiles()
         
-        retArray = []
+        if retArray is not None:
+            return retArray
         
-        for tile in self.tiles:
-            if (radius == 0 or self.distance(fromTile, tile) <= radius) and self.isInFOV(x, y, tile.getX(), tile.getY()):
-                retArray.append(tile)
-                
-        return retArray
+        else:
+            retArray = []
+            
+            x = fromTile.getX()
+            y = fromTile.getY()
+            
+            self.computeFOV(x, y)
+            
+            for tile in self.tiles:
+                if (radius == 0 or self.distance(fromTile, tile) <= radius) and self.FOVMap.isVisible(tile.getX(), tile.getY()):
+                    retArray.append(tile)
+            
+            fromTile.setVisibleTiles(retArray)
+            
+            return retArray
     
     def getVisibleCreaturesFromTile(self, fromTile, radius = 0):
         
@@ -340,12 +373,6 @@ class Level(Base):
 
         return path
         
-    def isInFOV(self, fromx, fromy, tox, toy):
-        if fromx == tox and fromy == toy:
-            return True
-#        self.computeFOV(fromx, fromy)
-        return self.FOVMap.lit(tox, toy)
-    
     def computeFOVProperties(self):
         
         fovArray = []

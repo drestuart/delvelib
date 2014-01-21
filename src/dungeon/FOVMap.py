@@ -33,7 +33,7 @@ class FOVMap(object):
                 or x >= self.width or y >= self.height
                 or self.data[y][x] == True)
         
-    def lit(self, x, y):
+    def isVisible(self, x, y):
         return self.light[y][x] == self.flag
     
     def set_lit(self, x, y):
@@ -87,7 +87,7 @@ class FOVMap(object):
         if x == self.lastx and y == self.lasty:
             return
         
-        print "Computing FOV"
+        print "Computing FOV for", x, y
         
         self.lastx, self.lasty = x, y
         

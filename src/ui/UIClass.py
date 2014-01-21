@@ -105,7 +105,7 @@ class UI(object):
                     self.charPanel.draw()
                     self.messagePanel.displayMessages()
                     
-                    self.currentLevel.computeFOV(self.player.getX(), self.player.getY())
+#                     self.currentLevel.computeFOV(self.player.getX(), self.player.getY())
                     self.clearMap()
                     self.drawLevel()
                 

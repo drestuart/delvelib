@@ -65,6 +65,8 @@ class Tile(Base):
         self.explored = False
 
         self.inventory = None
+        
+        self.visibleTiles = None
                 
 
     id = Column(Integer, primary_key=True, unique=True)
@@ -315,6 +317,12 @@ class Tile(Base):
     
     def getY(self):
         return self.y
+    
+    def getVisibleTiles(self):
+        return self.visibleTiles
+    
+    def setVisibleTiles(self, tiles):
+        self.visibleTiles = tiles
     
     def getExplored(self):
         return self.explored
