@@ -45,7 +45,7 @@ class FOVMap(object):
         if start < end:
             return
         radius_squared = radius*radius
-        for j in range(row, radius+1):
+        for j in range(row, radius+1 if radius > 0 else self.height):
             dx, dy = -j-1, -j
             blocked = False
             while dx <= 0:
@@ -61,7 +61,7 @@ class FOVMap(object):
                     break
                 else:
                     # Our light beam is touching this square; light it:
-                    if dx*dx + dy*dy < radius_squared:
+                    if radius_squared == 0 or dx*dx + dy*dy < radius_squared:
                         self.set_lit(X, Y)
                     if blocked:
                         # we're scanning a row of blocked squares:
@@ -72,7 +72,7 @@ class FOVMap(object):
                             blocked = False
                             start = new_start
                     else:
-                        if self.blocked(X, Y) and j < radius:
+                        if self.blocked(X, Y) and (radius == 0 or j < radius):
                             # This is a blocking square, start a child scan:
                             blocked = True
                             self._cast_light(cx, cy, j+1, start, l_slope,

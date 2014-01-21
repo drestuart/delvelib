@@ -280,20 +280,36 @@ class Level(Base):
         
         return tiles
     
+    def computeFOVProperties(self):
+        
+        fovArray = []
+        
+        # Initialize fovArray
+        for dummyy in range(self.height):
+            newCol = []
+            for dummyx in range(self.width):
+                newCol.append(False)
+            fovArray.append(newCol)
+        
+        for tile in self.tiles:
+            x = tile.x
+            y = tile.y
+            blocksSight = tile.blocksSight()
+            
+            fovArray[y][x] = blocksSight
+            
+        self.FOVMap = fov.FOVMap(fovArray)
+        
+    def computeFOV(self, x, y):
+        '''Compute the field of view of this map with respect to a particular position'''
+        self.FOVMap.do_fov(x, y, C.FOV_RADIUS)
+    
     def isInFOV(self, fromx, fromy, tox, toy):
         if fromx == tox and fromy == toy:
             return True
         
         fromTile = self.getTile(fromx, fromy)
         toTile = self.getTile(tox, toy)
-#         if fromTile.getVisibleTiles() is not None:
-#             toTile = self.getTile(tox, toy)
-#             return toTile in fromTile.getVisibleTiles()
-#         
-#         else:
-# #             visibleTiles = self.getVisibleTilesFromTile(fromTile, radius)
-#             self.computeFOV(fromx, fromy)
-#             return self.FOVMap.isVisible(tox, toy)
 
         if fromTile.getVisibleTiles() is None:
             visibleTiles = self.getVisibleTilesFromTile(fromTile)
@@ -303,7 +319,7 @@ class Level(Base):
         
         return toTile in visibleTiles
     
-    def getVisibleTilesFromTile(self, fromTile, radius = 0):
+    def getVisibleTilesFromTile(self, fromTile, radius = C.PLAYER_VISION_RADIUS):
         
         retArray = fromTile.getVisibleTiles()
         
@@ -326,7 +342,7 @@ class Level(Base):
             
             return retArray
     
-    def getVisibleCreaturesFromTile(self, fromTile, radius = 0):
+    def getVisibleCreaturesFromTile(self, fromTile, radius = C.PLAYER_VISION_RADIUS):
         
         tileArr = self.getVisibleTilesFromTile(fromTile, radius)
         
@@ -373,29 +389,7 @@ class Level(Base):
 
         return path
         
-    def computeFOVProperties(self):
-        
-        fovArray = []
-        
-        # Initialize fovArray
-        for dummyy in range(self.height):
-            newCol = []
-            for dummyx in range(self.width):
-                newCol.append(False)
-            fovArray.append(newCol)
-        
-        for tile in self.tiles:
-            x = tile.x
-            y = tile.y
-            blocksSight = tile.blocksSight()
-            
-            fovArray[y][x] = blocksSight
-            
-        self.FOVMap = fov.FOVMap(fovArray)
-        
-    def computeFOV(self, x, y):
-        '''Compute the field of view of this map with respect to a particular position'''
-        self.FOVMap.do_fov(x, y, C.FOV_RADIUS)
+    
         
     def findCreatures(self):
         self.creatures = []

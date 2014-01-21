@@ -73,8 +73,8 @@ BAR_WIDTH = 20
 
 # Field of view constants
 #FOV_ALGO = libtcod.FOV_BASIC  #default FOV algorithm
-FOV_LIGHT_WALLS = True
-FOV_RADIUS = 10
+FOV_RADIUS = 0
+PLAYER_VISION_RADIUS = 10
 
 ########################
 #
