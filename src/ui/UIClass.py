@@ -27,6 +27,12 @@ class UI(object):
         self.window = pygcurse.PygcurseWindow(C.SCREEN_WIDTH, C.SCREEN_HEIGHT, C.TITLE, font = self.font,
                                               fgcolor = colors.colorDefaultFG, bgcolor = colors.colorDefaultBG,
                                               fullscreen = self.fullscreen)
+        
+        self.fontsize = kwargs.get('fontsize')
+        
+        if self.fontsize:
+            self.window.font = pygame.font.Font(None, self.fontsize)
+            
         self.window.autoblit = False
         self.window.autoupdate = False
         self.window.autodisplayupdate = False

@@ -22,6 +22,8 @@ game = 0
 myUI = 0
 
 class Game(object):
+    
+    fontsize = None
 
     def __init__(self, **kwargs):
         global game
@@ -31,6 +33,8 @@ class Game(object):
             print "Error starting pygame"
         
         db.saveDB.start(True)
+        
+        self.fontsize = kwargs.get('fontsize')
     
         seed = 1155272238
         print seed
@@ -43,8 +47,8 @@ class Game(object):
         player = P.Player()
         d1.placeCreatureInRandomRoom(player)
         
-        orc1 = Cr.Orc()
-        d1.placeCreatureInRandomRoom(orc1)
+#         orc1 = Cr.Orc()
+#         d1.placeCreatureInRandomRoom(orc1)
         
     #    orc2 = Cr.Orc()
     #    d1.placeCreatureInRandomRoom(orc2)
@@ -52,7 +56,7 @@ class Game(object):
         db.saveDB.save(d1)
         
         global myUI
-        myUI = ui.UI(level = d1, player = player)
+        myUI = ui.UI(level = d1, player = player, fontsize = self.fontsize)
 #        myUI.createWindow()
         
     def play(self):
