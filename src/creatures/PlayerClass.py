@@ -33,7 +33,7 @@ class Player(Cr.Creature):
         level = self.getLevel()
         newTile = level.getTile(newX, newY)
         
-        if level.placeCreature(self, newTile):
+        if newTile is not None and level.placeCreature(self, newTile):
             
             #Remove self from the old tile
 #            oldTile = self.map.getTile(self.coordinates)

@@ -113,7 +113,10 @@ class Level(Base):
             print "self.tileArray not initialized!"
             return None
         
-        return self.tileArray[x][y]
+        if x >= 0 and x < C.MAP_WIDTH and y >= 0 and y < C.MAP_HEIGHT:
+            return self.tileArray[x][y]
+    
+        return None
     
     def distance(self, tilea, tileb):
         return U.ChebyshevDistance(tilea.getX(), tileb.getX(), tilea.getY(), tileb.getY())

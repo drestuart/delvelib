@@ -108,7 +108,7 @@ class Creature(Base):
         
         level = self.getLevel()
         
-        if level.placeCreature(self, newTile):
+        if newTile is not None and level.placeCreature(self, newTile):
                         
 #            print self.name + " moves to", self.getX(), self.getY()
             return True
