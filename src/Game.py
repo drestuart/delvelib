@@ -21,6 +21,9 @@ import pygame
 game = 0
 myUI = 0
 
+def message(msg):
+    game.message(msg)
+
 class Game(object):
     
     fontsize = None
@@ -63,8 +66,8 @@ class Game(object):
         myUI.gameLoop()
         db.saveDB.save(myUI.getCurrentLevel())
         
-    def message(self, msg, color = colors.white):
-        self.myUI.message(msg, color)
+    def message(self, msg):
+        myUI.message(msg)
 
 
 

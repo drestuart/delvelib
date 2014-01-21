@@ -5,6 +5,7 @@ Created on Jan 18, 2014
 '''
 
 #TODO implement infinite-radius fov
+import Game as G
 
 class FOVMap(object):
 
@@ -88,6 +89,7 @@ class FOVMap(object):
             return
         
         print "Computing FOV for", x, y
+        G.message("Computing FOV for " + str(x) + " " + str(y))
         
         self.lastx, self.lasty = x, y
         

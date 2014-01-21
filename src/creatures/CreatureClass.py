@@ -339,7 +339,7 @@ class Creature(Base):
         self.hateList = value
         
     def attack(self, enemy):
-        G.game.message(self.The() + " attacks " + enemy.the())
+        G.message(self.The() + " attacks " + enemy.the())
         print self.The() + " attacks " + enemy.the()
         
     def the(self):
@@ -362,7 +362,7 @@ class Creature(Base):
         
     def pickUpItem(self, item):
         
-        G.game.message(self.The() + " picks up " + item.a_an())
+        G.message(self.The() + " picks up " + item.a_an())
         self.getInventory().addItem(item)
     
     
