@@ -40,7 +40,7 @@ class Game(object):
         print seed
         random.seed(seed)
         
-        d1 = L.DungeonLevel(name = "Test", depth = 1, defaultFloorType = T.StoneFloor,
+        d1 = L.DungeonLevel(name = "Test", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1, defaultFloorType = T.StoneFloor,
                           defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
         
         d1.buildLevel()

@@ -449,19 +449,13 @@ class UI(object):
         
     def getTileDescUnderMouse(self):
     
-        #TODO fixme!
         #return a string with the tiles of all objects under the mouse
         (mousex, mousey) = pygame.mouse.get_pos()
         
         # get cell coords
         (x, y) = self.window.getcoordinatesatpixel(mousex, mousey, onscreen=True)
      
-#        tiles = [tile for tile in self.currentLevel.getTiles()
-#            if tile.getX() == x and tile.getY() == y and self.currentLevel.isInFOV(x, y)]
-#     
-#        return tiles[0].getDescription()
         
-#        if x >= 0 and x < C.MAP_WIDTH and y >= 0 and y < C.MAP_HEIGHT:
         # Check if the mouse is inside the map pane
         if self.mapConsole.containsPoint(x, y):
 #            print "Reading tile", (x, y)

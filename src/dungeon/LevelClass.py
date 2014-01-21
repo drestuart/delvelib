@@ -44,6 +44,12 @@ class Level(Base):
         self.nextLevel = kwargs.get('nextLevel', None)
         self.previousLevel = kwargs.get('previousLevel', None)
         
+        self.width = kwargs.get('width')
+        self.height = kwargs.get('height')
+        
+        if not self.width or not self.height:
+            raise ValueError("Level class constructor requires width and height values")
+        
         self.FOVMap = None
         
         self.tiles = []
@@ -69,9 +75,9 @@ class Level(Base):
         self.hasTile = []
         self.tileArray = []
         
-        for dummyx in range(C.MAP_WIDTH):
+        for dummyx in range(self.width):
             newCol = []
-            for dummyy in range(C.MAP_HEIGHT):
+            for dummyy in range(self.height):
                 newCol.append(False)
             self.hasTile.append(newCol)
 
@@ -98,9 +104,9 @@ class Level(Base):
         self.tileArray = []
         
         # Initialize
-        for dummyx in range(C.MAP_WIDTH):
+        for dummyx in range(self.width):
             newCol = []
-            for dummyy in range(C.MAP_HEIGHT):
+            for dummyy in range(self.height):
                 newCol.append(None)
             self.tileArray.append(newCol)
             
@@ -113,7 +119,7 @@ class Level(Base):
             print "self.tileArray not initialized!"
             return None
         
-        if x >= 0 and x < C.MAP_WIDTH and y >= 0 and y < C.MAP_HEIGHT:
+        if x >= 0 and x < self.width and y >= 0 and y < self.height:
             return self.tileArray[x][y]
     
         return None
@@ -128,8 +134,8 @@ class Level(Base):
         return db.saveDB.runQuery(query)
     
     def getRandomTile(self):
-        randX = random.randint(0, C.MAP_WIDTH)
-        randY = random.randint(0, C.MAP_HEIGHT)
+        randX = random.randint(0, self.width)
+        randY = random.randint(0, self.height)
         return self.getTile(randX, randY)
     
     def getRandomOpenTile(self):
@@ -141,16 +147,16 @@ class Level(Base):
     def getRandomTileInArea(self, x1, x2, y1, y2):
         
         x1 = max(0, x1)
-        x1 = min(x1, C.MAP_WIDTH)
+        x1 = min(x1, self.width)
         
         x2 = max(0, x2)
-        x2 = min(x2, C.MAP_WIDTH)
+        x2 = min(x2, self.width)
         
         y1 = max(0, y1)
-        y1 = min(y1, C.MAP_HEIGHT)
+        y1 = min(y1, self.height)
         
         y2 = max(0, y2)
-        y2 = min(y2, C.MAP_HEIGHT)
+        y2 = min(y2, self.height)
         
         
 #        randX = random.randint(x1, x2)
@@ -255,8 +261,8 @@ class Level(Base):
         x1 = max(0, centerX - radius)
         y1 = max(0, centerY - radius)
         
-        x2 = min(centerX + radius, C.MAP_WIDTH)
-        y2 = min(centerY + radius, C.MAP_HEIGHT)
+        x2 = min(centerX + radius, self.width)
+        y2 = min(centerY + radius, self.height)
         
         for x in range(x1, x2):
             tile1 = self.getTile(x, y1)
@@ -302,8 +308,8 @@ class Level(Base):
     
     def setupPathing(self):
         blocked = []
-        width = C.MAP_WIDTH
-        height = C.MAP_HEIGHT
+        width = self.width
+        height = self.height
         
         for dummyx in range(width):
             newCol = []
@@ -345,9 +351,9 @@ class Level(Base):
         fovArray = []
         
         # Initialize fovArray
-        for dummyy in range(C.MAP_HEIGHT):
+        for dummyy in range(self.height):
             newCol = []
-            for dummyx in range(C.MAP_WIDTH):
+            for dummyx in range(self.width):
                 newCol.append(False)
             fovArray.append(newCol)
         
@@ -548,8 +554,8 @@ class DungeonLevel(Level):
                 rand_height = random.randint(4, height)
                 
                 # boundary checking, thanks
-                rand_width = min(rand_width, C.MAP_WIDTH - x - 1 - C.DUNGEON_MARGIN)
-                rand_height = min(rand_height, C.MAP_HEIGHT - y - 1 - C.DUNGEON_MARGIN)
+                rand_width = min(rand_width, self._map_size[0] - x - 1 - C.DUNGEON_MARGIN)
+                rand_height = min(rand_height, self._map_size[1] - y - 1 - C.DUNGEON_MARGIN)
                 
          
                 direc = 0
@@ -651,7 +657,7 @@ class DungeonLevel(Level):
                         self.level.hasTile[x][y] = True
                 
         
-        d = dungeon(C.MAP_WIDTH, C.MAP_HEIGHT, C.MAX_ROOMS_AND_CORRIDORS, C.ROOM_CHANCE, self)
+        d = dungeon(self.width, self.height, C.MAX_ROOMS_AND_CORRIDORS, C.ROOM_CHANCE, self)
         d.addTiles(self)
         
         print "Building tile array"    
@@ -678,8 +684,8 @@ class DungeonLevel(Level):
 
     def fillInSpaces(self):
         # Fill in empty spaces with wall tiles
-        for x in range(C.MAP_WIDTH):
-            for y in range(C.MAP_HEIGHT):
+        for x in range(self.width):
+            for y in range(self.height):
 
                 hasTile = self.hasTile[x][y]
 #                tiles = self.getTileFromDB(x, y, self)
