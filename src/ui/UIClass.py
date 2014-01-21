@@ -38,7 +38,7 @@ class UI(object):
         self.window.autodisplayupdate = False
         
         # Set up UI panels
-        self.mapConsole = Panel(C.MAP_PANEL_DIMS, self.window)
+        self.mapPanel = Panel(C.MAP_PANEL_DIMS, self.window)
         self.messagePanel = MessagePanel(C.MESSAGE_PANEL_DIMS, self.window)
         self.charPanel = CharacterPanel(C.CHAR_PANEL_DIMS, self.window)
 
@@ -139,47 +139,17 @@ class UI(object):
         return None
     
     def displayTextWindow(self, title, x, y, width, height, lines):
-#        window = libtcod.console_new(width, height + 2)
         
         box = pygcurse.PygcurseTextbox(self.window, (x, y, width, height), fgcolor='white', bgcolor='black', 
                                        border='=', wrap=True, margin=1, caption=title)
         box.text = "\n".join(lines)
         box.update()
         
-#        libtcod.console_set_default_foreground(window, libtcod.white)
-        
-#        def addBorder(line):
-#            line = line.ljust(width - 4)
-#            line = "= " + line + " ="
-#            return line
-#        
-#        title = addBorder(title)
-#        
-#        libtcod.console_print_ex(window, 0, 0, libtcod.BKGND_NONE, libtcod.LEFT, "="*width)
-#        libtcod.console_print_rect_ex(window, 0, 1, width, height + 2, libtcod.BKGND_NONE, libtcod.LEFT, title)
-#        
-#        header_height = libtcod.console_get_height_rect(self.mapConsole, 0, 0, width, C.SCREEN_HEIGHT, title)
-#        
-#        # Print each line
-#        y = header_height + 1
-#        for line in lines:
-#            # Formatting
-#            line = addBorder(line)
-#            
-#            libtcod.console_print_ex(window, 0, y, libtcod.BKGND_NONE, libtcod.LEFT, line)
-#            y += 1
-#        
-#        libtcod.console_print_ex(window, 0, height + 1 , libtcod.BKGND_NONE, libtcod.LEFT, "="*width)
-#        
-#        libtcod.console_blit(window, 0, 0, width, height + 2, 0, C.MENU_X, C.MENU_Y, 1.0, 0.7)
-#        libtcod.console_flush()
-        
     
     def showPlayerInventory(self):
         title = C.PLAYER_INVENTORY_HEADER
         inv = self.player.getInventory()
         
-#        header_height = libtcod.console_get_height_rect(self.mapConsole, 0, 0, C.MENU_WIDTH, C.SCREEN_HEIGHT, title)
         height = inv.length()
         
         lines = []
@@ -190,7 +160,6 @@ class UI(object):
         
         self.displayTextWindow(title, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
         
-#        key = libtcod.console_wait_for_keypress(True)
         key, keyStr = keys.waitForInput()
         
         # Do nothing... yet
@@ -211,8 +180,6 @@ class UI(object):
 #        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
         index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
         
-#        key = libtcod.console_wait_for_keypress(True)
-        
         # Do nothing... yet
         return None
     
@@ -227,10 +194,7 @@ class UI(object):
                 text = item.getDescription()
                 lines.append(text)
         
-#        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
         index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
-        
-#        key = libtcod.console_wait_for_keypress(True)
         
         # Do nothing... yet
         return None
@@ -246,10 +210,7 @@ class UI(object):
                 text = item.getDescription()
                 lines.append(text)
         
-#        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
         index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
-        
-#        key = libtcod.console_wait_for_keypress(True)
         
         # Do nothing... yet
         return None
@@ -265,10 +226,7 @@ class UI(object):
                 text = item.getDescription()
                 lines.append(text)
         
-#        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
         index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
-        
-#        key = libtcod.console_wait_for_keypress(True)
         
         # Do nothing... yet
         return None
@@ -284,10 +242,7 @@ class UI(object):
                 text = item.getDescription()
                 lines.append(text)
         
-#        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
         index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
-        
-#        key = libtcod.console_wait_for_keypress(True)
         
         # Do nothing... yet
         return None
@@ -303,10 +258,7 @@ class UI(object):
                 text = item.getDescription()
                 lines.append(text)
         
-#        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
         index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
-        
-#        key = libtcod.console_wait_for_keypress(True)
         
         # Do nothing... yet
         return None
@@ -315,7 +267,6 @@ class UI(object):
     def pickUpItemMenu(self, inventory):
         #show a singleChoiceMenu with each item of the inventory as an option
         if inventory.length() == 0:
-#            lines = ['Inventory is empty.']
             return None
         else:
             items = inventory.getItems()
@@ -333,7 +284,6 @@ class UI(object):
     def selectItemMenu(self, inventory):
         #show a singleChoiceMenu with each item of the inventory as an option
         if inventory.length() == 0:
-#            options = ['Inventory is empty.']
             return None
         else:
             items = inventory.getItems()
@@ -366,7 +316,6 @@ class UI(object):
                 if self.player.move(dx, dy):
                     return 'took-turn'
  
-#            elif key == K_KP_PERIOD or keyStr == '.': # Wait
             elif keyStr == '.': # Wait
                 return 'took-turn'
             
@@ -413,16 +362,6 @@ class UI(object):
         else:
             return 'didnt-take-turn'
     
-    def handleKeysOld(self, key):
-        raise Exception("Deprecated UI.handleKeysOld")
-#         if key.vk == libtcod.KEY_ESCAPE:
-#             return 'exit'  #exit game
-#         else:
-#             return self.player.AI.takeTurn(key)
-        
-    
-
-        
     def message(self, newMsg):
         self.messagePanel.addMessage(newMsg)
         
@@ -445,7 +384,7 @@ class UI(object):
         
         for (x, y, symbol, color, background) in tilesToDraw:
 #            print '.'
-            self.mapConsole.putChar(symbol, x, y, color, background)
+            self.mapPanel.putChar(symbol, x, y, color, background)
         
     def getTileDescUnderMouse(self):
     
@@ -457,7 +396,7 @@ class UI(object):
      
         
         # Check if the mouse is inside the map pane
-        if self.mapConsole.containsPoint(x, y):
+        if self.mapPanel.containsPoint(x, y):
 #            print "Reading tile", (x, y)
 #            G.game.message( "Reading tile " + str(x) + ", " + str(y) )
             tile = self.currentLevel.getTile(x, y)
