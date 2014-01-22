@@ -17,7 +17,7 @@ import colors
 import database as db
 import random
 import FOVMap as fov
-import astar
+import AStar
 import Util as U
 #from CreatureClass import *
 
@@ -57,9 +57,7 @@ class Level(Base):
         
         self.creatures = []
         
-        self.moveGraph = None
-        self.moveGraphNodes = None
-        self.movePaths = None
+        self.astar = None
         
         
 ##########################################################################
@@ -356,33 +354,32 @@ class Level(Base):
         return retArray
     
     def setupPathing(self):
-        blocked = []
+        mapdata = []
         width = self.width
         height = self.height
-        
+
         for dummyx in range(width):
-            newCol = []
             for dummyy in range(height):
-                newCol.append(False)
-            blocked.append(newCol)
+                mapdata.append(1)
         
         for tile in self.tiles:
             if tile.blocksMove():
-                blocked[tile.getX()][tile.getY()] = True
+                mapdata[tile.getX() + tile.getY() * width] = -1
         
-        self.moveGraph, self.moveGraphNodes = astar.make_graph({"width": width, "height": height}, blocked)
-        self.movePaths = astar.AStarGrid(self.moveGraph)
+        self.astar = AStar.setUpMap(mapdata, self.width, self.height)
         
     
     def getPathToTile(self, fromTile, toTile):
         
-        if self.moveGraph is None or self.moveGraphNodes is None or self.movePaths is None:
+        if self.astar is None:
             self.setupPathing()
 
-        start, end = self.moveGraphNodes[fromTile.getX()][fromTile.getY()], self.moveGraphNodes[toTile.getX()][toTile.getY()]
-        path = self.movePaths.search(start, end)
+        startpoint = fromTile.getX(), fromTile.getY()
+        endpoint = toTile.getX(), toTile.getY()
         
-        path = [(node.x, node.y) for node in path]
+        pathObj = AStar.findPath(startpoint, endpoint, self.astar)
+        
+        path = [(node.location.x, node.location.y) for node in pathObj.getNodes()]
         
         if fromTile.getX() == path[0][0] and fromTile.getY() == path[0][1]:
             path.pop(0)

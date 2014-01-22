@@ -84,8 +84,7 @@ class AggressiveAI(AI):
             self.wander()
             return
         else:
-            print self.owner.getX(), self.owner.getY(), path
-#            x, y = libtcod.path_walk(path, recompute = True)
+#             print self.owner.getX(), self.owner.getY(), path
             x, y = path.pop(0)
             dx = x - self.owner.getX()
             dy = y - self.owner.getY()
