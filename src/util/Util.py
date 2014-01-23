@@ -64,9 +64,9 @@ def getDirectionNameFromAngle(angle):
             return name
 
 def main():
-    for i in range(0, 360, 5):
-        print i, getDirectionNameFromAngle(i)
-
+    print getDirectionName((10, 10), (10,11))
+    
+    
 if __name__ == '__main__':
     main()
     
