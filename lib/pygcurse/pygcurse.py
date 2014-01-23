@@ -1889,7 +1889,7 @@ class PygcurseInput():
             self.cursor += 1
 
 
-    def paste(text):
+    def paste(self, text):
         """
         Inserts the string text into the buffer at the position of the cursor. This does not actually use the system's clipboard, it only pastes from the text parameter.
         """
@@ -2166,7 +2166,8 @@ class PygcurseTextbox:
 
         # draw the textbox shadow
         if self.shadow is not None:
-            pygsurf.addshadow(x=x, y=y, width=width, height=height, amount=self.shadowamount, direction=self.shadow, xoffset=self.shadowxoffset, yoffset=self.shadowyoffset)
+#            pygsurf.addshadow(x=x, y=y, width=width, height=height, amount=self.shadowamount, direction=self.shadow, xoffset=self.shadowxoffset, yoffset=self.shadowyoffset)
+            pygsurf.addshadow(region = (x, y, width, height), amount=self.shadowamount, direction=self.shadow, xoffset=self.shadowxoffset, yoffset=self.shadowyoffset)
 
 
         if self.text == '':
@@ -2313,11 +2314,11 @@ class PygcurseTextbox:
     def _propsetmidbottom(self, value):
         self.x = value[0] - int(self.width / 2)
         self.y = value[1] - self.height
-    def _propsetcenter(self, value):
-        self.x = value[0] - int(self.width / 2)
-        self.y = value[1] - int(self.height / 2)
+#    def _propsetcenter(self, value):
+#        self.x = value[0] - int(self.width / 2)
+#        self.y = value[1] - int(self.height / 2)
     def _propsetregion(self, value):
-        self.x, self.y, self.width, self.height = pygsurf.getregion(value, False)
+        self.x, self.y, self.width, self.height = self.getregion(value, False)
 
     def _propgetsize(self):
         return (self.width, self.height)

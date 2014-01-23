@@ -13,6 +13,7 @@ import pygame
 from pygame.locals import *
 import sys
 from PanelClass import *
+import textwrap
 
 # TODO Abstract out all pygcurse calls into an interface class
 
@@ -116,34 +117,53 @@ class UI(object):
                 
             
     
-    def singleChoiceMenu(self, title, options, width):
+    def singleChoiceMenu(self, title, options, width = C.MENU_WIDTH):
 
-        height = len(options)
-        
         lines = []
         letter_index = ord('a')
         for option in options:
             text = '(' + chr(letter_index) + ') ' + option
             lines.append(text)
             letter_index += 1
+        
+        while True:
+            self.displayTextWindow(title, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, lines)
 
-        self.displayTextWindow(title, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
-        
-        key, keyStr = keys.waitForInput()
-     
-        #convert the ASCII code to an index; if it corresponds to an option, return it
-        index = key - ord('a')
-        if index >= 0 and index < len(options): 
-            return index
-        
-        return None
+            key, keyStr = keys.waitForInput()
+            
+            if key is None:
+                return
+         
+            #convert the ASCII code to an index; if it corresponds to an option, return it
+            index = key - ord('a')
+            if index >= 0 and index < len(options): 
+                return index
     
-    def displayTextWindow(self, title, x, y, width, height, lines):
+    def displayTextWindow(self, title, x, y, width, lines):
+
+        linesToDisplay = []
+        for line in lines:
+            wrappedLines = textwrap.wrap(line, width - 4)
+            for wline in wrappedLines:
+                wline = wline.ljust(width)
+                linesToDisplay.append(wline)
+                
+        height = len(linesToDisplay) + 2 + 2*C.MENU_MARGIN
         
-        box = pygcurse.PygcurseTextbox(self.window, (x, y, width, height), fgcolor='white', bgcolor='black', 
-                                       border='=', wrap=True, margin=1, caption=title)
-        box.text = "\n".join(lines)
+        # Attempt to center
+        x = (C.SCREEN_WIDTH - width)/2
+        y = (C.SCREEN_HEIGHT - height)/2
+        
+        box = pygcurse.PygcurseTextbox(self.window, (x, y, width, height), fgcolor='white', bgcolor='black', #border = '='
+                                       wrap=True, margin=C.MENU_MARGIN, caption=title, shadow = pygcurse.SOUTHEAST)   
+        
+        box.text = "\n".join(linesToDisplay)
+        
+        for line in box.text.split("\n"):
+            print "| " + line + " |"
         box.update()
+        self.window.update()
+        self.window.blittowindow()
         
     
     def showPlayerInventory(self):
@@ -158,7 +178,7 @@ class UI(object):
             text = item.getDescription()
             lines.append(text)
         
-        self.displayTextWindow(title, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
+        self.displayTextWindow(title, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, lines)
         
         key, keyStr = keys.waitForInput()
         
