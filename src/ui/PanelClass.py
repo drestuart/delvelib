@@ -36,11 +36,18 @@ class Panel(object):
         self.window.putchar(char, cellx, celly, fgcolor, bgcolor)
         
     def containsPoint(self, x, y):
-#        return (x >= self.x) and (x <= self.x + self.width) and \
-#                (y >= self.y) and (y <= self.y + self.height)
-        
         return (x >= self.x) and (x < self.x + self.width) and \
                 (y >= self.y) and (y < self.y + self.height)
+    
+    def clear(self):
+        # Clear tint
+        self.window.settint(0, 0, 0, (self.x, self.y, self.width, self.height))
+        
+        # Clear characters
+        for y in range(self.height):
+            self.putChars(" " * self.width, 0, y, colors.black, colors.black)
+        
+        
 
 class MessagePanel(Panel):
     # TODO implement multi-color messages
@@ -197,7 +204,7 @@ class CharacterPanel(Panel):
             else:
                 bg = backColor
 
-            self.window.putchar(' ', x, self.y + bary, fgcolor = None, bgcolor = bg)
+            self.window.putchar(' ', x, self.y + bary, fgcolor = colors.white, bgcolor = bg)
             
         # Add text
         text = name + ' ' + str(value) + '/' + str(maximum)

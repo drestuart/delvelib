@@ -48,11 +48,13 @@ class UI(object):
     def gameLoop(self):
         
         self.clock = pygame.time.Clock()
+        
+        self.clearScreen()
         self.charPanel.draw()
         self.messagePanel.displayMessages()
         
         self.currentLevel.computeFOV(self.player.getX(), self.player.getY())
-        self.clearMap()
+        
         self.drawLevel()
         
         self.window.update()
@@ -102,12 +104,12 @@ class UI(object):
                                 cr.takeTurn() 
                 
                 if redrawScreen:
-    
+                    
+                    self.clearScreen()
                     self.charPanel.draw()
                     self.messagePanel.displayMessages()
                     
 #                     self.currentLevel.computeFOV(self.player.getX(), self.player.getY())
-                    self.clearMap()
                     self.drawLevel()
                 
                 # Draw everything
@@ -391,11 +393,11 @@ class UI(object):
     def setCurrentLevel(self, lvl):
         self.currentLevel = lvl
         
-    def clearMap(self):
-        # TODO clear map pane with pygcurse
-#        raise Exception("NYI UIClass.clearMap()")
-        pass # Is this a thing we need?
-    
+    def clearScreen(self):
+        self.mapPanel.clear()
+        self.messagePanel.clear()
+        self.charPanel.clear()
+        
     def drawLevel(self):
         # Get all tiles to draw from level class
         # TODO implement windowing for larger maps
