@@ -43,7 +43,7 @@ class UI(object):
         self.messagePanel = MessagePanel(C.MESSAGE_PANEL_DIMS, self.window)
         self.charPanel = CharacterPanel(C.CHAR_PANEL_DIMS, self.window)
 
-        pygame.key.set_repeat(500, 250)
+        pygame.key.set_repeat(300, 150)
         
     def gameLoop(self):
         
