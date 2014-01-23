@@ -177,6 +177,11 @@ def main(x,y, spacer = ''):
 	caf.print_grid(spacer)
 	print
 
+def generateMap(width, height, initial_open = 0.4):
+	caf = CA_CaveFactory(height, width, 0.41)
+	caf.gen_map()
+	return caf.get_grid('')
+
 if __name__ == '__main__':
 	main(30, 30)
 	main(40, 40)

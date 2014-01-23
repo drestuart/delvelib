@@ -19,6 +19,7 @@ import random
 import FOVMap as fov
 import AStar
 import Util as U
+import ca_cave
 #from CreatureClass import *
 
 
@@ -400,20 +401,30 @@ class Level(Base):
             self.creatures.append(creature)
         return success
     
-    def placeCreatureInRandomRoom(self, creature):
-        while True:
-            room = random.choice(self.rooms)
-            tile = self.getRandomOpenTileInRoom(room)
-            if tile:
-                self.placeCreature(creature, tile)
-                break
-        
-    def placeCreatureInRandomTile(self, creature):
-        tile = self.getRandomOpenTile()
-        self.placeCreature(creature, tile)
-        
+    def placeCreatureAtRandom(self, creature):
+        raise NotImplementedError("placeStairs() not implemented, use a subclass")
     
+#     def placeCreatureInRandomRoom(self, creature):
+#         while True:
+#             room = random.choice(self.rooms)
+#             tile = self.getRandomOpenTileInRoom(room)
+#             if tile:
+#                 self.placeCreature(creature, tile)
+#                 break
+#         
+#     def placeCreatureInRandomTile(self, creature):
+#         tile = self.getRandomOpenTile()
+#         self.placeCreature(creature, tile)
+        
+    def buildLevel(self):
+        raise NotImplementedError("buildLevel() not implemented, use a subclass")
     
+    def placeItems(self):
+        raise NotImplementedError("placeItems() not implemented, use a subclass")
+    
+    def placeStairs(self):
+        raise NotImplementedError("placeStairs() not implemented, use a subclass")
+        
             
 class DungeonLevel(Level):
     '''A Level subclass for modeling one dungeon level.  Includes functionality for passing time and level construction.'''
@@ -695,26 +706,6 @@ class DungeonLevel(Level):
         print "Setting up FOV"
         self.computeFOVProperties()
         
-        
-        
-        
-        
-
-    def fillInSpaces(self):
-        # Fill in empty spaces with wall tiles
-        for x in range(self.width):
-            for y in range(self.height):
-
-                hasTile = self.hasTile[x][y]
-#                tiles = self.getTileFromDB(x, y, self)
-                
-                if not hasTile:
-#                if (len(tiles) == 0):
-                    newTile = self.defaultTunnelWallType(x, y, room = None)
-                    self.tiles.append(newTile)
-                    self.hasTile[x][y] = True
-                    
-
     def placeItems(self):
         
         for room in self.rooms:
@@ -723,137 +714,6 @@ class DungeonLevel(Level):
             if tile:
                 item = I.getRandomItem()
                 tile.addObject(item)
-
-                                               
-    # Create a room
-    def createRoom(self, room):
-        
-        for x in range(room.getX1(), room.getX2()):
-            for y in range(room.getY1(), room.getY2()):
-#                print "Creating tile at", x, ",", y
-                newTile = self.defaultFloorType(x=x, y=y, room = room)
-                self.tiles.append(newTile)
-                self.hasTile[x][y] = True
-                self.hasTile[x][y]
-        
-#        for x in range(room.getX1(), room.getX2()):
-#            for y in range(room.getY1(), room.getY2()):
-#                newTile = self.defaultFloorType(x = x, y = y)
-#                self.hasTile[x][y] = newTile
-#                room.tiles.append(newTile)
-        
-#        room.fillWithTiles()
-#        
-#        for tile in room.getTiles():
-#            x = tile.x
-#            y = tile.y
-#            self.addTile(tile)
-#            self.hasTile[x][y] = tile
-#        print "Room created with", len(room.getTiles()), "tiles"
-
-    def addTile(self, tile):
-        print "add (", tile.x, ",", tile.y, ")"
-        
-#        try:
-#            oldTileCol = self.hasTile[tile.x]
-#            oldTile = oldTileCol[tile.y]
-#            if oldTile:
-#                self.tiles.remove(oldTile)
-##                print "removed a tile"
-#        except IndexError:
-#            pass
-        
-        self.tiles.append(tile)
-        self.hasTile[tile.x][tile.y] = True
-
-    def createHTunnel(self, prevRoom, newRoom, x1, x2, y, placeDoorAtStart = False, placeDoorAtEnd = False):
-        
-        for x in range(min(x1, x2), max(x1, x2)):
-            skip = False
-            tilesHere = self.hasTile[x][y]
-            if tilesHere:
-                skip = True
-            
-            if not skip:
-#                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
-                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, room = None)
-                
-                if placeDoorAtStart and x == min(x1, x2):
-                    door = F.Door(tile = newTunnelTile)
-                    newTunnelTile.setFeature(door)
-                    
-                if placeDoorAtEnd and x == max(x1, x2):
-                    door = F.Door(tile = newTunnelTile)
-                    newTunnelTile.setFeature(door)
-                    
-                self.tiles.append(newTunnelTile)
-                self.hasTile[x][y] = True
-#                self.hasTile[x][y] = newTunnelTile
-#                self.addTile(newTunnelTile)
-
-    def createVTunnel(self, prevRoom, newRoom, x, y1, y2, placeDoorAtStart = False, placeDoorAtEnd = False):
-        
-        for y in range(min(y1, y2), max(y1, y2)):
-            skip = False
-            tilesHere = self.hasTile[x][y]
-            if tilesHere:
-                skip = True
-
-            if not skip:
-#                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, level = self, room = None)
-                newTunnelTile = self.defaultTunnelFloorType(x = x, y = y, room = None)
-                
-                if placeDoorAtStart and y == min(y1, y2):
-                    door = F.Door(tile = newTunnelTile)
-                    newTunnelTile.setFeature(door)
-                    
-                if placeDoorAtEnd and y == max(y1, y2):
-                    door = F.Door(tile = newTunnelTile)
-                    newTunnelTile.setFeature(door)
-                    
-                self.tiles.append(newTunnelTile)
-                self.hasTile[x][y] = True
-                self.hasTile[x][y]
-#                self.hasTile[x][y] = newTunnelTile
-#                self.addTile(newTunnelTile)
-
-    # Carve out a tunnel
-    def createTunnel(self, prevRoom, newRoom):
-        
-        x1, y1 = prevRoom.getCenter()
-        x2, y2 = newRoom.getCenter()
-        
-        if random.randint(0, 1) == 1:
-            # Horizontal first
-            
-            # Place doors?
-            placeDoorAtStart = False
-            if random.randint(0, 1) == 1:
-                placeDoorAtStart = True
-            
-            placeDoorAtEnd = False
-            if random.randint(0, 1) == 1:
-                placeDoorAtEnd = True
-            
-            self.createHTunnel(prevRoom, newRoom, x1, x2, min(y1, y2), placeDoorAtStart = placeDoorAtStart)
-            self.createVTunnel(prevRoom, newRoom, max(x1, x2), y1, y2, placeDoorAtEnd = placeDoorAtEnd)
-            
-                
-        else:
-            #Vertical first
-            
-            # Place doors?
-            placeDoorAtStart = False
-            if random.randint(0, 1) == 1:
-                placeDoorAtStart = True
-            
-            placeDoorAtEnd = False
-            if random.randint(0, 1) == 1:
-                placeDoorAtEnd = True
-                
-            self.createVTunnel(prevRoom, newRoom, min(x1, x2), y1, y2, placeDoorAtStart = placeDoorAtStart)
-            self.createHTunnel(prevRoom, newRoom, x1, x2, max(y1, y2), placeDoorAtEnd = placeDoorAtEnd)
-            
 
     def placeStairs(self):
         
@@ -884,100 +744,93 @@ class DungeonLevel(Level):
                 # Set destination
                 
                 break
-
-    
-#    def passTime(self, turns = 1):
-#        print "tick"
-#        
-#        for i in range(turns):
-#            creatures = []
-#            
-#            for x in range(self.WIDTH):
-#                for y in range(self.HEIGHT):
-#                    coords = Coordinates(x = x, y = y)
-#                    
-#                    tile = self.getTile(coords)
-#                    tile.passTime()
-#                    cr = tile.creature
-#                    
-#                    if cr is not None:
-#                        creatures.append(cr)
-#                        
-#            for cr in creatures:
-#                cr.passTime()
-    
-    
-#    def placeCreature(self, creature):
-#        while True:
-#            coords = self.getRandOpenSpace() 
-#            tile = self.getTile(coords)
-#            
-#            if not tile.creature:
-#                tile.addCreature(creature)
-#                creature.setPosition(self, coords)
-#                break
-#            
-#    def placeCreatures(self, num_creatures):
-#        for i in range(num_creatures):
-#            self.placeCreature(randomCreature(self))
-#
-#    def getRandOpenSpace(self):
-#        '''Get a random open square on the map'''
-#        while True:
-#            randx = libtcod.random_get_int(0, 0, self.WIDTH - 1)
-#            randy = libtcod.random_get_int(0, 0, self.HEIGHT - 1)
-#        
-#            if not self.isWalkable(randx, randy):
-#                return Coordinates(x = randx, y = randy)
-#                
-#    def getRandOpenSpace_NEW(self):
-#        '''Get the coordinates of a random open square on the map'''
-#        if self.openSpaces:
-#            randOpenTile = random.choice(self.openSpaces)
-#            return Coordinates(x = randOpenTile.x, y = randOpenTile.y)
-#        
-#        else:
-#            return None, None
+            
+    def placeCreatureAtRandom(self, creature):
+        # Place in a room
+        while True:
+            room = random.choice(self.rooms)
+            tile = self.getRandomOpenTileInRoom(room)
+            if tile:
+                self.placeCreature(creature, tile)
+                break
 
 
+class CaveLevel(Level):
+    
+    __mapper_args__ = {'polymorphic_identity': 'cave level'}
+
+    def __init__(self, **kwargs):
+        super(CaveLevel, self).__init__(**kwargs)
+
+    def buildLevel(self):
+        
+        levelGrid = ca_cave.generateMap(self.width, self.height)
+        rows = levelGrid.split("\n")
+
+        for y in range(self.height):
+            for x in range(self.width):
+                shape = rows[y][x]
                 
-
+                if shape == '.':
+                    newTile = self.defaultFloorType(x, y)
+                    
+                elif shape == '#':
+                    newTile = self.defaultWallType(x, y)
                 
-#####################################################
-#
-# Old functions!
-#
-#####################################################
+                else:
+                    print "Bad tile type:'", shape, "'"
+                
+                self.tiles.append(newTile)
+                self.hasTile[x][y] = True
+        
+        
+        print "Building tile array"    
+        self.buildTileArray()    
+        
+        # Place Stairs
+        print "Placing stairs"
+        self.placeStairs()
+        
+        # Place items
+        print "Placing items"
+        self.placeItems()
+        
+        print "Saving open tiles"
+        db.saveDB.save(self)
+        
+        print "Setting up FOV"
+        self.computeFOVProperties()
+    
+    def placeItems(self):
+        # Just place 20 random items for now
+        placedItems = 0
+        while placedItems < 20:
+            tile = self.getRandomOpenTile()
+            if tile:
+                item = I.getRandomItem()
+                tile.addObject(item)
+                placedItems += 1
+        
+        
+    
+    def placeStairs(self):
+        
+        while True:
+            upTile = self.getRandomOpenTile()
+            downTile = self.getRandomOpenTile()
+            
+            if upTile and downTile and not (upTile.getFeature() or downTile.getFeature()):
+            
+                upStair = F.upStair()
+                upTile.setFeature(upStair)
+                
+                downStair = F.downStair()
+                downTile.setFeature(downStair)
+                
+                # TODO Set destinations
+                
+                break
 
-#def target_tile(max_range=None):
-#    #return the position of a tile left-clicked in player's FOV (optionally in a range), or (None,None) if right-clicked.
-#    while True:
-#        #render the screen. this erases the inventory and shows the names of objects under the mouse.
-#        render_all()
-#        libtcod.console_flush()
-# 
-#        key = libtcod.console_check_for_keypress()
-#        mouse = libtcod.mouse_get_status()  #get mouse position and click status
-#        (x, y) = (mouse.cx, mouse.cy)
-# 
-#        #accept the target if the player clicked in FOV, and in case a range is specified, if it's in that range
-#        if (mouse.lbutton_pressed and libtcod.map_is_in_fov(FOVMap, x, y) and
-#            (max_range is None or player.distance(x, y) <= max_range)):
-#            return (x, y)
-#                    
-#        if mouse.rbutton_pressed or key.vk == libtcod.KEY_ESCAPE:
-#            return (None, None)  #cancel if the player right-clicked or pressed Escape
-#        
-#def target_monster(max_range=None):
-#    #returns a clicked monster inside FOV up to a range, or None if right-clicked
-#    while True:
-#        (x, y) = target_tile(max_range)
-#        if x is None:  #player cancelled
-#            return None
-# 
-#        #return the first clicked monster, otherwise continue looping
-#        for obj in objects:
-#            if obj.x == x and obj.y == y and obj.fighter and obj != player:
-#                return obj        
-#        
-#
+    def placeCreatureAtRandom(self, creature):
+        tile = self.getRandomOpenTile()
+        self.placeCreature(creature, tile)

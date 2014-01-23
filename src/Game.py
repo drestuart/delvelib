@@ -43,18 +43,20 @@ class Game(object):
         print seed
         random.seed(seed)
         
-        d1 = L.DungeonLevel(name = "Test", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1, defaultFloorType = T.StoneFloor,
-                          defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
+#         d1 = L.DungeonLevel(name = "Test", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1, defaultFloorType = T.StoneFloor,
+#                           defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
+
+        d1 = L.CaveLevel(name = "Test", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1, defaultFloorType = T.RockTunnel, defaultWallType = T.RockWall)
         
         d1.buildLevel()
         player = P.Player()
-        d1.placeCreatureInRandomRoom(player)
+        d1.placeCreatureAtRandom(player)
         
         orc1 = Cr.Orc()
-        d1.placeCreatureInRandomRoom(orc1)
+        d1.placeCreatureAtRandom(orc1)
         
     #    orc2 = Cr.Orc()
-    #    d1.placeCreatureInRandomRoom(orc2)
+    #    d1.placeCreatureAtRandom(orc2)
         
         db.saveDB.save(d1)
         
