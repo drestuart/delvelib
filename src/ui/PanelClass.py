@@ -4,14 +4,18 @@ Created on Jan 18, 2014
 @author: dstu
 '''
 
-import re
-import colors
 import Const as C
+import colors
+import keys
+import pygame
+from pygame.locals import *
+import re
+import textwrap
 
 fgdefault = colors.colorMessagePanelFG
 bgdefault = colors.colorMessagePanelBG
 
-__all__ = ["Panel", "MessagePanel", "CharacterPanel"]
+__all__ = ["Panel", "MessagePanel", "CharacterPanel", "MenuPanel"]
 
 class Panel(object):
     def __init__(self, dims, window, margin = 0):
@@ -211,6 +215,151 @@ class CharacterPanel(Panel):
         textx = self.x + barx + (totalWidth - len(text)) / 2
         
         self.window.putchars(text, textx, self.y + bary)
+    
+        
+class MenuPanel(Panel):
+    def __init__(self, *args, **kwargs):
+        super(MenuPanel, self).__init__((0, 0, kwargs['width'], 0), *args)
+        
+        self.selected = [0]
+        
+        self.title = kwargs['title']
+        self.margin = kwargs.get('margin', C.MENU_MARGIN)
+        
+        self.defaultFGColor = kwargs.get('defaultFGColor', C.MENU_TEXT_COLOR)
+        
+        self.selectedBGColor = kwargs.get('selectedBGColor', C.MENU_SELECTED_COLOR)
+        self.defaultBGColor = kwargs.get('defaultBGColor', C.MENU_UNSELECTED_COLOR)
+        
+        self.tbBorder = kwargs.get('tbBorder', '-')
+        self.lrBorder = kwargs.get('lrBorder', '|')
+        self.multilineIndent = kwargs.get('multilineIndent', 1)
+        
+        self.shadow = kwargs.get('shadow', None)
+        self.shadowamount = kwargs.get('shadowamount', 51)
+        self.shadowx, self.shadowy = kwargs.get('shadowx', 1), kwargs.get('shadowy', 1)
+        
+        self.setupOptions(kwargs['options'])
+        
+        self.titleLine = self.title.center(self.width, self.tbBorder)
+        
+        
+        
+    def setupOptions(self, options):
+        self.options = options
+        
+        # Set up word wrap
+        self.linesToDisplay = {}
+        optNum = 0
+        self.height = 2*(self.margin + 1)
+        letter_index = ord('a')
+        
+        for line in self.options:
+            # Add letters
+            line = '(' + chr(letter_index) + ') ' + line
+            
+            self.linesToDisplay[optNum] = []
+            wrappedLines = textwrap.wrap(line, self.width - 2*(self.margin + 1))
+            linesForOption = 0
+            
+            for wline in wrappedLines:
+                
+                if linesForOption > 0:
+                    wline = ' ' * self.multilineIndent + wline.ljust(self.width - 2*(self.margin + 1) - self.multilineIndent)
+                else:
+                    wline = wline.ljust(self.width - 2*(self.margin + 1))
+                    
+                self.linesToDisplay[optNum].append(wline)
+                self.height += 1
+                linesForOption += 1
+                
+            optNum += 1
+            letter_index += 1
+                
+#        self.height = len(self.linesToDisplay) + 2*(self.margin + 1)
+        
+        self.x = (C.SCREEN_WIDTH - self.width)/2
+        self.y = (C.SCREEN_HEIGHT - self.height)/2
+        
+    def getSingleChoice(self):
+        
+        while True:
+            self.draw()
+            key, keyStr = keys.waitForInput()
+            
+            if key is None:
+                return
+         
+            if key in (K_KP2, K_DOWN, K_j):
+                self.selected[0] += 1
+                if self.selected[0] >= len(self.options):
+                    self.selected[0] = 0
+                continue
+            
+            elif key in (K_KP8, K_UP, K_k):
+                self.selected[0] -= 1
+                if self.selected[0] < 0:
+                    self.selected[0] = len(self.options) - 1
+                continue
+            
+            elif key in (K_RETURN, K_KP_ENTER):
+                return self.selected[0]
+            
+            #convert the ASCII code to an index; if it corresponds to an option, return it
+            index = key - ord('a')
+            if index >= 0 and index < len(self.options): 
+                return index
+            
+    def getMultiChoice(self):
+        pass
+        # TODO
+
+    def draw(self):
+        
+        # print top and bottom borders and title
+        self.putChars(self.titleLine, 0, 0, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+        self.putChars(self.tbBorder * self.width, 0, self.height - 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+        
+        # Draw margin lines
+        for i in range(self.margin):
+            
+            # Side borders
+            self.putChars(self.lrBorder + " " * self.margin, 0, i + 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+            self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, i + 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+            # Spaces
+            self.putChars(" " * (self.width - self.margin - 1), self.margin + 1, i + 1, fgcolor=colors.blankBackground, bgcolor=colors.blankBackground)
+            
+            self.putChars(self.lrBorder + " " * self.margin, 0, self.height - 2 - i, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+            self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, self.height - 2 - i, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+            self.putChars(" " * (self.width - self.margin - 1), self.margin + 1, self.height - 2 - i, fgcolor=colors.blankBackground, bgcolor=colors.blankBackground)
+        
+        # print options, finally
+        y = self.margin + 1
+        for key in sorted(self.linesToDisplay.keys()):
+            if key in self.selected:
+                bg = self.selectedBGColor
+            else:
+                bg = self.defaultBGColor
+            
+            lines = self.linesToDisplay[key]
+            for line in lines:
+
+                # print side borders
+                self.putChars(self.lrBorder + " " * self.margin, 0, y, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+                self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, y, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+                
+                # print text
+                self.putChars(line, self.margin + 1, y, fgcolor = self.defaultFGColor, bgcolor=bg)
+                y += 1
+            
+            
+    
+        # Draw shadow
+        if self.shadow is not None:
+            self.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
+        
+        self.window.update()
+        self.window.blittowindow()
         
 def main():
     
@@ -218,12 +367,12 @@ def main():
     import pygame
     import sys
     
-    window = pygcurse.PygcurseWindow(40, 25)
-    charPanel = CharacterPanel((5, 5, 20, 15), window)
-    for h in range(5, 18):
-        charPanel.render_bar(1, 1, 18, "HP", h, 20, colors.darkBlue, colors.darkRed)
-        pygcurse.waitforkeypress()
+    options = ['bread', 'butter', 'eggs', 'an option which is significantly longer and will test my wordwrapping code to its very uttermost', 'milk', 'pickles']
     
+    window = pygcurse.PygcurseWindow(C.SCREEN_WIDTH, C.SCREEN_HEIGHT)
+    panel = MenuPanel(window, options = options, width = 25, title = "Groceries")
+    print panel.getSingleChoice()
+        
     pygame.quit()
     sys.exit()
 

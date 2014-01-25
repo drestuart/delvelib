@@ -93,6 +93,7 @@ class UI(object):
                     player_action = None
                     key = event.key
                     player_action = self.handleKeys(key, event)
+                    
                     if player_action == 'exit':
                         print "Got a QUIT command"
                         pygame.quit()
@@ -120,29 +121,32 @@ class UI(object):
             
     
     def singleChoiceMenu(self, title, options, width = C.MENU_WIDTH):
-
-        lines = []
-        letter_index = ord('a')
-        for option in options:
-            text = '(' + chr(letter_index) + ') ' + option
-            lines.append(text)
-            letter_index += 1
         
-        while True:
-            self.displayTextWindow(title, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, lines)
-
-            key, keyStr = keys.waitForInput()
-            
-            if key is None:
-                return
-         
-            #convert the ASCII code to an index; if it corresponds to an option, return it
-            index = key - ord('a')
-            if index >= 0 and index < len(options): 
-                return index
+        menu = MenuPanel(self.window, options = options, width = width, title = title, shadow = pygcurse.SOUTHEAST)
+        return menu.getSingleChoice()
+        
+#        lines = []
+#        letter_index = ord('a')
+#        for option in options:
+#            text = '(' + chr(letter_index) + ') ' + option
+#            lines.append(text)
+#            letter_index += 1
+#        
+#        while True:
+#            self.displayTextWindow(title, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, lines)
+#
+#            key, keyStr = keys.waitForInput()
+#            
+#            if key is None:
+#                return
+#         
+#            #convert the ASCII code to an index; if it corresponds to an option, return it
+#            index = key - ord('a')
+#            if index >= 0 and index < len(options): 
+#                return index
     
     def displayTextWindow(self, title, x, y, width, lines):
-
+#        raise Exception("Deprecated (displayTextWindow)")
         linesToDisplay = []
         for line in lines:
             wrappedLines = textwrap.wrap(line, width - 4)
@@ -327,7 +331,6 @@ class UI(object):
             
 #        elif event.type == KEYUP:
         elif event.type == KEYDOWN:
-
             
             keyStr = pygame.key.name(key)
             direc = keys.getMovementDirection(key, keyStr)
@@ -339,13 +342,12 @@ class UI(object):
                     return 'took-turn'
  
             elif keyStr == '.': # Wait
+                G.message("Waiting")
                 return 'took-turn'
             
             elif keyStr == ',': # Pick up items
-                if self.player.getTile().getInventory():
-#                    item = self.player.getTile().getInventory().pop(0)
-                    
-                    inv = self.player.getTile().getInventory()
+                inv = self.player.getTile().getInventory()
+                if inv:
                     item = self.pickUpItemMenu(inv)
                     if item:
 #                        inv.removeItem(item)

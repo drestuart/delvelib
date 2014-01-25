@@ -61,6 +61,8 @@ darkMagenta = (139,0,139)
 
 green = (0,255,0)
 
+goldenrod = (218,165,32)
+
 blankBackground = black
 
 colorDefaultFG = white

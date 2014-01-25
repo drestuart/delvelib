@@ -31,6 +31,7 @@ class Game(object):
     def __init__(self, **kwargs):
         global game
         game = self
+        self.debug = kwargs.get('debug', False)
         
         if pygame.init() != (6,0):
             print "Error starting pygame"
@@ -68,6 +69,7 @@ class Game(object):
         db.saveDB.save(myUI.getCurrentLevel())
         
     def message(self, msg):
+        if self.debug: print msg
         myUI.message(msg)
 
 

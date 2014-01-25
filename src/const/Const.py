@@ -4,6 +4,8 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
+import colors
+
 # Global constants
 
 TITLE = "delveRL"
@@ -54,6 +56,9 @@ MENU_X = 20 #SCREEN_WIDTH - MENU_WIDTH
 MENU_Y = 10
 MENU_FPS = 20
 MENU_MARGIN = 1
+MENU_TEXT_COLOR = colors.white
+MENU_SELECTED_COLOR = colors.goldenrod
+MENU_UNSELECTED_COLOR = colors.black
 
 PICK_UP_ITEM_MENU_HEADER = "Pick up what?"
 PLAYER_INVENTORY_HEADER = "Inventory"

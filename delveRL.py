@@ -15,7 +15,7 @@ def main():
     
     print '-=delveRL=-'
     
-    game = G.Game()
+    game = G.Game(debug = True)
     game.play()
 
 
