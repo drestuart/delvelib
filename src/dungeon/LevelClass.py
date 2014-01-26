@@ -393,13 +393,18 @@ class Level(Base):
         startpoint = fromTile.getXY()
         endpoint = toTile.getXY()
         
-        print "Computing path from", startpoint, "to", endpoint
-        print "Blocking:", fromTile.blocksMove(), toTile.blocksMove()
+#        print "Computing path from", startpoint, "to", endpoint
+#        print "Blocking:", fromTile.blocksMove(), toTile.blocksMove()
         
-        # Hack to fix issue with starting tile being blocked
+        # Hack to fix issue with starting and ending tiles being blocked
         self.astar.setMovable(fromTile.getX(), fromTile.getY(), True)
+        if toTile.blocksMove() and toTile.getCreature(): self.astar.setMovable(toTile.getX(), toTile.getY(), True)
+        
         pathObj = AStar.findPath(startpoint, endpoint, self.astar)
+        
+        # Disenhack
         self.astar.setMovable(fromTile.getX(), fromTile.getY(), False)
+        if toTile.blocksMove() and toTile.getCreature(): self.astar.setMovable(toTile.getX(), toTile.getY(), False)
         
         if pathObj:
             path = [(node.location.x, node.location.y) for node in pathObj.getNodes()]
@@ -407,12 +412,12 @@ class Level(Base):
             if fromTile.getXY() == path[0]:
                 path.pop(0)
                 
-            print path
+#            print path
             
             return path
         
         else:
-            print "No path found!"
+#            print "No path found!"
             return None
         
     
@@ -733,6 +738,9 @@ class DungeonLevel(Level):
         
         print "Setting up FOV"
         self.computeFOVProperties()
+        
+        print "Setting up pathing"
+        self.setupPathing()
         
     def placeItems(self):
         

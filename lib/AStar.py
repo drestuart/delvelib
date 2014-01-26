@@ -106,7 +106,6 @@ class AStar:
 
         end = tolocation
         fnode = self.mh.getNode(fromlocation)
-#        fnode = Node(fromlocation,1,((fromlocation.y*self.mh.w)+fromlocation.x))
         self.on.append(fnode)
         self.o.append(fnode.lid)
         nextNode = fnode 
@@ -117,6 +116,7 @@ class AStar:
                 return self._tracePath(finish)
             nextNode=self._getBestOpenNode()
                 
+#        dumpMap(self)
         return None
     
     def setMovable(self, x, y, movable):
@@ -154,10 +154,10 @@ class SQ_MapHandler:
             return None
         d = self.m[(y*self.w)+x]
         if d == -1:
-            print "Tile is not movable:", x, y, d
+#            print "Tile is not movable:", x, y, d
             return None
-        else:
-            print "Tile is movable:", x, y, d
+#        else:
+#            print "Tile is movable:", x, y, d
         
         return Node(location,d,((y*self.w)+x));                
 
@@ -211,6 +211,7 @@ def setUpMap(mapdata, width, height):
 #     maphandler = SQ_MapHandler(mapdataflat, width, height)
     maphandler = SQ_MapHandler(mapdata, width, height)
     astar = AStar(maphandler)
+#    dumpMap(astar)
     return astar
 
 def findPath(startpoint, endpoint, astar):
@@ -218,6 +219,22 @@ def findPath(startpoint, endpoint, astar):
     end = SQ_Location(endpoint[0], endpoint[1])
     
     return astar.findPath(start, end)
+
+def dumpMap(astar):
+    mapdata = astar.mh.m
+    width = astar.mh.w
+    height = astar.mh.h
+    
+    for y in range(height):
+#        print [('#' if d==-1 else '.') for d in mapdata[y*width:(y+1)*width - 1]]
+        for d in mapdata[y*width:(y+1)*width - 1]:
+            if d == -1:
+                print '#',
+            else:
+                print '.',
+            
+        print
+    
 
     
     

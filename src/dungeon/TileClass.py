@@ -166,10 +166,10 @@ class Tile(colors.withBackgroundColor, Base):
         return [self.removeObject(ind) for ind in indices]
     
     def placeCreature(self, creature):
-        if self.creature:
-            print "Move failed, tile", self.getXY(), "is occupied"
-        if self.blocksMove():
-            print "Move failed, tile", self.getXY(), "is blocked"
+#        if self.creature:
+#            print "Move failed, tile", self.getXY(), "is occupied"
+#        if self.blocksMove():
+#            print "Move failed, tile", self.getXY(), "is blocked"
         if (not self.blocksMove()) and (not self.creature):
             oldTile = creature.getTile()
             if oldTile:
