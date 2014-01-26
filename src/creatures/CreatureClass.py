@@ -105,6 +105,9 @@ class Creature(colors.withColor, Base):
     
     def getY(self):
         return self.tile.getY()
+    
+    def getXY(self):
+        return self.tile.getXY()
         
     def getLevel(self):
         return self.getTile().getLevel()

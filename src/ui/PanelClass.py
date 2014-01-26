@@ -194,27 +194,35 @@ class CharacterPanel(Panel):
     def __init__(self, *args):
         super(CharacterPanel, self).__init__(*args)
         
-    def draw(self):
+    def draw(self, playerx = 0, playery = 0):
         self.render_bar(1, 1, 18, "HP", 15, 20, colors.darkBlue, colors.darkRed)
+        self.showCoords(1, 3, playerx, playery)
+        
+    def showCoords(self, x, y, playerx, playery):
+        
+        self.putChars("Position: " + str(playerx) + ", " + str(playery), x, y, fgcolor = colors.white, bgcolor = colors.black)
+        
     
     def render_bar(self, barx, bary, totalWidth, name, value, maximum, barColor, backColor):
         #draw a bar (HP, experience, etc). first calculate the width of the bar
         barWidth = min( int(float(value) / maximum * totalWidth), totalWidth)
      
         # Draw bar
-        for x in range(self.x + barx, self.x + barx + totalWidth):
-            if x < self.x + barx + barWidth:
+        for x in range(barx, barx + totalWidth):
+#            if x < self.x + barx + barWidth:
+            if x < barx + barWidth:
                 bg = barColor
             else:
                 bg = backColor
 
-            self.window.putchar(' ', x, self.y + bary, fgcolor = colors.white, bgcolor = bg)
+#            self.window.putchar(' ', x, self.y + bary, fgcolor = colors.white, bgcolor = bg)
+            self.putChar(' ', x, bary, fgcolor = colors.white, bgcolor = bg)
             
         # Add text
         text = name + ' ' + str(value) + '/' + str(maximum)
-        textx = self.x + barx + (totalWidth - len(text)) / 2
+        textx = barx + (totalWidth - len(text)) / 2
         
-        self.window.putchars(text, textx, self.y + bary)
+        self.putChars(text, textx, bary)
     
         
 class MenuPanel(Panel):

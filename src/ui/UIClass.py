@@ -50,7 +50,7 @@ class UI(object):
         self.clock = pygame.time.Clock()
         
         self.clearScreen()
-        self.charPanel.draw()
+        self.charPanel.draw(self.player.getX(), self.player.getY())
         self.messagePanel.displayMessages()
         
         self.currentLevel.computeFOV(self.player.getX(), self.player.getY())
@@ -107,7 +107,7 @@ class UI(object):
                 if redrawScreen:
                     
                     self.clearScreen()
-                    self.charPanel.draw()
+                    self.charPanel.draw(self.player.getX(), self.player.getY())
                     self.messagePanel.displayMessages()
                     
 #                     self.currentLevel.computeFOV(self.player.getX(), self.player.getY())
