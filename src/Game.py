@@ -17,6 +17,7 @@ import database as db
 import random
 import colors
 import pygame
+from pubsub import pub
 
 game = 0
 myUI = 0
@@ -33,6 +34,9 @@ class Game(object):
         game = self
         self.debug = kwargs.get('debug', False)
         
+        if self.debug:
+            pub.subscribe(self.debugListener, 'event')
+                
         if pygame.init() != (6,0):
             print "Error starting pygame"
         
@@ -44,10 +48,10 @@ class Game(object):
         print seed
         random.seed(seed)
         
-#         d1 = L.DungeonLevel(name = "Test", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1, defaultFloorType = T.StoneFloor,
-#                           defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
+        d1 = L.DungeonLevel(name = "Test", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1, defaultFloorType = T.StoneFloor,
+                           defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
 
-        d1 = L.CaveLevel(name = "Test", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1, defaultFloorType = T.RockTunnel, defaultWallType = T.RockWall)
+#        d1 = L.CaveLevel(name = "Test", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1, defaultFloorType = T.RockTunnel, defaultWallType = T.RockWall)
         
         d1.buildLevel()
         player = P.Player()
@@ -63,6 +67,10 @@ class Game(object):
         
         global myUI
         myUI = ui.UI(level = d1, player = player, fontsize = self.fontsize)
+        
+    def debugListener(self,topic=pub.AUTO_TOPIC, **args):
+        print 'Got an event of type: ' + topic.getName()
+        print '  with data: ' + str(args)
         
     def play(self):
         myUI.gameLoop()

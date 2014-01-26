@@ -156,7 +156,7 @@ class AggressiveAI(AI):
             path = self.getLevel().getPathToTile(self.getTile(), goalTile)
             
 #            if path and not libtcod.path_is_empty(path):
-            if len(path) > 0:
+            if path and len(path) > 0:
                 self.owner.setPath(path)
                 return True
             else:

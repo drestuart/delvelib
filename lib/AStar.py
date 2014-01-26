@@ -106,6 +106,7 @@ class AStar:
 
         end = tolocation
         fnode = self.mh.getNode(fromlocation)
+#        fnode = Node(fromlocation,1,((fromlocation.y*self.mh.w)+fromlocation.x))
         self.on.append(fnode)
         self.o.append(fnode.lid)
         nextNode = fnode 
@@ -117,6 +118,12 @@ class AStar:
             nextNode=self._getBestOpenNode()
                 
         return None
+    
+    def setMovable(self, x, y, movable):
+        if movable: 
+            self.mh.m[(y*self.mh.w)+x] = 1
+        else:
+            self.mh.m[(y*self.mh.w)+x] = -1
       
 class SQ_Location:
     """A simple Square Map Location implementation"""
@@ -147,8 +154,11 @@ class SQ_MapHandler:
             return None
         d = self.m[(y*self.w)+x]
         if d == -1:
+            print "Tile is not movable:", x, y, d
             return None
-
+        else:
+            print "Tile is movable:", x, y, d
+        
         return Node(location,d,((y*self.w)+x));                
 
     def getAdjacentNodes(self, curnode, dest):
@@ -207,7 +217,7 @@ def findPath(startpoint, endpoint, astar):
     start = SQ_Location(startpoint[0], startpoint[1])
     end = SQ_Location(endpoint[0], endpoint[1])
     
-    return astar.findPath(start,end)
+    return astar.findPath(start, end)
 
     
     

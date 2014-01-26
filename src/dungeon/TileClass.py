@@ -4,6 +4,7 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
+from pubsub import pub
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
 from sqlalchemy.types import String, Integer, Boolean
@@ -11,6 +12,7 @@ import Util as U
 import colors
 import database as db
 import InventoryClass as Inv
+
 
 #from DungeonFeatureClass import *
 
@@ -164,12 +166,19 @@ class Tile(colors.withBackgroundColor, Base):
         return [self.removeObject(ind) for ind in indices]
     
     def placeCreature(self, creature):
+        if self.creature:
+            print "Move failed, tile", self.getXY(), "is occupied"
+        if self.blocksMove():
+            print "Move failed, tile", self.getXY(), "is blocked"
         if (not self.blocksMove()) and (not self.creature):
-            if creature.getTile():
+            oldTile = creature.getTile()
+            if oldTile:
                 creature.getTile().removeCreature()
+                pub.sendMessage("event.removedCreature", tile = oldTile, creature = creature)
             
             self.creature = creature
             self.creature.setTile(self)
+            pub.sendMessage("event.addedCreature", tile = self, creature = creature)
             return True
         
         else:
@@ -280,6 +289,9 @@ class Tile(colors.withBackgroundColor, Base):
     
     def getY(self):
         return self.y
+    
+    def getXY(self):
+        return self.x, self.y
     
     def getVisibleTiles(self):
         return self.visibleTiles

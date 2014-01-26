@@ -20,6 +20,7 @@ import FOVMap as fov
 import AStar
 import Util as U
 import ca_cave
+from pubsub import pub
 #from CreatureClass import *
 
 
@@ -79,6 +80,11 @@ class Level(Base):
             for dummyy in range(self.height):
                 newCol.append(False)
             self.hasTile.append(newCol)
+            
+        # Event listeners
+        pub.subscribe(self.handleAddedCreature, "event.addedCreature")
+        pub.subscribe(self.handleRemovedCreature, "event.removedCreature")
+        
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
@@ -369,23 +375,45 @@ class Level(Base):
         
         self.astar = AStar.setUpMap(mapdata, self.width, self.height)
         
+    def handleRemovedCreature(self, tile, creature):
+#        print "Creature removed from tile", tile.getXY()
+        x, y = tile.getXY()
+        if self.astar: self.astar.setMovable(x, y, True)
+        
+    def handleAddedCreature(self, tile, creature):
+#        print "Creature added to tile", tile.getXY()
+        x, y = tile.getXY()
+        if self.astar: self.astar.setMovable(x, y, False)
     
     def getPathToTile(self, fromTile, toTile):
         
         if self.astar is None:
             self.setupPathing()
 
-        startpoint = fromTile.getX(), fromTile.getY()
-        endpoint = toTile.getX(), toTile.getY()
+        startpoint = fromTile.getXY()
+        endpoint = toTile.getXY()
         
+        print "Computing path from", startpoint, "to", endpoint
+        print "Blocking:", fromTile.blocksMove(), toTile.blocksMove()
+        
+        # Hack to fix issue with starting tile being blocked
+        self.astar.setMovable(fromTile.getX(), fromTile.getY(), True)
         pathObj = AStar.findPath(startpoint, endpoint, self.astar)
+        self.astar.setMovable(fromTile.getX(), fromTile.getY(), False)
         
-        path = [(node.location.x, node.location.y) for node in pathObj.getNodes()]
+        if pathObj:
+            path = [(node.location.x, node.location.y) for node in pathObj.getNodes()]
+            
+            if fromTile.getXY() == path[0]:
+                path.pop(0)
+                
+            print path
+            
+            return path
         
-        if fromTile.getX() == path[0][0] and fromTile.getY() == path[0][1]:
-            path.pop(0)
-
-        return path
+        else:
+            print "No path found!"
+            return None
         
     
         
