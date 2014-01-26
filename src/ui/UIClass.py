@@ -125,26 +125,6 @@ class UI(object):
         menu = MenuPanel(self.window, options = options, width = width, title = title, shadow = pygcurse.SOUTHEAST)
         return menu.getSingleChoice()
         
-#        lines = []
-#        letter_index = ord('a')
-#        for option in options:
-#            text = '(' + chr(letter_index) + ') ' + option
-#            lines.append(text)
-#            letter_index += 1
-#        
-#        while True:
-#            self.displayTextWindow(title, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, lines)
-#
-#            key, keyStr = keys.waitForInput()
-#            
-#            if key is None:
-#                return
-#         
-#            #convert the ASCII code to an index; if it corresponds to an option, return it
-#            index = key - ord('a')
-#            if index >= 0 and index < len(options): 
-#                return index
-    
     def displayTextWindow(self, title, x, y, width, lines):
 #        raise Exception("Deprecated (displayTextWindow)")
         linesToDisplay = []
