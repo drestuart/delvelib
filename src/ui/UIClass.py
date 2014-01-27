@@ -60,7 +60,7 @@ class UI(object):
         self.window.update()
         self.window.blittowindow()
         
-        pygame.event.set_allowed([QUIT, MOUSEMOTION, KEYDOWN, KEYUP])
+        pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
         
         while True:
             # Handle framerate
@@ -80,13 +80,11 @@ class UI(object):
                     pygame.quit()
                     sys.exit()
                 
-                elif event.type == MOUSEMOTION:
-                    desc = self.getTileDescUnderMouse()
-                    self.messagePanel.setSingleMessage(desc)
-                    redrawScreen = self.messagePanel.messageChanged
+#                 elif event.type == MOUSEMOTION:
+#                     desc = self.getTileDescUnderMouse()
+#                     self.messagePanel.setSingleMessage(desc)
+#                     redrawScreen = self.messagePanel.messageChanged
 
-#                elif event.type in (KEYDOWN, KEYUP):
-#                elif event.type == KEYUP:
                 elif event.type == KEYDOWN:
                     redrawScreen = True
                     
