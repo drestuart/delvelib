@@ -310,7 +310,7 @@ class MenuPanel(Panel):
                     self.selected[0] = len(self.options) - 1
                 continue
             
-            elif key in (K_RETURN, K_KP_ENTER):
+            elif key in (K_RETURN, K_KP_ENTER, K_COMMA):
                 return self.selected[0]
             
             #convert the ASCII code to an index; if it corresponds to an option, return it
