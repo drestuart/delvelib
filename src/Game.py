@@ -71,9 +71,6 @@ class Game(object):
         d1.setNextLevel(d2)
         d2.setPreviousLevel(d1)
         
-        print d1.id, "=>", d2.id
-#        print d2.previousLevelId, "=>", d1.nextLevelId
-        
         global myUI
         myUI = ui.UI(level = d1, player = player, fontsize = self.fontsize)
         

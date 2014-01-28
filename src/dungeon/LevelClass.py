@@ -52,15 +52,12 @@ class Level(Base):
         if not self.width or not self.height:
             raise ValueError("Level class constructor requires width and height values")
         
-        self.FOVMap = None
-        
         self.tiles = []
         self.rooms = []
-        
         self.creatures = []
+
         
-        self.astar = None
-        
+        self.load()
         
 ##########################################################################
 #
@@ -70,26 +67,6 @@ class Level(Base):
 #
 ##########################################################################        
 #        self.hasTile = [[False]*C.MAP_HEIGHT]*C.MAP_WIDTH
-        
-        # Initialize self.hasTile
-        self.hasTile = []
-        self.tileArray = []
-        
-        self.upStairs = []
-        self.downStairs = []
-        
-        for dummyx in range(self.width):
-            newCol = []
-            for dummyy in range(self.height):
-                newCol.append(False)
-            self.hasTile.append(newCol)
-            
-        # Event listeners
-        pub.subscribe(self.handleAddedCreature, "event.addedCreature")
-        pub.subscribe(self.handleRemovedCreature, "event.removedCreature")
-        
-        # Build it!
-#        self.buildLevel()
         
 
     id = Column(Integer, primary_key=True)
@@ -106,6 +83,37 @@ class Level(Base):
     __mapper_args__ = {'polymorphic_on': levelType,
                        'polymorphic_identity': 'level'}
     
+    def load(self):
+        
+        self.FOVMap = None
+        self.astar = None
+        self.upStairs = []
+        self.downStairs = []
+        self.tileArray = []
+
+        # Initialize self.hasTile
+        self.hasTile = []
+        
+        for dummyx in range(self.width):
+            newCol = []
+            for dummyy in range(self.height):
+                newCol.append(False)
+            self.hasTile.append(newCol)
+        
+        self.findDownStairs()
+        self.findUpStairs()
+        
+        # Event listeners
+        pub.subscribe(self.handleAddedCreature, "event.addedCreature")
+        pub.subscribe(self.handleRemovedCreature, "event.removedCreature")
+        
+        # Load child objects
+        for cr in self.creatures:
+            cr.load()
+        
+        for t in self.tiles:
+            t.load()
+        
 
     def buildTileArray(self):
         self.tileArray = []
@@ -122,7 +130,7 @@ class Level(Base):
             self.tileArray[tile.x][tile.y] = tile
         
     def getTile(self, x, y):
-        if not self.__dict__.get('tileArray'):
+        if not self.tileArray:
             print "self.tileArray not initialized!"
             self.buildTileArray()
         
@@ -239,10 +247,6 @@ class Level(Base):
 #                UI.putChar(x, y, symbol, color, background)
         return tileArray
                 
-    def clear(self):
-        raise Exception("Level.clear() is deprecated")
-#        UI.clearMap()
-
     def getTilesInRadius(self, radius, centerX, centerY):
         
         assert radius >= 0 and radius == int(radius) #Do better error checking here.
@@ -309,7 +313,7 @@ class Level(Base):
         
     def computeFOV(self, x, y):
         '''Compute the field of view of this map with respect to a particular position'''
-        if not self.__dict__.get('FOVMap'):
+        if not self.FOVMap:
             self.computeFOVProperties()
             
         self.FOVMap.do_fov(x, y, C.FOV_RADIUS)
@@ -392,7 +396,7 @@ class Level(Base):
     
     def getPathToTile(self, fromTile, toTile):
         
-        if self.__dict__.get('astar') is None:
+        if self.astar is None:
             self.setupPathing()
 
         startpoint = fromTile.getXY()
@@ -441,18 +445,6 @@ class Level(Base):
     
     def placeCreatureAtRandom(self, creature):
         raise NotImplementedError("placeStairs() not implemented, use a subclass")
-    
-#     def placeCreatureInRandomRoom(self, creature):
-#         while True:
-#             room = random.choice(self.rooms)
-#             tile = self.getRandomOpenTileInRoom(room)
-#             if tile:
-#                 self.placeCreature(creature, tile)
-#                 break
-#         
-#     def placeCreatureInRandomTile(self, creature):
-#         tile = self.getRandomOpenTile()
-#         self.placeCreature(creature, tile)
         
     def buildLevel(self):
         raise NotImplementedError("buildLevel() not implemented, use a subclass")
@@ -471,8 +463,8 @@ class Level(Base):
                 self.upStairs.append(tile)
     
     def getUpStairs(self):
-#        if not self.upStairs:
-        if not self.__dict__.get('upStairs', None):
+        if not self.upStairs:
+#         if not self.__dict__.get('upStairs', None):
             self.findUpStairs()
         
         return self.upStairs
@@ -485,8 +477,8 @@ class Level(Base):
                 self.downStairs.append(tile)
     
     def getDownStairs(self):
-#        if not self.downStairs:
-        if not self.__dict__.get('downStairs', None):
+        if not self.downStairs:
+#         if not self.__dict__.get('downStairs', None):
             self.findDownStairs()
         
         return self.downStairs

@@ -37,12 +37,11 @@ class Creature(colors.withColor, Base):
         self.damageTaken = kwargs.get('damageTaken', 0)
         
         self.visible = kwargs.get('visible', True)
-        self.path = None
-        
-        self.hateList = kwargs.get('hateList', ['player'])
-        
         self.AIClass = kwargs['AIClass']
-        self.initializeAI()
+        self.AIClassName = kwargs['AIClass'].__name__
+        self.AI = None
+
+        self.load()
         
         self.inventory = I.Inventory()
 
@@ -74,6 +73,14 @@ class Creature(colors.withColor, Base):
     
     __mapper_args__ = {'polymorphic_on': creatureType,
                        'polymorphic_identity': 'creature'}
+    
+    def load(self):
+        self.AIClass = None
+        self.AI = None
+        self.path = None
+        self.hateList = ['player']
+        
+        self.initializeAI()
     
     def getInventory(self):
         return self.inventory
@@ -193,7 +200,7 @@ class Creature(colors.withColor, Base):
         
     def initializeAI(self):
         if self.AIClassName and not self.__dict__.get('AIClass'):
-            self.AIClass = AI.__dict__[self.AIClassName]
+            self.AIClass = AI.getAIClassByName(self.AIClassName)
         else:
             self.AIClassName = self.AIClass.__name__
         

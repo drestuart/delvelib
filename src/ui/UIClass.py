@@ -434,8 +434,12 @@ class UI(object):
             clevel = self.currentLevel
             nlevel = self.currentLevel.getNextLevel()
             
+            if not nlevel:
+                return False
+            
             db.saveDB.save(clevel)
             
+            nlevel.load()
             self.setCurrentLevel(nlevel)
             nlevel.placeOnUpStair(self.player)
             
@@ -454,9 +458,12 @@ class UI(object):
             clevel = self.currentLevel
             plevel = self.currentLevel.getPreviousLevel()
             
-            db.saveDB.save(clevel)
-            db.saveDB.save(plevel)
+            if not plevel:
+                return False
             
+            db.saveDB.save(clevel)
+            
+            plevel.load()
             self.setCurrentLevel(plevel)
             plevel.placeOnDownStair(self.player)
             

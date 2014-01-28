@@ -9,6 +9,9 @@ import random
 import keys
 from pygame.locals import *
 
+def getAIClassByName(name):
+    return AIdict.get(name)
+
 class AI(object):
     
     def setOwner(self, creature):
@@ -178,3 +181,10 @@ class SedentaryAI(AI):
     def takeTurn(self):
         pass
 
+
+AIdict = {
+          "SedentaryAI" : SedentaryAI,
+          "NeutralAI" : NeutralAI,
+          "AggressiveAI" : AggressiveAI,
+          "PlayerAI" : PlayerAI
+          }

@@ -46,14 +46,11 @@ class Tile(colors.withBackgroundColor, Base):
         self.room = kwargs.get('room', None)
         
         self.feature = kwargs.get('feature', None)
-        
         self.creature = kwargs.get('creature', None)
-        
         self.explored = False
-
         self.inventory = None
         
-        self.visibleTiles = None
+        self.load()
                 
 
     id = Column(Integer, primary_key=True, unique=True)
@@ -96,6 +93,12 @@ class Tile(colors.withBackgroundColor, Base):
     
     __mapper_args__ = {'polymorphic_on': tileType,
                        'polymorphic_identity': 'tile'}
+    
+    def load(self):
+        self.visibleTiles = None
+        
+        
+        
     
     def initializeInventory(self):
         if not self.inventory:
