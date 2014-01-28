@@ -497,30 +497,39 @@ class Level(Base):
             return True
         return False
     
-    def getNextLevel(self):
-        return self.nextLevel
-    
-    def getPreviousLevel(self):
-        return self.previousLevel
+#     def getNextLevel(self):
+#         return self.nextLevel
+#     
+#     def getPreviousLevel(self):
+#         return self.previousLevel
     
     def setNextLevel(self, other):
-        self.nextLevel = other
-        self.nextLevelId = other.id
-#        other.previousLevel = self
-#        other.previousLevelId = self.id
+#         self.nextLevel = other
+#         self.nextLevelId = other.id
+#         other.previousLevel = self
+#         other.previousLevelId = self.id
+        
+        # Just get the first one, fix later
+        dstair = self.getDownStairs()[0].getFeature()
+        ustairTile = other.getUpStairs()[0]
+        
+        dstair.setDestination(ustairTile)
         
     def setPreviousLevel(self, other):
-        self.previousLevel = other
-        self.previousLevelId = other.id
-#        other.nextLevel = self
-#        other.nextLevelId = self.id
+#         self.previousLevel = other
+#         self.previousLevelId = other.id
+#         other.nextLevel = self
+#         other.nextLevelId = self.id
+
+        # Just get the first one, fix later
+        ustair = self.getUpStairs()[0].getFeature()
+        dstairTile = other.getDownStairs()[0]
         
+        ustair.setDestination(dstairTile)
         
-# Monkey-patch in previous- and nex-level relationships
-Level.nextLevelId = Column(Integer, ForeignKey(Level.id))
-Level.nextLevel = relationship(Level, backref=backref('previousLevel', uselist = False), remote_side = Level.id, primaryjoin="Level.id==Level.nextLevelId")
-Level.previousLevelId = Column(Integer, ForeignKey(Level.id))
-            
+def connectLevels(upper, lower):
+    pass
+        
 class DungeonLevel(Level):
     '''A Level subclass for modeling one dungeon level.  Includes functionality for passing time and level construction.'''
     

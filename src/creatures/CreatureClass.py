@@ -246,6 +246,8 @@ class Creature(colors.withColor, Base):
         self.goalEnemyId = value
 
     def getPath(self):
+        if not self.__dict__.get('path'):
+            self.path = None
         return self.path
 
     def setPath(self, value):

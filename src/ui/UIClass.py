@@ -14,7 +14,7 @@ from pygame.locals import *
 import sys
 from PanelClass import *
 import textwrap
-from DungeonFeatureClass import downStair, upStair
+from DungeonFeatureClass import downStair, upStair, Stair
 import database as db
 import LevelClass
 
@@ -326,7 +326,7 @@ class UI(object):
  
             elif keyStr == '.': # Wait
                 if (KMOD_SHIFT & key_mods): # '>' key
-                    if self.goToNextLevel():
+                    if self.takeStairs():
                         return 'took-turn'
                 else:
                     G.message("Waiting")
@@ -334,7 +334,8 @@ class UI(object):
             
             elif keyStr == ',': # Pick up items
                 if (KMOD_SHIFT & key_mods): # '<' key
-                    if self.goToPreviousLevel():
+#                     if self.goToPreviousLevel():
+                    if self.takeStairs():
                         return 'took-turn'
                     
                 else:
@@ -423,55 +424,36 @@ class UI(object):
         else:
             return ''
         
-    
-            
-    def goToNextLevel(self):
+    def takeStairs(self):
         tile = self.player.getTile()
         feature = tile.getFeature()
         
-        if feature and isinstance(feature, downStair):
-            G.message("Heading down the stairs!")
-            clevel = self.currentLevel
-            nlevel = self.currentLevel.getNextLevel()
+        if feature and isinstance(feature, Stair):
+            if isinstance(feature, upStair):
+                G.message("Heading up the stairs!")
+            elif isinstance(feature, downStair):
+                G.message("Heading down the stairs!")
             
-            if not nlevel:
+            clevel = self.currentLevel
+            destination = feature.getDestination()
+            if not destination:
+                return False
+            
+            toLevel = destination.getLevel()
+            
+            if not toLevel:
                 return False
             
             db.saveDB.save(clevel)
             
-            nlevel.load()
-            self.setCurrentLevel(nlevel)
-            nlevel.placeOnUpStair(self.player)
+            toLevel.load()
+            self.setCurrentLevel(toLevel)
+            toLevel.placeCreature(self.player, destination)
             
             return True
         
         G.message("No stairs here!")
         return False
-    
-    def goToPreviousLevel(self):
-        tile = self.player.getTile()
-        feature = tile.getFeature()
-        
-        if feature and isinstance(feature, upStair):
-            G.message("Heading up the stairs!")
-            
-            clevel = self.currentLevel
-            plevel = self.currentLevel.getPreviousLevel()
-            
-            if not plevel:
-                return False
-            
-            db.saveDB.save(clevel)
-            
-            plevel.load()
-            self.setCurrentLevel(plevel)
-            plevel.placeOnDownStair(self.player)
-            
-            return True
-        
-        G.message("No stairs here!")
-        return False
-    
     
     
         

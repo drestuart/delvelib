@@ -23,8 +23,6 @@ class DungeonFeature(colors.withBackgroundColor, Base):
     
     def __init__(self, symbol, **kwargs):
         super(DungeonFeature, self).__init__(**kwargs)
-#        self.blockSight = kwargs.get('blockSight', False)
-#        self.blockMove = kwargs.get('blockMove', False)
         self.symbol = symbol
         
         self.tile = kwargs.get('tile', None)
@@ -38,10 +36,8 @@ class DungeonFeature(colors.withBackgroundColor, Base):
     description = Column(String)
     symbol = Column(String(length=1, convert_unicode = False))
     
-    tileId = Column(Integer) #, ForeignKey('tiles.id')
-    
+    tileId = Column(Integer)
     visible = Column(Boolean)
-    
     featureType = Column(String)
     
     __mapper_args__ = {'polymorphic_on': featureType,
@@ -53,12 +49,11 @@ class DungeonFeature(colors.withBackgroundColor, Base):
     def setVisible(self, val):
         self.visible = val
 
-#    def getBlockSight(self):
-#        return self.blockSight
-#
-#
-#    def getBlockMove(self):
-#        return self.blockMove
+    def getBlockSight(self):
+        return self.blockSight
+
+    def getBlockMove(self):
+        return self.blockMove
 
 
     def getSymbol(self):
@@ -165,6 +160,7 @@ class Stair(DungeonFeature):
     
     def setDestination(self, d):
         self.destination = d
+
         
 class upStair(Stair):
     
