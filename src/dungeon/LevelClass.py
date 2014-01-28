@@ -41,10 +41,10 @@ class Level(Base):
         
         print "Initializing", self.name
         
-        self.defaultFloorType = kwargs.get('defaultFloorType', None)
-        self.defaultWallType = kwargs.get('defaultWallType', None)
-        self.defaultTunnelFloorType = kwargs.get('defaultTunnelFloorType', None)
-        self.defaultTunnelWallType = kwargs.get('defaultTunnelWallType', None)
+#         self.defaultFloorType = kwargs.get('defaultFloorType', None)
+#         self.defaultWallType = kwargs.get('defaultWallType', None)
+#         self.defaultTunnelFloorType = kwargs.get('defaultTunnelFloorType', None)
+#         self.defaultTunnelWallType = kwargs.get('defaultTunnelWallType', None)
         
         self.width = kwargs.get('width')
         self.height = kwargs.get('height')
@@ -131,7 +131,7 @@ class Level(Base):
         
     def getTile(self, x, y):
         if not self.tileArray:
-            print "self.tileArray not initialized!"
+#             print "self.tileArray not initialized!"
             self.buildTileArray()
         
         if x >= 0 and x < self.width and y >= 0 and y < self.height:
@@ -526,6 +526,10 @@ class DungeonLevel(Level):
     
     __mapper_args__ = {'polymorphic_identity': 'dungeon level'}
 
+    defaultFloorType = T.StoneFloor
+    defaultWallType = T.RockWall
+    defaultTunnelFloorType = T.RockTunnel
+    defaultTunnelWallType = T.RockWall
     
     def __init__(self, **kwargs):
         super(DungeonLevel, self).__init__(**kwargs)
@@ -862,7 +866,10 @@ class DungeonLevel(Level):
 class CaveLevel(Level):
     
     __mapper_args__ = {'polymorphic_identity': 'cave level'}
-
+    
+    defaultFloorType = T.RockTunnel
+    defaultWallType = T.RockWall
+    
     def __init__(self, **kwargs):
         super(CaveLevel, self).__init__(**kwargs)
 

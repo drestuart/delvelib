@@ -48,10 +48,9 @@ class Game(object):
         print seed
         random.seed(seed)
         
-        d1 = L.DungeonLevel(name = "Test Dungeon", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1, defaultFloorType = T.StoneFloor,
-                           defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
+        d1 = L.DungeonLevel(name = "Test Dungeon", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1)
 
-        d2 = L.CaveLevel(name = "Test Cave", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 2, defaultFloorType = T.RockTunnel, defaultWallType = T.RockWall)
+        d2 = L.CaveLevel(name = "Test Cave", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 2)
         
         d1.buildLevel()
         d2.buildLevel()
