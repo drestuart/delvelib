@@ -452,6 +452,12 @@ class Level(Base):
     def placeItems(self):
         raise NotImplementedError("placeItems() not implemented, use a subclass")
     
+    def placeUpStair(self):
+        raise NotImplementedError("placeUpStair() not implemented, use a subclass")
+    
+    def placeDownStair(self):
+        raise NotImplementedError("placeDownStair() not implemented, use a subclass")
+    
     def placeStairs(self):
         raise NotImplementedError("placeStairs() not implemented, use a subclass")
     
@@ -485,29 +491,20 @@ class Level(Base):
     
     def placeOnUpStair(self, creature):
         stairTiles = self.getUpStairs()
+        print stairTiles
         if stairTiles:
             self.placeCreature(creature, stairTiles[0])
             return True
-        return False
+        raise Exception("No upstair found!")
         
     def placeOnDownStair(self, creature):
         stairTiles = self.getDownStairs()
         if stairTiles:
             self.placeCreature(creature, stairTiles[0])
             return True
-        return False
-    
-#     def getNextLevel(self):
-#         return self.nextLevel
-#     
-#     def getPreviousLevel(self):
-#         return self.previousLevel
+        raise Exception("No downstair found!")
     
     def setNextLevel(self, other):
-#         self.nextLevel = other
-#         self.nextLevelId = other.id
-#         other.previousLevel = self
-#         other.previousLevelId = self.id
         
         # Just get the first one, fix later
         dstair = self.getDownStairs()[0].getFeature()
@@ -516,10 +513,6 @@ class Level(Base):
         dstair.setDestination(ustairTile)
         
     def setPreviousLevel(self, other):
-#         self.previousLevel = other
-#         self.previousLevelId = other.id
-#         other.nextLevel = self
-#         other.nextLevelId = self.id
 
         # Just get the first one, fix later
         ustair = self.getUpStairs()[0].getFeature()
@@ -528,7 +521,22 @@ class Level(Base):
         ustair.setDestination(dstairTile)
         
 def connectLevels(upper, lower):
-    pass
+    
+    # Place a downstair in the upper level
+    downTile = upper.placeDownStair()
+    dStair = downTile.getFeature()
+    
+    # Place an upstair in the lower level
+    upTile = lower.placeUpStair()
+    uStair = upTile.getFeature()
+    
+    # Set the stair tiles as destinations for their respective stairs
+    uStair.setDestination(downTile)
+    dStair.setDestination(upTile)
+    
+    print upper.getDownStairs(), lower.getUpStairs()
+    
+    return True
         
 class DungeonLevel(Level):
     '''A Level subclass for modeling one dungeon level.  Includes functionality for passing time and level construction.'''
@@ -801,8 +809,8 @@ class DungeonLevel(Level):
         self.buildTileArray()    
         
         # Place Stairs
-        print "Placing stairs"
-        self.placeStairs()
+#         print "Placing stairs"
+#         self.placeStairs()
         
         # Place items
         print "Placing items"
@@ -830,8 +838,38 @@ class DungeonLevel(Level):
                 item = I.getRandomItem()
                 tile.addObject(item)
 
-    def placeStairs(self):
+    def placeUpStair(self):
+        while True:
+            upRoom = random.choice(self.rooms)
+            upTile = self.getRandomOpenTileInRoom(upRoom)
+            
+            if upTile and not upTile.getFeature():
+                
+                upStair = F.upStair()
+                upTile.setFeature(upStair)
+                self.upStairs.append(upTile)
+                
+                break
+            
+        return upTile
         
+    def placeDownStair(self):
+        while True:
+            downRoom = random.choice(self.rooms)
+            downTile = self.getRandomOpenTileInRoom(downRoom)
+            
+            if downTile and not downTile.getFeature():
+                
+                downStair = F.downStair()
+                downTile.setFeature(downStair)
+                self.downStairs.append(downTile)
+                
+                break
+            
+        return downTile
+    
+    def placeStairs(self):
+        raise Exception("Level.placeStairs is deprecated")
         while True:
             # Choose rooms
             upRoom = random.choice(self.rooms)
@@ -907,9 +945,9 @@ class CaveLevel(Level):
         print "Building tile array"    
         self.buildTileArray()    
         
-        # Place Stairs
-        print "Placing stairs"
-        self.placeStairs()
+#         # Place Stairs
+#         print "Placing stairs"
+#         self.placeStairs()
         
         # Place items
         print "Placing items"
@@ -935,10 +973,36 @@ class CaveLevel(Level):
                 tile.addObject(item)
                 placedItems += 1
         
+    def placeUpStair(self):
+        while True:
+            upTile = self.getRandomOpenTile()
+            
+            if upTile and not upTile.getFeature():
+                
+                upStair = F.upStair()
+                upTile.setFeature(upStair)
+                self.upStairs.append(upTile)
+                
+                break
+            
+        return upTile
         
-    
+    def placeDownStair(self):
+        while True:
+            downTile = self.getRandomOpenTile()
+            
+            if downTile and not downTile.getFeature():
+                
+                downStair = F.downStair()
+                downTile.setFeature(downStair)
+                self.downStairs.append(downTile)
+                
+                break
+            
+        return downTile
+
     def placeStairs(self):
-        
+        raise Exception("Level.placeStairs is deprecated")
         while True:
             upTile = self.getRandomOpenTile()
             downTile = self.getRandomOpenTile()

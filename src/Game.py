@@ -55,6 +55,9 @@ class Game(object):
         d1.buildLevel()
         d2.buildLevel()
         
+        L.connectLevels(d1, d2)
+        d1.placeUpStair()
+        
         player = P.Player()
         d1.placeOnUpStair(player)
         
@@ -67,8 +70,10 @@ class Game(object):
         db.saveDB.save(d1)
         db.saveDB.save(d2)
         
-        d1.setNextLevel(d2)
-        d2.setPreviousLevel(d1)
+#         d1.setNextLevel(d2)
+#         d2.setPreviousLevel(d1)
+        
+        
         
         global myUI
         myUI = ui.UI(level = d1, player = player, fontsize = self.fontsize)
