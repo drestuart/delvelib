@@ -55,7 +55,7 @@ class Game(object):
         
         d1.buildLevel()
         player = P.Player()
-        d1.placeCreatureAtRandom(player)
+        d1.placeOnUpStair(player)
         
         orc1 = Cr.Orc()
         d1.placeCreatureAtRandom(orc1)

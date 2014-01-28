@@ -21,6 +21,7 @@ import AStar
 import Util as U
 import ca_cave
 from pubsub import pub
+from DungeonFeatureClass import upStair, downStair
 #from CreatureClass import *
 
 
@@ -74,6 +75,9 @@ class Level(Base):
         # Initialize self.hasTile
         self.hasTile = []
         self.tileArray = []
+        
+        self.upStairs = []
+        self.downStairs = []
         
         for dummyx in range(self.width):
             newCol = []
@@ -457,6 +461,46 @@ class Level(Base):
     
     def placeStairs(self):
         raise NotImplementedError("placeStairs() not implemented, use a subclass")
+    
+    def findUpStairs(self):
+        self.upStairs = []
+        for tile in self.tiles:
+            feature = tile.getFeature()
+            if feature and isinstance(feature, upStair):
+                self.upStairs.append(tile)
+    
+    def getUpStairs(self):
+        if not self.upStairs:
+            self.findUpStairs()
+        
+        return self.upStairs
+    
+    def findDownStairs(self):
+        self.downStairs = []
+        for tile in self.tiles:
+            feature = tile.getFeature()
+            if feature and isinstance(feature, downStair):
+                self.downStairs.append(tile)
+    
+    def getDownStairs(self):
+        if not self.downStairs:
+            self.findDownStairs()
+        
+        return self.downStairs
+    
+    def placeOnUpStair(self, creature):
+        stairTiles = self.getUpStairs()
+        if stairTiles:
+            self.placeCreature(creature, stairTiles[0])
+            return True
+        return False
+        
+    def placeOnDownStair(self, creature):
+        stairTiles = self.getDownStairs()
+        if stairTiles:
+            self.placeCreature(creature, stairTiles[0])
+            return True
+        return False
         
             
 class DungeonLevel(Level):
@@ -741,6 +785,10 @@ class DungeonLevel(Level):
         
         print "Setting up pathing"
         self.setupPathing()
+        
+        print "Finding the stairs"
+        self.findUpStairs()
+        self.findDownStairs()
         
     def placeItems(self):
         
