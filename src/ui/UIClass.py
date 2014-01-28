@@ -14,6 +14,9 @@ from pygame.locals import *
 import sys
 from PanelClass import *
 import textwrap
+from DungeonFeatureClass import downStair, upStair
+import database as db
+import LevelClass
 
 # TODO Abstract out all pygcurse calls into an interface class
 
@@ -90,7 +93,9 @@ class UI(object):
                     
                     player_action = None
                     key = event.key
-                    player_action = self.handleKeys(key, event)
+                    key_mods = pygame.key.get_mods()
+
+                    player_action = self.handleKeys(key, event, key_mods)
                     
                     if player_action == 'exit':
                         print "Got a QUIT command"
@@ -302,8 +307,8 @@ class UI(object):
         
         return inventory.getItem(index)
         
-    def handleKeys(self, key, event):
-     
+    def handleKeys(self, key, event, key_mods):
+
         if key == K_ESCAPE:
             return "exit"
             
@@ -320,18 +325,27 @@ class UI(object):
                     return 'took-turn'
  
             elif keyStr == '.': # Wait
-                G.message("Waiting")
-                return 'took-turn'
+                if (KMOD_SHIFT & key_mods): # '>' key
+                    if self.goToNextLevel():
+                        return 'took-turn'
+                else:
+                    G.message("Waiting")
+                    return 'took-turn'
             
             elif keyStr == ',': # Pick up items
-                inv = self.player.getTile().getInventory()
-                if inv:
-                    item = self.pickUpItemMenu(inv)
-                    if item:
-#                        inv.removeItem(item)
-                        self.player.pickUpItem(item)
+                if (KMOD_SHIFT & key_mods): # '<' key
+                    if self.goToPreviousLevel():
+                        return 'took-turn'
                     
-                    return 'took-turn'
+                else:
+                    inv = self.player.getTile().getInventory()
+                    if inv:
+                        item = self.pickUpItemMenu(inv)
+                        if item:
+    #                        inv.removeItem(item)
+                            self.player.pickUpItem(item)
+                        
+                        return 'took-turn'
                 
             elif keyStr == 'W':  # Wear something
                 self.wearMenu()                
@@ -411,7 +425,48 @@ class UI(object):
         
     
             
+    def goToNextLevel(self):
+        tile = self.player.getTile()
+        feature = tile.getFeature()
+        
+        if feature and isinstance(feature, downStair):
+            G.message("Heading down the stairs!")
+            clevel = self.currentLevel
+            nlevel = self.currentLevel.getNextLevel()
             
+            db.saveDB.save(clevel)
+            
+            self.setCurrentLevel(nlevel)
+            nlevel.placeOnUpStair(self.player)
+            
+            return True
+        
+        G.message("No stairs here!")
+        return False
+    
+    def goToPreviousLevel(self):
+        tile = self.player.getTile()
+        feature = tile.getFeature()
+        
+        if feature and isinstance(feature, upStair):
+            G.message("Heading up the stairs!")
+            
+            clevel = self.currentLevel
+            plevel = self.currentLevel.getPreviousLevel()
+            
+            db.saveDB.save(clevel)
+            db.saveDB.save(plevel)
+            
+            self.setCurrentLevel(plevel)
+            plevel.placeOnDownStair(self.player)
+            
+            return True
+        
+        G.message("No stairs here!")
+        return False
+    
+    
+    
         
     
     

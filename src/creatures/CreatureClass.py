@@ -21,6 +21,8 @@ class Creature(colors.withColor, Base):
     __tablename__ = "creatures"
     __table_args__ = {'extend_existing': True}
     
+    blockSight = False
+    
     
     def __init__(self, **kwargs):
         super(Creature, self).__init__(**kwargs)
@@ -62,6 +64,9 @@ class Creature(colors.withColor, Base):
     
     inventoryId = Column(Integer, ForeignKey("inventories.id"))
     inventory = relationship("Inventory", backref = backref("creature", uselist = False), uselist = False, primaryjoin = "Creature.inventoryId == Inventory.id")
+    
+    levelId = Column(Integer, ForeignKey('levels.id'))
+    level = relationship("Level", backref=backref("creatures"), uselist = False, primaryjoin = "Creature.levelId == Level.id")
     
     visible = Column(Boolean)
     
@@ -187,9 +192,8 @@ class Creature(colors.withColor, Base):
         self.symbol = value
         
     def initializeAI(self):
-        if self.AIClassName and not self.AIClass:
-            # Get AI class by name
-            pass
+        if self.AIClassName and not self.__dict__.get('AIClass'):
+            self.AIClass = AI.__dict__[self.AIClassName]
         else:
             self.AIClassName = self.AIClass.__name__
         
@@ -197,6 +201,8 @@ class Creature(colors.withColor, Base):
         self.AI.setOwner(self)
         
     def takeTurn(self):
+        if not self.__dict__.get('AI'):
+            self.initializeAI()
         self.AI.takeTurn()
         
     def getGoalTile(self):

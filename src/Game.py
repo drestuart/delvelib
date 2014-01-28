@@ -48,22 +48,31 @@ class Game(object):
         print seed
         random.seed(seed)
         
-        d1 = L.DungeonLevel(name = "Test", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1, defaultFloorType = T.StoneFloor,
+        d1 = L.DungeonLevel(name = "Test Dungeon", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1, defaultFloorType = T.StoneFloor,
                            defaultWallType = T.RockWall, defaultTunnelFloorType = T.RockTunnel, defaultTunnelWallType = T.RockWall)
 
-#        d1 = L.CaveLevel(name = "Test", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1, defaultFloorType = T.RockTunnel, defaultWallType = T.RockWall)
+        d2 = L.CaveLevel(name = "Test Cave", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 2, defaultFloorType = T.RockTunnel, defaultWallType = T.RockWall)
         
         d1.buildLevel()
+        d2.buildLevel()
+        
         player = P.Player()
         d1.placeOnUpStair(player)
         
         orc1 = Cr.Orc()
         d1.placeCreatureAtRandom(orc1)
         
-    #    orc2 = Cr.Orc()
-    #    d1.placeCreatureAtRandom(orc2)
+        orc2 = Cr.Orc()
+        d1.placeCreatureAtRandom(orc2)
         
         db.saveDB.save(d1)
+        db.saveDB.save(d2)
+        
+        d1.setNextLevel(d2)
+        d2.setPreviousLevel(d1)
+        
+        print d1.id, "=>", d2.id
+#        print d2.previousLevelId, "=>", d1.nextLevelId
         
         global myUI
         myUI = ui.UI(level = d1, player = player, fontsize = self.fontsize)

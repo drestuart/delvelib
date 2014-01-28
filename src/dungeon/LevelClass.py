@@ -39,13 +39,12 @@ class Level(Base):
         self.name = kwargs.get('name', " ")
         self.depth = kwargs.get('depth', 0)
         
+        print "Initializing", self.name
+        
         self.defaultFloorType = kwargs.get('defaultFloorType', None)
         self.defaultWallType = kwargs.get('defaultWallType', None)
         self.defaultTunnelFloorType = kwargs.get('defaultTunnelFloorType', None)
         self.defaultTunnelWallType = kwargs.get('defaultTunnelWallType', None)
-
-        self.nextLevel = kwargs.get('nextLevel', None)
-        self.previousLevel = kwargs.get('previousLevel', None)
         
         self.width = kwargs.get('width')
         self.height = kwargs.get('height')
@@ -89,16 +88,15 @@ class Level(Base):
         pub.subscribe(self.handleAddedCreature, "event.addedCreature")
         pub.subscribe(self.handleRemovedCreature, "event.removedCreature")
         
+        # Build it!
+#        self.buildLevel()
+        
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
     depth = Column(Integer)
-    
-    nextLevel = relationship("Level", uselist=False, primaryjoin="Level.id==Level.nextLevelId")
-    nextLevelId = Column(Integer, ForeignKey("levels.id"))
-    
-    previousLevel = relationship("Level", uselist=False, primaryjoin="Level.id==Level.previousLevelId")
-    previousLevelId = Column(Integer, ForeignKey("levels.id"))
+    width = Column(Integer)
+    height = Column(Integer)
     
     tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
     rooms = relationship("Room", backref = "level")
@@ -124,9 +122,9 @@ class Level(Base):
             self.tileArray[tile.x][tile.y] = tile
         
     def getTile(self, x, y):
-        if not self.tileArray:
+        if not self.__dict__.get('tileArray'):
             print "self.tileArray not initialized!"
-            return None
+            self.buildTileArray()
         
         if x >= 0 and x < self.width and y >= 0 and y < self.height:
             return self.tileArray[x][y]
@@ -311,6 +309,9 @@ class Level(Base):
         
     def computeFOV(self, x, y):
         '''Compute the field of view of this map with respect to a particular position'''
+        if not self.__dict__.get('FOVMap'):
+            self.computeFOVProperties()
+            
         self.FOVMap.do_fov(x, y, C.FOV_RADIUS)
     
     def isInFOV(self, fromx, fromy, tox, toy):
@@ -391,7 +392,7 @@ class Level(Base):
     
     def getPathToTile(self, fromTile, toTile):
         
-        if self.astar is None:
+        if self.__dict__.get('astar') is None:
             self.setupPathing()
 
         startpoint = fromTile.getXY()
@@ -470,7 +471,8 @@ class Level(Base):
                 self.upStairs.append(tile)
     
     def getUpStairs(self):
-        if not self.upStairs:
+#        if not self.upStairs:
+        if not self.__dict__.get('upStairs', None):
             self.findUpStairs()
         
         return self.upStairs
@@ -483,7 +485,8 @@ class Level(Base):
                 self.downStairs.append(tile)
     
     def getDownStairs(self):
-        if not self.downStairs:
+#        if not self.downStairs:
+        if not self.__dict__.get('downStairs', None):
             self.findDownStairs()
         
         return self.downStairs
@@ -501,7 +504,30 @@ class Level(Base):
             self.placeCreature(creature, stairTiles[0])
             return True
         return False
+    
+    def getNextLevel(self):
+        return self.nextLevel
+    
+    def getPreviousLevel(self):
+        return self.previousLevel
+    
+    def setNextLevel(self, other):
+        self.nextLevel = other
+        self.nextLevelId = other.id
+#        other.previousLevel = self
+#        other.previousLevelId = self.id
         
+    def setPreviousLevel(self, other):
+        self.previousLevel = other
+        self.previousLevelId = other.id
+#        other.nextLevel = self
+#        other.nextLevelId = self.id
+        
+        
+# Monkey-patch in previous- and nex-level relationships
+Level.nextLevelId = Column(Integer, ForeignKey(Level.id))
+Level.nextLevel = relationship(Level, backref=backref('previousLevel', uselist = False), remote_side = Level.id, primaryjoin="Level.id==Level.nextLevelId")
+Level.previousLevelId = Column(Integer, ForeignKey(Level.id))
             
 class DungeonLevel(Level):
     '''A Level subclass for modeling one dungeon level.  Includes functionality for passing time and level construction.'''
@@ -819,11 +845,13 @@ class DungeonLevel(Level):
             
                 upStair = F.upStair()
                 upTile.setFeature(upStair)
+                self.upStairs.append(upTile)
                 
                 # Set destination
             
                 downStair = F.downStair()
                 downTile.setFeature(downStair)
+                self.downStairs.append(downTile)
                 
                 # Set destination
                 
@@ -884,6 +912,10 @@ class CaveLevel(Level):
         
         print "Setting up FOV"
         self.computeFOVProperties()
+        
+        print "Finding the stairs"
+        self.findUpStairs()
+        self.findDownStairs()
     
     def placeItems(self):
         # Just place 20 random items for now
@@ -907,9 +939,11 @@ class CaveLevel(Level):
             
                 upStair = F.upStair()
                 upTile.setFeature(upStair)
+                self.upStairs.append(upTile)
                 
                 downStair = F.downStair()
                 downTile.setFeature(downStair)
+                self.downStairs.append(downTile)
                 
                 # TODO Set destinations
                 
