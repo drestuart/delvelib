@@ -4,26 +4,26 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
+import random
+
+from pubsub import pub
+# from sqlalchemy import and_
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer
-from sqlalchemy import and_
+
+import AStar
 import Const as C
+from DungeonFeatureClass import upStair, downStair
+import DungeonFeatureClass as F
+import FOVMap as fov
+import ItemClass as I
 import RoomClass as R
 import TileClass as T
-import DungeonFeatureClass as F
-import ItemClass as I
-import colors
-import database as db
-import random
-import FOVMap as fov
-import AStar
 import Util as U
 import ca_cave
-from pubsub import pub
-from DungeonFeatureClass import upStair, downStair
-#from CreatureClass import *
-
+import colors
+import database as db
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -36,15 +36,10 @@ class Level(Base):
     
     def __init__(self, **kwargs):
         
-        self.name = kwargs.get('name', " ")
+        self.name = kwargs.get('name', "")
         self.depth = kwargs.get('depth', 0)
         
         print "Initializing", self.name
-        
-#         self.defaultFloorType = kwargs.get('defaultFloorType', None)
-#         self.defaultWallType = kwargs.get('defaultWallType', None)
-#         self.defaultTunnelFloorType = kwargs.get('defaultTunnelFloorType', None)
-#         self.defaultTunnelWallType = kwargs.get('defaultTunnelWallType', None)
         
         self.width = kwargs.get('width')
         self.height = kwargs.get('height')
@@ -55,7 +50,6 @@ class Level(Base):
         self.tiles = []
         self.rooms = []
         self.creatures = []
-
         
         self.load()
         
@@ -74,6 +68,8 @@ class Level(Base):
     depth = Column(Integer)
     width = Column(Integer)
     height = Column(Integer)
+    
+    dungeonId = Column(Integer, ForeignKey("dungeons.id"))
     
     tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
     rooms = relationship("Room", backref = "level")
@@ -130,7 +126,7 @@ class Level(Base):
             self.tileArray[tile.x][tile.y] = tile
         
     def getTile(self, x, y):
-        if not self.tileArray:
+        if not self.__dict__.get('tileArray'):
 #             print "self.tileArray not initialized!"
             self.buildTileArray()
         
@@ -143,10 +139,10 @@ class Level(Base):
         return U.ChebyshevDistance(tilea.getX(), tileb.getX(), tilea.getY(), tileb.getY())
     
     
-    def getTileFromDB(self, x, y, level):
-        query = db.saveDB.getQueryObj(T.Tile)
-        query.filter(and_(T.Tile.x == x, T.Tile.y == y, T.Tile.level == level))
-        return db.saveDB.runQuery(query)
+#     def getTileFromDB(self, x, y, level):
+#         query = db.saveDB.getQueryObj(T.Tile)
+#         query.filter(and_(T.Tile.x == x, T.Tile.y == y, T.Tile.level == level))
+#         return db.saveDB.runQuery(query)
     
     def getRandomTile(self):
         randX = random.randint(0, self.width)
@@ -313,7 +309,7 @@ class Level(Base):
         
     def computeFOV(self, x, y):
         '''Compute the field of view of this map with respect to a particular position'''
-        if not self.FOVMap:
+        if not self.__dict__.get('FOVMap'):
             self.computeFOVProperties()
             
         self.FOVMap.do_fov(x, y, C.FOV_RADIUS)
@@ -469,8 +465,8 @@ class Level(Base):
                 self.upStairs.append(tile)
     
     def getUpStairs(self):
-        if not self.upStairs:
-#         if not self.__dict__.get('upStairs', None):
+#        if not self.upStairs:
+        if not self.__dict__.get('upStairs', None):
             self.findUpStairs()
         
         return self.upStairs
@@ -483,8 +479,8 @@ class Level(Base):
                 self.downStairs.append(tile)
     
     def getDownStairs(self):
-        if not self.downStairs:
-#         if not self.__dict__.get('downStairs', None):
+#        if not self.downStairs:
+        if not self.__dict__.get('downStairs', None):
             self.findDownStairs()
         
         return self.downStairs
@@ -533,8 +529,6 @@ def connectLevels(upper, lower):
     # Set the stair tiles as destinations for their respective stairs
     uStair.setDestination(downTile)
     dStair.setDestination(upTile)
-    
-    print upper.getDownStairs(), lower.getUpStairs()
     
     return True
         
@@ -839,6 +833,9 @@ class DungeonLevel(Level):
                 tile.addObject(item)
 
     def placeUpStair(self):
+        if not self.__dict__.get('upStairs'):
+            self.upStairs = []
+        
         while True:
             upRoom = random.choice(self.rooms)
             upTile = self.getRandomOpenTileInRoom(upRoom)
@@ -854,6 +851,9 @@ class DungeonLevel(Level):
         return upTile
         
     def placeDownStair(self):
+        if not self.__dict__.get('downStairs'):
+            self.downStairs = []
+        
         while True:
             downRoom = random.choice(self.rooms)
             downTile = self.getRandomOpenTileInRoom(downRoom)
@@ -974,6 +974,9 @@ class CaveLevel(Level):
                 placedItems += 1
         
     def placeUpStair(self):
+        if not self.__dict__.get('upStairs'):
+            self.upStairs = []
+            
         while True:
             upTile = self.getRandomOpenTile()
             
@@ -988,6 +991,9 @@ class CaveLevel(Level):
         return upTile
         
     def placeDownStair(self):
+        if not self.__dict__.get('downStairs'):
+            self.downStairs = []
+            
         while True:
             downTile = self.getRandomOpenTile()
             

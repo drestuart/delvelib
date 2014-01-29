@@ -297,7 +297,7 @@ class Tile(colors.withBackgroundColor, Base):
         return self.x, self.y
     
     def getVisibleTiles(self):
-        return self.visibleTiles
+        return self.__dict__.get('visibleTiles')
     
     def setVisibleTiles(self, tiles):
         self.visibleTiles = tiles

@@ -1,4 +1,3 @@
-
 import random
 
 def random_choice_index(chances):  #choose one option from list of chances, returning its index
