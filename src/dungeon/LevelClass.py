@@ -39,8 +39,6 @@ class Level(Base):
         self.name = kwargs.get('name', "")
         self.depth = kwargs.get('depth', 0)
         
-        print "Initializing", self.name
-        
         self.width = kwargs.get('width')
         self.height = kwargs.get('height')
         

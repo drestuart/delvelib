@@ -80,7 +80,6 @@ class Dungeon(Base):
             self.levels.append(newLevel)
             db.saveDB.save(newLevel)
             
-        
         db.saveDB.save(self)
 
         # TODO Connect top level to world map
