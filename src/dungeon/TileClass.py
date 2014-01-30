@@ -305,11 +305,11 @@ class Tile(colors.withBackgroundColor, Base):
     def getXY(self):
         return self.x, self.y
     
-    def getVisibleTiles(self):
-        return self.__dict__.get('visibleTiles')
-    
-    def setVisibleTiles(self, tiles):
-        self.visibleTiles = tiles
+#     def getVisibleTiles(self):
+#         return self.__dict__.get('visibleTiles')
+#     
+#     def setVisibleTiles(self, tiles):
+#         self.visibleTiles = tiles
     
     def getExplored(self):
         return self.explored

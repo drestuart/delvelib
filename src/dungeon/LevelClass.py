@@ -141,12 +141,6 @@ class Level(Base):
     def distance(self, tilea, tileb):
         return U.ChebyshevDistance(tilea.getX(), tileb.getX(), tilea.getY(), tileb.getY())
     
-    
-#     def getTileFromDB(self, x, y, level):
-#         query = db.saveDB.getQueryObj(T.Tile)
-#         query.filter(and_(T.Tile.x == x, T.Tile.y == y, T.Tile.level == level))
-#         return db.saveDB.runQuery(query)
-    
     def getRandomTile(self):
         randX = random.randint(0, self.width)
         randY = random.randint(0, self.height)
@@ -292,7 +286,6 @@ class Level(Base):
     
     def computeFOVProperties(self, force = False):
         
-        print "Loading FOV data"
         fovArray = []
         self.FOVMap = None
         
@@ -324,56 +317,73 @@ class Level(Base):
             
         self.FOVMap.do_fov(x, y, C.FOV_RADIUS)
     
-    def isInFOV(self, fromx, fromy, tox, toy):
+#     def isInFOV_old(self, fromx, fromy, tox, toy):
+#         if fromx == tox and fromy == toy:
+#             return True
+#         
+#         fromTile = self.getTile(fromx, fromy)
+#         toTile = self.getTile(tox, toy)
+# 
+# #         if fromTile.getVisibleTiles() is None:
+#         visibleTiles = self.getVisibleTilesFromTile(fromTile)
+#         
+# #         else:
+# #             visibleTiles = fromTile.getVisibleTiles()
+#         
+#         return toTile in visibleTiles
+    
+    def isInFOV(self, fromx, fromy, tox, toy, radius = C.PLAYER_VISION_RADIUS):
         if fromx == tox and fromy == toy:
             return True
         
         fromTile = self.getTile(fromx, fromy)
         toTile = self.getTile(tox, toy)
-
-#         if fromTile.getVisibleTiles() is None:
-        visibleTiles = self.getVisibleTilesFromTile(fromTile)
         
-#         else:
-#             visibleTiles = fromTile.getVisibleTiles()
+        self.computeFOV(fromx, fromy)
+        if (radius == 0 or self.distance(fromTile, toTile) <= radius) and self.FOVMap.isVisible(tox, toy):
+            return True
+        return False
         
-        return toTile in visibleTiles
     
-    def getVisibleTilesFromTile(self, fromTile, radius = C.PLAYER_VISION_RADIUS):
-        
-        retArray = fromTile.getVisibleTiles()
-        
-        if retArray is not None:
-            return retArray
-        
-        else:
-            retArray = []
-            
-            x = fromTile.getX()
-            y = fromTile.getY()
-            
-            self.computeFOV(x, y)
-            
-            for tile in self.tiles:
-                if (radius == 0 or self.distance(fromTile, tile) <= radius) and self.FOVMap.isVisible(tile.getX(), tile.getY()):
-                    retArray.append(tile)
-            
-            fromTile.setVisibleTiles(retArray)
-            
-            return retArray
+#     def getVisibleTilesFromTile(self, fromTile, radius = C.PLAYER_VISION_RADIUS):
+#         
+#         retArray = []
+#          
+#         x = fromTile.getX()
+#         y = fromTile.getY()
+#          
+#         self.computeFOV(x, y)
+#          
+#         for tile in self.tiles:
+#             if (radius == 0 or self.distance(fromTile, tile) <= radius) and self.FOVMap.isVisible(tile.getX(), tile.getY()):
+#                 retArray.append(tile)
+#          
+#         return retArray
     
     def getVisibleCreaturesFromTile(self, fromTile, radius = C.PLAYER_VISION_RADIUS):
         
-        tileArr = self.getVisibleTilesFromTile(fromTile, radius)
-        
+        fromx, fromy = fromTile.getXY()
+        thisCreature = fromTile.getCreature()
         retArray = []
         
-        for tile in tileArr:
-            creature = tile.getCreature()
-            if creature and creature.isVisible():
+        for creature in self.creatures:
+            if creature is thisCreature: continue
+            
+            creaturex, creaturey = creature.getTile().getXY()
+            if creature and creature.isVisible() and self.isInFOV(fromx, fromy, creaturex, creaturey):
                 retArray.append(creature)
-                
+            
         return retArray
+#         tileArr = self.getVisibleTilesFromTile(fromTile, radius)
+#         
+#         retArray = []
+#         
+#         for tile in tileArr:
+#             creature = tile.getCreature()
+#             if creature and creature.isVisible():
+#                 retArray.append(creature)
+#                 
+#         return retArray
     
     def setupPathing(self):
         mapdata = []
