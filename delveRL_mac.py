@@ -25,7 +25,7 @@ def main():
 
     print '-=delveRL=-'
     
-    game = G.Game(fontsize = fontsize)
+    game = G.Game(fontsize = fontsize, debug = False)
     
     game.play()
 

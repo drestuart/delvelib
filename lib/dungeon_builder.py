@@ -8,6 +8,7 @@ Available at: http://roguebasin.roguelikedevelopment.org/index.php?title=Python_
 import Const as C
 import random
 import RoomClass as R
+import DungeonFeatureClass as F
 
 # This is just the basic dungeon tile. It holds a shape.
 class dungeon_tile:
@@ -241,8 +242,8 @@ class dungeon:
                     
                 elif shape == '+':
                     newTile = self.level.defaultFloorType(x, y)
-#                            door = F.Door(tile = newTile)
-#                            newTile.setFeature(door)
+                    door = F.Door(tile = newTile)
+                    newTile.setFeature(door)
                     
                     
                 else:

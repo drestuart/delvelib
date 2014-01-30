@@ -23,7 +23,7 @@ import LevelClass
 class UI(object):
 
     def __init__(self, **kwargs):
-        self.currentLevel = kwargs.get('level', None)
+        self.setCurrentLevel(kwargs.get('level', None))
         self.player = kwargs.get('player', None)
         self.fullscreen = kwargs.get('fullscreen', False)
         self.font = kwargs.get('font', None)
@@ -387,6 +387,7 @@ class UI(object):
     
     def setCurrentLevel(self, lvl):
         self.currentLevel = lvl
+        lvl.load()
         
     def clearScreen(self):
         self.mapPanel.clear()

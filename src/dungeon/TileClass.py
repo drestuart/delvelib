@@ -6,7 +6,7 @@ Created on Mar 10, 2013
 
 from pubsub import pub
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
+from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer, Boolean
 import Util as U
 import colors
@@ -97,8 +97,17 @@ class Tile(colors.withBackgroundColor, Base):
     def load(self):
         self.visibleTiles = None
         
+    def bump(self, bumper):    
+        if self.creature:
+            return self.creature.handleBump(bumper)
         
+        if self.feature:
+            return self.feature.handleBump(bumper)
         
+        return self.handleBump(bumper)
+        
+    def handleBump(self, bumper):
+        return False
     
     def initializeInventory(self):
         if not self.inventory:

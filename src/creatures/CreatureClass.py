@@ -85,6 +85,9 @@ class Creature(colors.withColor, Base):
     def getInventory(self):
         return self.inventory
     
+    def handleBump(self, bumper):
+        return False
+    
     def move(self, dx, dy):
         
         newX = self.getX() + dx

@@ -4,6 +4,7 @@ Created on Mar 12, 2013
 @author: dstu
 '''
 
+from pubsub import pub
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey, ForeignKeyConstraint
 from sqlalchemy.types import String, Integer, Boolean
@@ -43,6 +44,9 @@ class DungeonFeature(colors.withBackgroundColor, Base):
     __mapper_args__ = {'polymorphic_on': featureType,
                        'polymorphic_identity': 'feature'}
 
+    def handleBump(self, creature):
+        return False
+    
     def isVisible(self):
         return self.visible
     
@@ -109,28 +113,35 @@ class Door(DungeonFeature):
 
 
     def open_(self):
-        if self.closed:
-            self.closed = False
-            self.symbol = "'"
+        if self.isClosed():
+            self.setClosed(False)
+            pub.sendMessage("event.doorOpen", tile = self.tile)
             return True
-        
         else:
             return False
         
     def close(self):
-        if self.closed:
+        if self.isClosed():
             return False
-        
         else:
-            self.closed = True
-            self.symbol = "+"
+            self.setClosed(True)
+            pub.sendMessage("event.doorClose", tile = self.tile)
             return True
+    
+    def handleBump(self, creature):
+        if self.isClosed():
+            return self.open_()
+        return False
 
     def isClosed(self):
         return self.closed
 
     def setClosed(self, value):
         self.closed = value
+        if value:
+            self.symbol = "+"
+        else:
+            self.symbol = "'"
 
     def getSymbol(self):
         if self.closed:

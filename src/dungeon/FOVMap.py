@@ -5,7 +5,6 @@ Created on Jan 18, 2014
 '''
 
 #TODO implement infinite-radius fov
-import Game as G
 
 class FOVMap(object):
 

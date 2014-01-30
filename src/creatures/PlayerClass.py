@@ -35,19 +35,11 @@ class Player(Cr.Creature):
         
         if newTile is not None and level.placeCreature(self, newTile):
             
-            #Remove self from the old tile
-#            oldTile = self.map.getTile(self.coordinates)
-#            oldTile.removeCreature()
-        
-#            self.setPosition(self.map, newCoords)
-            #self.energy -= self.moveCost
-                        
-#            print self.name + " moves to", self.getX(), self.getY()
-#            self.getLevel().setNeedToComputeFOV(True)
             return True
         
         else:
-            return False
+#             return False
+            return newTile.bump(self)
     
     def the(self):
         return self.getName()

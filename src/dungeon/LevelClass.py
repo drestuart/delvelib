@@ -7,7 +7,6 @@ Created on Mar 10, 2013
 import random
 
 from pubsub import pub
-# from sqlalchemy import and_
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer
@@ -18,8 +17,8 @@ from DungeonFeatureClass import upStair, downStair
 import DungeonFeatureClass as F
 import FOVMap as fov
 import ItemClass as I
-import RoomClass as R
 import TileClass as T
+import Game as G
 import Util as U
 import ca_cave
 import colors
@@ -101,6 +100,11 @@ class Level(Base):
         # Event listeners
         pub.subscribe(self.handleAddedCreature, "event.addedCreature")
         pub.subscribe(self.handleRemovedCreature, "event.removedCreature")
+        
+        pub.subscribe(self.handleDoorOpen, "event.doorOpen")
+        pub.subscribe(self.handleDoorClose, "event.doorClose")
+        
+        
         
         # Load child objects
         for cr in self.creatures:
@@ -286,9 +290,13 @@ class Level(Base):
         
         return tiles
     
-    def computeFOVProperties(self):
+    def computeFOVProperties(self, force = False):
         
+        print "Loading FOV data"
         fovArray = []
+        self.FOVMap = None
+        
+        # TODO hang on to fovArray and change sight properties in-place
         
         # Initialize fovArray
         for dummyy in range(self.height):
@@ -306,6 +314,9 @@ class Level(Base):
             
         self.FOVMap = fov.FOVMap(fovArray)
         
+        if force:
+            self.FOVMap.lastx, self.FOVMap.lasty = None, None
+        
     def computeFOV(self, x, y):
         '''Compute the field of view of this map with respect to a particular position'''
         if not self.__dict__.get('FOVMap'):
@@ -320,11 +331,11 @@ class Level(Base):
         fromTile = self.getTile(fromx, fromy)
         toTile = self.getTile(tox, toy)
 
-        if fromTile.getVisibleTiles() is None:
-            visibleTiles = self.getVisibleTilesFromTile(fromTile)
+#         if fromTile.getVisibleTiles() is None:
+        visibleTiles = self.getVisibleTilesFromTile(fromTile)
         
-        else:
-            visibleTiles = fromTile.getVisibleTiles()
+#         else:
+#             visibleTiles = fromTile.getVisibleTiles()
         
         return toTile in visibleTiles
     
@@ -388,6 +399,19 @@ class Level(Base):
 #        print "Creature added to tile", tile.getXY()
         x, y = tile.getXY()
         if self.astar: self.astar.setMovable(x, y, False)
+        
+    def handleDoorOpen(self, tile):
+        x, y = tile.getXY()
+        G.message("Door opened " + str(x) + ", " + str(y))
+        if self.astar: self.astar.setMovable(x, y, True)
+        self.computeFOVProperties(force = True)
+    
+    def handleDoorClose(self, tile):
+        x, y = tile.getXY()
+        G.message("Door closed " + str(x) + ", " + str(y))
+        if self.astar: self.astar.setMovable(x, y, False)
+        self.computeFOVProperties(force = True)
+    
     
     def getPathToTile(self, fromTile, toTile):
         
@@ -486,7 +510,6 @@ class Level(Base):
     
     def placeOnUpStair(self, creature):
         stairTiles = self.getUpStairs()
-        print stairTiles
         if stairTiles:
             self.placeCreature(creature, stairTiles[0])
             return True
