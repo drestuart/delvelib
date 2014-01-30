@@ -578,8 +578,7 @@ class DungeonLevel(Level):
         super(DungeonLevel, self).__init__(**kwargs)
     
     def buildLevel(self):
-        
-        
+
         d = dungeon_builder.dungeon(self.width, self.height, C.MAX_ROOMS_AND_CORRIDORS, C.ROOM_CHANCE, self)
         d.addTiles(self)
         

@@ -37,9 +37,11 @@ class Player(Cr.Creature):
             
             return True
         
-        else:
+        elif newTile is not None:
 #             return False
             return newTile.bump(self)
+        else:
+            return False
     
     def the(self):
         return self.getName()

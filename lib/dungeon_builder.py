@@ -96,7 +96,9 @@ class dungeon:
                 elif feature > room_chance:
                     if self._make_corridor(newx+xmod, newy+ymod, 6, direction):
                         current_features += 1
-                        self._tiles[newx][newy].set_shape('+')
+#                         self._tiles[newx][newy].set_shape('+') # Problems here?
+                        self._tiles[newx][newy].set_shape('.')
+
  
     # this makes a corridor at x,y in a direction
     def _make_corridor(self, x, y, length, direction):
@@ -240,7 +242,7 @@ class dungeon:
                 elif shape == '':
                     newTile = self.level.defaultTunnelWallType(x, y)
                     
-                elif shape == '+':
+                elif shape in ('+', '_'):
                     newTile = self.level.defaultFloorType(x, y)
                     door = F.Door(tile = newTile)
                     newTile.setFeature(door)
@@ -251,3 +253,5 @@ class dungeon:
         
                 self.level.tiles.append(newTile)
                 self.level.hasTile[x][y] = True
+                
+
