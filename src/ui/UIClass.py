@@ -476,7 +476,7 @@ class UI(object):
                 doors.append(feat)
         
         if len(doors) == 0:
-            G.message("You don't see any doors nearby")
+            G.message("You don't see any closed doors nearby")
             return False
         
         elif len(doors) == 1:
@@ -499,14 +499,49 @@ class UI(object):
                         d.open_()
                         G.message("You open the door")
                         return True
-                G.message("You don't see a door there")
+                G.message("You don't see a closed door there")
                 return False
             else:
                 return False
     
     
     def closeAdjacentDoor(self, player):
-        pass
+        adjTiles = self.getCurrentLevel().getAdjacentTiles(player.getTile())
+        doors = []
+        
+        for tile in adjTiles:
+            feat = tile.getFeature()
+            if feat and isinstance(feat, Door) and feat.isOpen():
+                doors.append(feat)
+        
+        if len(doors) == 0:
+            G.message("You don't see any open doors nearby")
+            return False
+        
+        elif len(doors) == 1:
+            door = doors[0]
+            door.close()
+            G.message("You close the door")
+            return True
+        
+        else:
+            G.message("In which direction?")
+            key, keyStr = keys.waitForInput()
+            direc = keys.getMovementDirection(key, keyStr)
+            
+            if direc:
+                playerx, playery = player.getXY()
+                doorx, doory = playerx + direc[0], playery + direc[1]
+                
+                for d in doors:
+                    if d.getTile().getXY() == (doorx, doory):
+                        d.close()
+                        G.message("You close the door")
+                        return True
+                G.message("You don't see an open door there")
+                return False
+            else:
+                return False
     
     
     
