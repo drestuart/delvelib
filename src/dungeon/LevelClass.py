@@ -271,17 +271,28 @@ class Level(Base):
         for x in range(x1, x2):
             tile1 = self.getTile(x, y1)
             tile2 = self.getTile(x, y2)
-            tiles.append(tile1)
-            tiles.append(tile2)
+            if tile1: tiles.append(tile1)
+            if tile2: tiles.append(tile2)
         
         for y in range(y1 + 1, y2 - 1):
             tile1 = self.getTile(x1, y)
             tile2 = self.getTile(x2, y)
-            tiles.append(tile1)
-            tiles.append(tile2)
+            if tile1: tiles.append(tile1)
+            if tile2: tiles.append(tile2)
         
-        assert len(tiles) == 4*radius - 4
+#         assert len(tiles) == 4*radius - 4
         
+        return tiles
+    
+    def getAdjacentTiles(self, fromTile):
+#         return self.getTilesAtRadius(1, fromTile.getX(), fromTile.getY())
+        tiles = []
+        x, y = fromTile.getXY()
+        for i in (-1, 0, 1):
+            for j in (-1, 0, 1):
+                if not (i == 0 and j == 0):
+                    tile = self.getTile(x + i, y + j)
+                    if tile: tiles.append(tile)
         return tiles
     
     def computeFOVProperties(self, force = False):

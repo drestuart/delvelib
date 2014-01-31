@@ -59,4 +59,3 @@ def getMovementDirection(key, keyStr):
         return movementKeys[key]
     else:
         return None
-        return None

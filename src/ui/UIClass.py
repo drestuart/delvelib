@@ -14,7 +14,7 @@ from pygame.locals import *
 import sys
 from PanelClass import *
 import textwrap
-from DungeonFeatureClass import downStair, upStair, Stair
+from DungeonFeatureClass import downStair, upStair, Stair, Door
 import database as db
 import LevelClass
 
@@ -60,8 +60,7 @@ class UI(object):
         
         self.drawLevel()
         
-        self.window.update()
-        self.window.blittowindow()
+        self.drawWindow()
         
         pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
         
@@ -117,11 +116,11 @@ class UI(object):
                     self.drawLevel()
                 
                 # Draw everything
-                self.window.update()
-                self.window.blittowindow()
-                
-                
-            
+                self.drawWindow()
+    
+    def drawWindow(self):
+        self.window.update()
+        self.window.blittowindow()
     
     def singleChoiceMenu(self, title, options, width = C.MENU_WIDTH):
         
@@ -151,9 +150,7 @@ class UI(object):
         for line in box.text.split("\n"):
             print "| " + line + " |"
         box.update()
-        self.window.update()
-        self.window.blittowindow()
-        
+        self.drawWindow()        
     
     def showPlayerInventory(self):
         title = C.PLAYER_INVENTORY_HEADER
@@ -348,6 +345,16 @@ class UI(object):
                         
                         return 'took-turn'
                 
+            elif keyStr == 'c': # Close a door
+                if self.closeAdjacentDoor(self.player):
+                    return 'took-turn'
+                return 'didnt-take-turn'
+            
+            elif keyStr == 'o': # Open a door 
+                if self.openAdjacentDoor(self.player):
+                    return 'took-turn'
+                return 'didnt-take-turn'   
+            
             elif keyStr == 'W':  # Wear something
                 self.wearMenu()                
                 return 'didnt-take-turn'
@@ -381,6 +388,8 @@ class UI(object):
     
     def message(self, newMsg):
         self.messagePanel.addMessage(newMsg)
+        self.messagePanel.displayMessages()
+        self.drawWindow()
         
     def getCurrentLevel(self):
         return self.currentLevel
@@ -457,7 +466,50 @@ class UI(object):
         return False
     
     
+    def openAdjacentDoor(self, player):
+        adjTiles = self.getCurrentLevel().getAdjacentTiles(player.getTile())
+        doors = []
         
+        for tile in adjTiles:
+            feat = tile.getFeature()
+            if feat and isinstance(feat, Door) and feat.isClosed():
+                doors.append(feat)
+        
+        if len(doors) == 0:
+            G.message("You don't see any doors nearby")
+            return False
+        
+        elif len(doors) == 1:
+            door = doors[0]
+            door.open_()
+            G.message("You open the door")
+            return True
+        
+        else:
+            G.message("In which direction?")
+            key, keyStr = keys.waitForInput()
+            direc = keys.getMovementDirection(key, keyStr)
+            
+            if direc:
+                playerx, playery = player.getXY()
+                doorx, doory = playerx + direc[0], playery + direc[1]
+                
+                for d in doors:
+                    if d.getTile().getXY() == (doorx, doory):
+                        d.open_()
+                        G.message("You open the door")
+                        return True
+                G.message("You don't see a door there")
+                return False
+            else:
+                return False
+    
+    
+    def closeAdjacentDoor(self, player):
+        pass
+    
+    
+    
     
     
     
