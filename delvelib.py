@@ -13,7 +13,7 @@ def main():
     y = 50
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)
     
-    print '-=delveRL=-'
+    print '-=delvelib=-'
     
     game = G.Game(debug = False)
     game.play()

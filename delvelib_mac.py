@@ -23,7 +23,7 @@ def main():
     os.environ['SDL_VIDEODRIVER'] = 'x11'
 # x11, dga, fbcon, directfb, ggi, vgl, svgalib, aalib    
 
-    print '-=delveRL=-'
+    print '-=delvelib=-'
     
     game = G.Game(fontsize = fontsize, debug = False)
     
