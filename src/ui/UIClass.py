@@ -319,7 +319,16 @@ class UI(object):
             # Move
             if direc:
                 dx, dy = direc
+                
+                # Move camera
+                if (KMOD_CTRL & key_mods):
+                    self.mapPanel.moveCamera(dx, dy)
+                    return 'didnt-take-turn'
+                    
+                # Move player
                 if self.player.move(dx, dy):
+                    # Reset map camera
+                    self.mapPanel.resetCameraOffset()
                     return 'took-turn'
  
             elif keyStr == '.': # Wait
