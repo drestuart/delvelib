@@ -49,8 +49,12 @@ class withBackgroundColor(withColor):
 # Common colors
 black = (0,0,0)
 white = (255,255,255)
+grey = (128,128,128)
+lightGrey = (192,192,192)
+lighterGrey = (211,211,211)
 
 blue = (0,0,255)
+lightSkyBlue = (135,206,250)
 lightBlue = (173,216,230)
 darkBlue = (0,0,139)
 
@@ -60,8 +64,15 @@ darkRed = (139,0,0)
 darkMagenta = (139,0,139)
 
 green = (0,255,0)
+darkerGreen = (0,100,0)
 
 goldenrod = (218,165,32)
+gold = (255,215,0)
+brown = (165,42,42)
+darkBrown = (139,69,19)
+sienna = (160,82,45)
+
+# UI Colors
 
 blankBackground = black
 
@@ -84,14 +95,14 @@ colorLightWall = (130, 110, 50)
 colorDarkGround = (50, 50, 150)
 colorLightGround = (200, 180, 50)
 
-colorSienna = colorWood = (160,82,45)
-colorRock = colorLightGrey = (192,192,192)
-colorStone = colorLighterGrey = (211,211,211)
-colorGrass = colorDarkerGreen = (0,100,0)
+colorWood = sienna 
+colorRock = darkBrown
+colorStone = lighterGrey
+colorGrass = darkerGreen
 
-colorNotInFOV = colorGrey = (128,128,128)
+colorNotInFOV = grey
 
-colorSteel = colorLightSkyBlue = (135,206,250)
-colorGold = (255,215,0)
-colorMeat = colorBrown = (165,42,42)
-colorLeather = colorDarkBrown = (139,69,19)
+colorSteel = lightSkyBlue
+colorGold = gold
+colorMeat = brown
+colorLeather = darkBrown
