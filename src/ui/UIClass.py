@@ -16,7 +16,6 @@ from PanelClass import *
 import textwrap
 from DungeonFeatureClass import downStair, upStair, Stair, Door
 import database as db
-import LevelClass
 
 # TODO Abstract out all pygcurse calls into an interface class
 

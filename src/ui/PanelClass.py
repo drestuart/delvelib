@@ -7,7 +7,6 @@ Created on Jan 18, 2014
 import Const as C
 import colors
 import keys
-import pygame
 from pygame.locals import *
 import re
 import textwrap

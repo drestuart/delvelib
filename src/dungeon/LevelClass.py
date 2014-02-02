@@ -524,9 +524,6 @@ class Level(Base):
     def placeDownStair(self):
         raise NotImplementedError("placeDownStair() not implemented, use a subclass")
     
-    def placeStairs(self):
-        raise NotImplementedError("placeStairs() not implemented, use a subclass")
-    
     def findUpStairs(self):
         self.upStairs = []
         for tile in self.tiles:
@@ -607,9 +604,9 @@ class DungeonLevel(Level):
     __mapper_args__ = {'polymorphic_identity': 'dungeon level'}
 
     defaultFloorType = T.StoneFloor
-    defaultWallType = T.RockWall
-    defaultTunnelFloorType = T.RockTunnel
-    defaultTunnelWallType = T.RockWall
+    defaultWallType = T.StoneWall
+    defaultTunnelFloorType = T.StoneFloor
+    defaultTunnelWallType = T.StoneWall
     
     def __init__(self, **kwargs):
         super(DungeonLevel, self).__init__(**kwargs)
@@ -621,10 +618,6 @@ class DungeonLevel(Level):
         
         print "Building tile array"    
         self.buildTileArray()    
-        
-        # Place Stairs
-#         print "Placing stairs"
-#         self.placeStairs()
         
         # Place items
         print "Placing items"
@@ -688,43 +681,12 @@ class DungeonLevel(Level):
             
         return downTile
     
-    def placeStairs(self):
-        raise Exception("Level.placeStairs is deprecated")
-        while True:
-            # Choose rooms
-            upRoom = random.choice(self.rooms)
-            
-            while True:
-                downRoom = random.choice(self.rooms)
-                if len(self.rooms) == 1 or downRoom is not upRoom:
-                    break
-            
-            # Place stairs
-            
-            upTile = self.getRandomOpenTileInRoom(upRoom)
-            downTile = self.getRandomOpenTileInRoom(downRoom)
-            
-            if upTile and downTile and not (upTile.getFeature() or downTile.getFeature()):
-            
-                upStair = F.upStair()
-                upTile.setFeature(upStair)
-                self.upStairs.append(upTile)
-                
-                # Set destination
-            
-                downStair = F.downStair()
-                downTile.setFeature(downStair)
-                self.downStairs.append(downTile)
-                
-                # Set destination
-                
-                break
-            
-    def placeCreatureAtRandom(self, creature):
+    def placeCreatureAtRandom(self, creature, inRoom = True):
         # Place in a room
         while True:
             room = random.choice(self.rooms)
-            tile = self.getRandomOpenTileInRoom(room)
+            if inRoom: tile = self.getRandomOpenTileInRoom(room)
+            else: tile = self.getRandomOpenTile()
             if tile:
                 self.placeCreature(creature, tile)
                 break
@@ -764,10 +726,6 @@ class CaveLevel(Level):
         
         print "Building tile array"    
         self.buildTileArray()    
-        
-#         # Place Stairs
-#         print "Placing stairs"
-#         self.placeStairs()
         
         # Place items
         print "Placing items"
@@ -827,26 +785,24 @@ class CaveLevel(Level):
             
         return downTile
 
-    def placeStairs(self):
-        raise Exception("Level.placeStairs is deprecated")
-        while True:
-            upTile = self.getRandomOpenTile()
-            downTile = self.getRandomOpenTile()
-            
-            if upTile and downTile and not (upTile.getFeature() or downTile.getFeature()):
-            
-                upStair = F.upStair()
-                upTile.setFeature(upStair)
-                self.upStairs.append(upTile)
-                
-                downStair = F.downStair()
-                downTile.setFeature(downStair)
-                self.downStairs.append(downTile)
-                
-                # TODO Set destinations
-                
-                break
-
     def placeCreatureAtRandom(self, creature):
         tile = self.getRandomOpenTile()
         self.placeCreature(creature, tile)
+
+class TownLevel(DungeonLevel):
+    
+    __mapper_args__ = {'polymorphic_identity': 'town level'}
+    
+    def __init__(self, **kwargs):
+        super(TownLevel, self).__init__(**kwargs)
+        
+    
+    def buildLevel(self):
+        self.width
+        self.height
+    
+    
+
+
+
+
