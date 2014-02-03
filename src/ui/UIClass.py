@@ -362,23 +362,11 @@ class UI(object):
             elif keyStr == 'w':  # Wield something
                 self.wieldMenu()                
                 return 'didnt-take-turn'
-            
-            elif keyStr == 'q':  # Quaff something
-                self.quaffMenu()                
-                return 'didnt-take-turn'
-            
-            elif keyStr == 'r':  # Read something
-                self.readMenu()                
-                return 'didnt-take-turn'
-            
+                        
             elif keyStr == 'e':  # Eat something
                 self.eatMenu()                
                 return 'didnt-take-turn'
-            
-            elif keyStr == 'z':  # Zap something
-                self.zapMenu()                
-                return 'didnt-take-turn'
-                
+                            
             elif keyStr == 'i':
                 self.showPlayerInventory()
                 return 'didnt-take-turn'
