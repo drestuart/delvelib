@@ -365,6 +365,13 @@ class RockWall(Wall):
         super(RockWall, self).__init__(x, y, baseDescription = "A rock wall", color = colors.colorRock, **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'rockwall'}
+    
+class StoneWall(Wall):
+    
+    def __init__(self, x, y, **kwargs):
+        super(StoneWall, self).__init__(x, y, baseDescription = "A stone wall", color = colors.colorStone, **kwargs)
+    
+    __mapper_args__ = {'polymorphic_identity': 'stonewall'}
 
 
 class Floor(Tile):
@@ -403,6 +410,7 @@ class RockTunnel(Floor):
         super(RockTunnel, self).__init__(x, y, baseDescription = "A rocky tunnel", color = colors.colorRock, **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'rocktunnel'}
+    
         
 
             

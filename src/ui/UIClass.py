@@ -16,14 +16,14 @@ from PanelClass import *
 import textwrap
 from DungeonFeatureClass import downStair, upStair, Stair, Door
 import database as db
-import LevelClass
 
 # TODO Abstract out all pygcurse calls into an interface class
 
 class UI(object):
 
     def __init__(self, **kwargs):
-        self.setCurrentLevel(kwargs.get('level', None))
+#        self.setCurrentLevel(kwargs.get('level', None))
+        self.currentLevel = kwargs.get('level', None)
         self.player = kwargs.get('player', None)
         self.fullscreen = kwargs.get('fullscreen', False)
         self.font = kwargs.get('font', None)
@@ -42,7 +42,7 @@ class UI(object):
         self.window.autodisplayupdate = False
         
         # Set up UI panels
-        self.mapPanel = Panel(C.MAP_PANEL_DIMS, self.window)
+        self.mapPanel = MapPanel(self.currentLevel, C.MAP_PANEL_DIMS, self.window)
         self.messagePanel = MessagePanel(C.MESSAGE_PANEL_DIMS, self.window)
         self.charPanel = CharacterPanel(C.CHAR_PANEL_DIMS, self.window)
 
@@ -56,10 +56,10 @@ class UI(object):
         self.charPanel.draw(self.player.getX(), self.player.getY())
         self.messagePanel.displayMessages()
         
+        self.currentLevel.setupEventListeners()
+        
         self.currentLevel.computeFOV(self.player.getX(), self.player.getY())
-        
         self.drawLevel()
-        
         self.drawWindow()
         
         pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
@@ -318,7 +318,16 @@ class UI(object):
             # Move
             if direc:
                 dx, dy = direc
+                
+                # Move camera
+                if (KMOD_CTRL & key_mods):
+                    self.mapPanel.moveCamera(dx, dy)
+                    return 'didnt-take-turn'
+                    
+                # Move player
                 if self.player.move(dx, dy):
+                    # Reset map camera
+                    self.mapPanel.resetCameraOffset()
                     return 'took-turn'
  
             elif keyStr == '.': # Wait
@@ -384,6 +393,7 @@ class UI(object):
     
     def setCurrentLevel(self, lvl):
         self.currentLevel = lvl
+        self.mapPanel.setLevel(lvl)
         lvl.load()
         
     def clearScreen(self):
@@ -395,11 +405,7 @@ class UI(object):
         # Get all tiles to draw from level class
         # TODO implement windowing for larger maps
         playerx, playery = self.player.getX(), self.player.getY()
-        tilesToDraw = self.currentLevel.getTilesToDraw(playerx, playery)
-        
-        for (x, y, symbol, color, background) in tilesToDraw:
-#            print '.'
-            self.mapPanel.putChar(symbol, x, y, color, background)
+        self.mapPanel.drawLevel(playerx, playery)
         
     def getTileDescUnderMouse(self):
     

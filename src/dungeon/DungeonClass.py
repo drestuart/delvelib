@@ -43,8 +43,15 @@ class Dungeon(Base):
     
     levelChances = {L.DungeonLevel : 7,
                     L.CaveLevel : 3}
-    defaultWidth = C.MAP_WIDTH
-    defaultHeight = C.MAP_HEIGHT
+    
+#    defaultWidth = C.MAP_WIDTH     # 75
+#    defaultHeight = C.MAP_HEIGHT   # 45
+    
+#    defaultWidth = 40
+#    defaultHeight = 30
+    
+    defaultWidth = 100
+    defaultHeight = 80
     
     def getLevels(self):
         return self.levels
@@ -60,7 +67,7 @@ class Dungeon(Base):
             
             
             newLevel = newLevelClass(name = newName, depth = newDepth, width = self.defaultWidth,
-                                     height = self.defaultHeight) # Do something more interesting with the widths here
+                                     height = self.defaultHeight) # Do something more interesting with the dimensions999 here
             
             newLevel.buildLevel()
             

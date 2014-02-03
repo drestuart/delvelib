@@ -7,7 +7,6 @@ Created on Jan 18, 2014
 import Const as C
 import colors
 import keys
-import pygame
 from pygame.locals import *
 import re
 import textwrap
@@ -15,7 +14,7 @@ import textwrap
 fgdefault = colors.colorMessagePanelFG
 bgdefault = colors.colorMessagePanelBG
 
-__all__ = ["Panel", "MessagePanel", "CharacterPanel", "MenuPanel"]
+__all__ = ["MessagePanel", "CharacterPanel", "MenuPanel", "MapPanel"]
 
 class Panel(object):
     def __init__(self, dims, window, margin = 0):
@@ -223,7 +222,86 @@ class CharacterPanel(Panel):
         textx = barx + (totalWidth - len(text)) / 2
         
         self.putChars(text, textx, bary)
+
+
+class MapPanel(Panel):
+    def __init__(self, level, *args):
+        super(MapPanel, self).__init__(*args)
+        self.level = level
+        self.camx = 0
+        self.camy = 0
+        
+        self.xoffset = 0
+        self.yoffset = 0
+        
+    def setLevel(self, lvl):
+        self.level = lvl
+        
+    def getLevel(self):
+        return self.level
     
+    def moveCamera(self, dx, dy):
+        self.xoffset += dx
+        self.yoffset += dy
+        
+#        print self.camx + self.xoffset, self.camy + self.yoffset
+        
+    def resetCameraOffset(self):
+        self.xoffset = 0
+        self.yoffset = 0
+    
+    def cameraDims(self):
+        return self.camx, self.camy, self.width, self.height
+    
+    def positionCamera(self, playerx, playery):
+        
+        lwidth = self.level.getWidth()
+        lheight = self.level.getHeight()
+        
+        lcenterx = int(lwidth/2)
+        lcentery = int(lheight/2)
+        
+        xmin = 0
+        ymin = 0
+        
+        xmax = lwidth - self.width
+        ymax = lheight - self.height 
+                
+        # If the level is smaller than the map panel, just center the whole thing
+        if lwidth <= self.width:
+            self.camx = lcenterx - int(self.width/2)
+        
+        # Otherwise center on the player's position
+        else:
+            self.camx = playerx - int(self.width/2)
+            self.camx = min(xmax, max(xmin, self.camx))
+            
+            # Add offset
+            self.camx += self.xoffset
+            self.camx = min(xmax, max(xmin, self.camx))
+        
+        
+        # Do it again for the y coordinate
+        if lheight <= self.height:
+            self.camy = lcentery - int(self.height/2)
+        else:
+            self.camy = playery - int(self.height/2) 
+            self.camy = min(ymax, max(ymin, self.camy))
+            self.camy += self.yoffset
+            self.camy = min(ymax, max(ymin, self.camy))
+            
+    
+    def drawLevel(self, playerx, playery):
+        
+        # Set camera position
+        self.positionCamera(playerx, playery)
+        
+        # Get tiles
+        tilesToDraw = self.level.getTilesToDraw(playerx, playery, self.cameraDims())
+        
+        for (x, y, symbol, color, background) in tilesToDraw:
+            self.putChar(symbol, x - self.camx, y - self.camy, color, background)
+        
         
 class MenuPanel(Panel):
     def __init__(self, *args, **kwargs):
@@ -368,6 +446,7 @@ class MenuPanel(Panel):
         
         self.window.update()
         self.window.blittowindow()
+        
         
 def main():
     
