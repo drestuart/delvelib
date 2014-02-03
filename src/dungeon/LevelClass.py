@@ -23,6 +23,7 @@ import Util as U
 import ca_cave
 import colors
 import database as db
+import town_builder
 import dungeon_builder
 
 Base = db.saveDB.getDeclarativeBase()
@@ -42,7 +43,7 @@ class Level(Base):
         self.width = kwargs.get('width')
         self.height = kwargs.get('height')
         
-        if not self.width or not self.height:
+        if self.width is None or self.height is None:
             raise ValueError("Level class constructor requires width and height values")
         
         self.tiles = []
@@ -684,8 +685,9 @@ class DungeonLevel(Level):
     def placeCreatureAtRandom(self, creature, inRoom = True):
         # Place in a room
         while True:
-            room = random.choice(self.rooms)
-            if inRoom: tile = self.getRandomOpenTileInRoom(room)
+            if inRoom: 
+                room = random.choice(self.rooms)
+                tile = self.getRandomOpenTileInRoom(room)
             else: tile = self.getRandomOpenTile()
             if tile:
                 self.placeCreature(creature, tile)
@@ -796,13 +798,39 @@ class TownLevel(DungeonLevel):
     def __init__(self, **kwargs):
         super(TownLevel, self).__init__(**kwargs)
         
+    buildingWallTile = T.WoodWall
+    buildingFloorTile = T.WoodFloor
+    outsideFloorTile = T.GrassFloor
+    roadTile = T.RoadFloor
     
     def buildLevel(self):
-        self.width
-        self.height
-    
-    
+        t = town_builder.town(self.width, self.height, self)
+        t.addTiles(self)
 
+        print "Building tile array"    
+        self.buildTileArray()    
+        
+        # Place items
+        print "Placing items"
+        self.placeItems()
+        
+        print "Saving open tiles"
+        db.saveDB.save(self)
+        
+        print "Setting up FOV"
+        self.computeFOVProperties()
+        
+        print "Setting up pathing"
+        self.setupPathing()
+        
+        print "Finding the stairs"
+        self.findUpStairs()
+        self.findDownStairs()
 
+    def placeCreatureAtRandom(self, creature):
+        # Very random
+        # TODO: make more random
+        tile = self.getTile(1, 1)
+        self.placeCreature(creature, tile)
 
 

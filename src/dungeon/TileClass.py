@@ -411,7 +411,13 @@ class RockTunnel(Floor):
     
     __mapper_args__ = {'polymorphic_identity': 'rocktunnel'}
     
+class RoadFloor(Floor):
+    
+    def __init__(self, x, y, **kwargs):
+        super(RoadFloor, self).__init__(x, y, baseDescription = "A dirt road", color = colors.brown, **kwargs)
+        self.baseSymbol = '~'
         
+    __mapper_args__ = {'polymorphic_identity': 'roadfloor'}
 
             
 def main():

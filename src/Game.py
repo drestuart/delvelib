@@ -46,23 +46,18 @@ class Game(object):
         print seed
         random.seed(seed)
         
-        d = D.Dungeon(name = "The Dungeons of Dread", startingDepth = 1)
-        d.generateLevels(4)
+#         d = D.Dungeon(name = "The Dungeons of Dread", startingDepth = 1)
+#         d.generateLevels(4)
+#         
+#         d1 = d.getLevels()[1]
+
+        d1 = L.TownLevel(name = "Danville", width = C.TOWN_LEVEL_WIDTH, height = C.TOWN_LEVEL_HEIGHT)
+        d1.buildLevel()
         
-        d1 = d.getLevels()[1]
-        
-#         d1 = L.DungeonLevel(name = "Test Dungeon", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 1)
-# 
-#         d2 = L.CaveLevel(name = "Test Cave", width = C.MAP_WIDTH, height = C.MAP_HEIGHT, depth = 2)
-#         
-#         d1.buildLevel()
-#         d2.buildLevel()
-#         
-#         L.connectLevels(d1, d2)
-#         d1.placeUpStair()
-#         
         player = P.Player()
-        d1.placeOnUpStair(player)
+        d1.placeCreatureAtRandom(player)
+#         d1.placeOnUpStair(player)
+
 #         
 #         orc1 = Cr.Orc()
 #         d1.placeCreatureAtRandom(orc1)
@@ -71,10 +66,6 @@ class Game(object):
 #         d1.placeCreatureAtRandom(orc2)
 #         
 #         db.saveDB.save(d1)
-#         db.saveDB.save(d2)
-        
-#         d1.setNextLevel(d2)
-#         d2.setPreviousLevel(d1)
         
         
         

@@ -97,13 +97,8 @@ class Room(Rect, Base):
 
     def __init__(self, **kwargs):
         super(Room, self).__init__(kwargs['x'], kwargs['y'], kwargs['width'], kwargs['height'])
-#        self.level = kwargs.get('level', None)
-        
-#        self.defaultFloorType = kwargs.get('defaultFloorType', None)
-#        self.defaultWallType = kwargs.get('defaultWallType', None)
         
         self.getCenter()
-        
         self.tiles = []
     
     id = Column(Integer, primary_key=True)
