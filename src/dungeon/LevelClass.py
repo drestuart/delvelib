@@ -796,7 +796,11 @@ class TownLevel(DungeonLevel):
     __mapper_args__ = {'polymorphic_identity': 'town level'}
     
     def __init__(self, **kwargs):
-        super(TownLevel, self).__init__(**kwargs)
+        super(TownLevel, self).__init__(width = kwargs['cellsWide'] * C.TOWN_CELL_WIDTH, 
+                                        height = kwargs['cellsHigh'] * C.TOWN_CELL_HEIGHT, 
+                                        **kwargs)
+        self.cellsWide = max(1, kwargs['cellsWide'])
+        self.cellsHigh = max(1, kwargs['cellsHigh'])
         
     buildingWallTile = T.WoodWall
     buildingFloorTile = T.WoodFloor
@@ -804,7 +808,7 @@ class TownLevel(DungeonLevel):
     roadTile = T.RoadFloor
     
     def buildLevel(self):
-        t = town_builder.town(self.width, self.height, self)
+        t = town_builder.town(self.cellsWide, self.cellsHigh, self)
         t.addTiles(self)
 
         print "Building tile array"    

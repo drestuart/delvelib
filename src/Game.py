@@ -51,7 +51,7 @@ class Game(object):
 #         
 #         d1 = d.getLevels()[1]
 
-        d1 = L.TownLevel(name = "Danville", width = C.TOWN_LEVEL_WIDTH, height = C.TOWN_LEVEL_HEIGHT)
+        d1 = L.TownLevel(name = "Danville", cellsWide = 2, cellsHigh = 2)
         d1.buildLevel()
         
         player = P.Player()

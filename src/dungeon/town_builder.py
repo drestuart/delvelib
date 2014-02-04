@@ -3,6 +3,14 @@ import random
 import RoomClass as R
 import DungeonFeatureClass as F
 
+# Some constants
+room_width = 7
+room_height = 7
+road_width = 5
+room_road_margin = 1
+room_room_margin = 1
+bldgs_in_row = 4
+
 # This is just the basic dungeon tile. It holds a shape.
 class dungeon_tile:
     _shape = ''
@@ -15,55 +23,86 @@ class dungeon_tile:
  
     def set_shape(self, shape):
         self._shape = shape
+        
+class town_cell(object):
+    cell_width = C.TOWN_CELL_WIDTH
+    cell_height = C.TOWN_CELL_HEIGHT
+    
+    def __init__(self, town, cellx, celly, celltype):
+        self.town = town
+        self.cellx, self.celly = cellx, celly
+        self.celltype = celltype
+        
+        self.xoffset = self.cellx*self.cell_width
+        self.yoffset = self.celly*self.cell_height
+        
+        self.roady = (self.cell_height - road_width)/2 + self.yoffset
+    
+    def buildSpecialBuildings(self):
+        pass
+        
+    def buildRoads(self):
+        # Lay road
+        if self.celltype == 'horz_road':
+            self.town.makeHorzRoad(self.roady, road_width)
+    
+    def buildBuildings(self):
+        if self.celltype == 'horz_road':
+            bldgx = 4 + self.xoffset
+            bldgy = self.roady - room_road_margin - room_height
+            
+            # Lay first row of buildings
+            for i in range(bldgs_in_row):
+                self.town.makeBldg(bldgx, bldgy, room_width, room_height, 'south')
+                bldgx += room_width + room_room_margin
+     
+            # Lay second row of buildings
+            bldgx = 4 + self.xoffset
+            bldgy += room_width + road_width + room_road_margin*2
+            for i in range(bldgs_in_row):
+                self.town.makeBldg(bldgx, bldgy, room_width, room_height, 'north')
+                bldgx += room_width + room_room_margin
+    
+    
+        
  
 # Our randomly generated dungeon
 class town:
     _map_size = (0, 0)
     _tiles = []
  
-    def __init__(self, map_size_x, map_size_y, level):
+    def __init__(self, cellsWide, cellsHigh, level):
         
         self.level = level
         self.rooms = []
-        
-        # Some constants
-        room_width = 7
-        room_height = 5
-        road_width = 3
-        room_road_margin = 1
-        room_room_margin = 1
  
-        # set the map size
-        self._map_size = (map_size_x, map_size_y)
+        self.cellsWide = cellsWide
+        self.cellsHigh = cellsHigh
+        
+        self._map_size = (self.cellsWide*C.TOWN_CELL_WIDTH, self.cellsHigh*C.TOWN_CELL_HEIGHT)
+        
+        print "Town size: ", self._map_size
  
         # fill the map with blank tiles
         for x in range (0, self._map_size[0]):
             self._tiles.append([])
             for dummyy in range (0,  self._map_size[1]):
                 self._tiles[x].append(dungeon_tile(''))
-                
-        bldgx = 2
-        bldgy = 2
         
-        # Lay first row of buildings
-        for i in range(5):
-            self.makeRoom(bldgx, bldgy, room_width, room_height, 'south')
-            bldgx += room_width + room_room_margin
- 
-        # Lay road
-        bldgy += room_height + room_road_margin
-        self.makeHorzRoad(bldgy, road_width)
+        cells = []
         
-        # Lay second row of buildings
-        bldgx = 2
-        bldgy += road_width + room_road_margin
-        for i in range(5):
-            self.makeRoom(bldgx, bldgy, room_width, room_height, 'north')
-            bldgx += room_width + room_room_margin
+        for i in range(self.cellsWide):
+            for j in range(cellsHigh):
+                cell = town_cell(self, i, j, 'horz_road')
+                cells.append(cell)
 
+        for cell in cells:
+            cell.buildRoads()
+        
+        for cell in cells:
+            cell.buildBuildings()
  
- 
-    def makeRoom(self, x, y, width, height, door_side):
+    def makeBldg(self, x, y, width, height, door_side):
 #         rand_width = random.randint(4, width)
 #         rand_height = random.randint(4, height)
         room_width = width
@@ -111,6 +150,7 @@ class town:
         
         if not doorx and not doory: return False
         
+        print x + doorx, y + doory
         self._tiles[x + doorx][y + doory].set_shape('+')
                 
         return True
