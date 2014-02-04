@@ -242,7 +242,7 @@ class dungeon:
                 elif shape == '':
                     newTile = self.level.defaultTunnelWallType(x, y)
                     
-                elif shape in ('+', '_'):
+                elif shape == '+':
                     newTile = self.level.defaultFloorType(x, y)
                     door = F.Door(tile = newTile)
                     newTile.setFeature(door)

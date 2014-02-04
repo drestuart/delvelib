@@ -189,16 +189,12 @@ class upStair(Stair):
     blockMove = False
     blockSight = False
     
-    def goUp(self, creature):
-        creature.setTile(self.getDestination())
-        creature.setLevel(self.getDestination().getLevel())
-        
-    def getBlockSight(self):
-        return self.blockSight
-
-
-    def getBlockMove(self):
-        return self.blockMove
+    def getDestination(self):
+        return self.destination
+    
+    def setDestination(self, dest):
+        self.destination = dest
+    
 
 class downStair(Stair):
     
@@ -211,15 +207,22 @@ class downStair(Stair):
     
     blockMove = False
     blockSight = False
+    
+    def getDestination(self):
+        return self.destination
+    
+    def setDestination(self, dest):
+        self.destination = dest
 
-    def goDown(self, creature):
-        creature.setTile(self.getDestination())
-        creature.setLevel(self.getDestination().getLevel())
 
-    def getBlockSight(self):
-        return self.blockSight
+class Altar(DungeonFeature):
+    
+    def __init__(self, **kwargs):
+        super(Altar, self).__init__(symbol = '_', description = 'an altar', color = colors.colorStone, backgroundColor = colors.black, **kwargs)
+        
+    blockMove = False
+    blockSight = False
+        
+    __mapper_args__ = {'polymorphic_identity': 'altar'}
 
-
-    def getBlockMove(self):
-        return self.blockMove
 

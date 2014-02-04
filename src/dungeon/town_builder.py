@@ -1,3 +1,5 @@
+
+import os.path
 import Const as C
 import random
 import RoomClass as R
@@ -40,8 +42,12 @@ class town_cell(object):
         self.roadx = (self.cell_width - road_width)/2 + self.xoffset   # For a N-S road
         self.roady = (self.cell_height - road_width)/2 + self.yoffset  # For an E-W road
     
-    def buildSpecialBuildings(self):
-        pass
+    def buildSpecialBuilding(self):
+        if self.celltype == 'temple':
+            bldgType = 'temple'
+            self.town.makeSpecialBuilding(bldgType, self)
+        else:
+            return
         
     def buildRoads(self):
         # Lay road
@@ -119,10 +125,14 @@ class town:
                 cell = town_cell(self, i, j, celltype)
                 cells.append(cell)
                 
+        # Pick one cell to build a special building
+        specialCell = random.choice(cells)
+        specialCell.celltype = 'temple'
+                
         random.shuffle(cells)
         
         for cell in cells:
-            cell.buildSpecialBuildings()
+            cell.buildSpecialBuilding()
 
         for cell in cells:
             cell.buildRoads()
@@ -197,7 +207,6 @@ class town:
                 self._tiles[j][i].set_shape('~')
         return True
     
-    # TODO
     def makeVertRoad(self, x, roadWidth):
         
         for j in range(x, x + roadWidth):
@@ -205,6 +214,25 @@ class town:
                 if self._tiles[j][i].get_shape() != '': continue
                 self._tiles[j][i].set_shape('~')
         return True
+
+    def makeSpecialBuilding(self, bldgType, cell):
+        templateFile = open(os.path.join("data", "templates", bldgType), 'r')
+        lines = templateFile.readlines()
+        templateFile.close()
+        
+        bldg_width = len(lines[0]) - 1
+        bldg_height = len(lines)
+        
+        bldgx = (cell.cell_width - bldg_width)/2 + cell.xoffset
+        bldgy = (cell.cell_height - bldg_height)/2 + cell.yoffset
+        
+        # Lay down building tiles
+        for x in range(bldg_width):
+            for y in range(bldg_height):
+                shape = lines[y][x]
+                if self._tiles[x + bldgx][y + bldgy].get_shape() != '': 
+                    raise Exception("Tile " + str(x + bldgx) + ", " + str(y + bldgy) + " is occupied: " + self._tiles[x + bldgx][y + bldgy].get_shape())
+                self._tiles[x + bldgx][y + bldgy].set_shape(shape)
 
     def addTiles(self, level):
         
@@ -225,11 +253,16 @@ class town:
                 elif shape == '~':
                     newTile = self.level.roadTile(x, y)
                     
-                elif shape in ('+', '_'):
+                elif shape == '+':
                     newTile = self.level.buildingFloorTile(x, y)
                     door = F.Door(tile = newTile)
                     newTile.setFeature(door)
-                    
+                
+                elif shape == '_':
+                    newTile = self.level.buildingFloorTile(x, y)
+                    altar = F.Altar(tile = newTile)
+                    newTile.setFeature(altar)
+                
                 else:
                     print "Bad tile type:'", shape, "'"
         
