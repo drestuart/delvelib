@@ -2,6 +2,7 @@ import Const as C
 import random
 import RoomClass as R
 import DungeonFeatureClass as F
+from randomChoice import weightedChoice
 
 # Some constants
 room_width = 7
@@ -36,7 +37,8 @@ class town_cell(object):
         self.xoffset = self.cellx*self.cell_width
         self.yoffset = self.celly*self.cell_height
         
-        self.roady = (self.cell_height - road_width)/2 + self.yoffset
+        self.roadx = (self.cell_width - road_width)/2 + self.xoffset   # For a N-S road
+        self.roady = (self.cell_height - road_width)/2 + self.yoffset  # For an E-W road
     
     def buildSpecialBuildings(self):
         pass
@@ -45,6 +47,10 @@ class town_cell(object):
         # Lay road
         if self.celltype == 'horz_road':
             self.town.makeHorzRoad(self.roady, road_width)
+        elif self.celltype == 'vert_road':
+            self.town.makeVertRoad(self.roadx, road_width)
+        else:
+            pass
     
     def buildBuildings(self):
         if self.celltype == 'horz_road':
@@ -58,12 +64,26 @@ class town_cell(object):
      
             # Lay second row of buildings
             bldgx = 4 + self.xoffset
-            bldgy += room_width + road_width + room_road_margin*2
+            bldgy += room_height + road_width + room_road_margin*2
             for i in range(bldgs_in_row):
                 self.town.makeBldg(bldgx, bldgy, room_width, room_height, 'north')
                 bldgx += room_width + room_room_margin
     
-    
+        elif self.celltype == 'vert_road':
+            bldgx = self.roadx - room_road_margin - room_width
+            bldgy = 4 + self.yoffset
+            
+            # First column
+            for i in range(bldgs_in_row):
+                self.town.makeBldg(bldgx, bldgy, room_width, room_height, 'east')
+                bldgy += room_height + room_room_margin
+            
+            # Second column
+            bldgx += room_width + road_width + room_road_margin*2
+            bldgy = 4 + self.yoffset
+            for i in range(bldgs_in_row):
+                self.town.makeBldg(bldgx, bldgy, room_width, room_height, 'west')
+                bldgy += room_height + room_room_margin
         
  
 # Our randomly generated dungeon
@@ -81,8 +101,6 @@ class town:
         
         self._map_size = (self.cellsWide*C.TOWN_CELL_WIDTH, self.cellsHigh*C.TOWN_CELL_HEIGHT)
         
-        print "Town size: ", self._map_size
- 
         # fill the map with blank tiles
         for x in range (0, self._map_size[0]):
             self._tiles.append([])
@@ -90,11 +108,21 @@ class town:
                 self._tiles[x].append(dungeon_tile(''))
         
         cells = []
+        cellTypeChance = {
+                          'horz_road' : 1,
+                          'vert_road' : 2
+                          }
         
         for i in range(self.cellsWide):
             for j in range(cellsHigh):
-                cell = town_cell(self, i, j, 'horz_road')
+                celltype = weightedChoice(cellTypeChance)
+                cell = town_cell(self, i, j, celltype)
                 cells.append(cell)
+                
+        random.shuffle(cells)
+        
+        for cell in cells:
+            cell.buildSpecialBuildings()
 
         for cell in cells:
             cell.buildRoads()
@@ -112,20 +140,27 @@ class town:
         room_width = min(room_width, self._map_size[0] - x - 1 - C.DUNGEON_MARGIN)
         room_height = min(room_height, self._map_size[1] - y - 1 - C.DUNGEON_MARGIN)
         
-        # Register this room object
+        # Check that we're not intersecting any other rooms or existing features
         newRoom = R.Room(x=x, y=y, width=room_width, height=room_height)
-        newRoom.setLevel(self.level)
         
         for room in self.rooms:
             if room.intersect(newRoom):
+                del newRoom
                 return False
         
-        # Lay down walls and floors
         for i in range(y, y + room_height):
             if i < 0 or i > self._map_size[1]-1: return False
             for j in range(x, x + room_width):
                 if j < 0 or j > self._map_size[0]-1: return False
                 if self._tiles[j][i].get_shape() != '': return False
+        
+        
+        # It's valid, so register this room object
+        newRoom.setLevel(self.level)
+        
+        # Lay down walls and floors
+        for i in range(y, y + room_height):
+            for j in range(x, x + room_width):
                 if (j == x or j == x + room_width - 1 or i == y or i == y + room_height - 1):
                     self._tiles[j][i].set_shape('#')
                 else:
@@ -150,7 +185,6 @@ class town:
         
         if not doorx and not doory: return False
         
-        print x + doorx, y + doory
         self._tiles[x + doorx][y + doory].set_shape('+')
                 
         return True
@@ -159,13 +193,18 @@ class town:
         
         for i in range(y, y + roadWidth):
             for j in range(self._map_size[0]):
-                if self._tiles[j][i].get_shape() != '': return False
+                if self._tiles[j][i].get_shape() != '': continue
                 self._tiles[j][i].set_shape('~')
         return True
     
     # TODO
     def makeVertRoad(self, x, roadWidth):
-        return False
+        
+        for j in range(x, x + roadWidth):
+            for i in range(self._map_size[1]):
+                if self._tiles[j][i].get_shape() != '': continue
+                self._tiles[j][i].set_shape('~')
+        return True
 
     def addTiles(self, level):
         
