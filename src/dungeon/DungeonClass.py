@@ -25,6 +25,7 @@ class Dungeon(Base):
     def __init__(self, **kwargs):
         self.name = kwargs.get('name', "")
         self.startingDepth = kwargs.get('startingDepth', 0)
+        self.withTown = kwargs.get("withTown", False)
         
         self.levels = []
     
@@ -60,14 +61,16 @@ class Dungeon(Base):
         
         # Build levels
         for i in range(numLevels):
-            newLevelClass = weightedChoice(self.levelChances)
-            
             newDepth = self.startingDepth + i
             newName = self.name + " " + str(i + 1)
             
-            
-            newLevel = newLevelClass(name = newName, depth = newDepth, width = self.defaultWidth,
-                                     height = self.defaultHeight) # Do something more interesting with the dimensions999 here
+            if self.withTown and newDepth == self.startingDepth:
+                newLevel = L.TownLevel(name = newName, depth = newDepth, cellsWide = 2, cellsHigh = 2)
+                
+            else:
+                newLevelClass = weightedChoice(self.levelChances)
+                newLevel = newLevelClass(name = newName, depth = newDepth, width = self.defaultWidth,
+                                         height = self.defaultHeight) # Do something more interesting with the dimensions999 here
             
             newLevel.buildLevel()
             
