@@ -217,10 +217,14 @@ class town:
 
     def makeSpecialBuilding(self, bldgType, cell):
         templateFile = open(os.path.join("data", "templates", bldgType), 'r')
-        lines = templateFile.readlines()
+        lines = []
+        
+        for line in templateFile.readlines():
+            lines.append(line.rstrip())
+            
         templateFile.close()
         
-        bldg_width = len(lines[0]) - 1
+        bldg_width = len(lines[0])
         bldg_height = len(lines)
         
         bldgx = (cell.cell_width - bldg_width)/2 + cell.xoffset
