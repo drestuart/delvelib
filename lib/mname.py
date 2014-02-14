@@ -56,7 +56,7 @@ class MName:
                 self.mcd.add_key(s[n:n+chainlen], s[n+chainlen])
             self.mcd.add_key(s[len(l):len(l)+chainlen], "\n")
     
-    def New(self):
+    def name(self):
         """
         New name from the Markov chain
         """
