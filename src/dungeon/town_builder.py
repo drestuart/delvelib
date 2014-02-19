@@ -36,6 +36,7 @@ class town_cell(object):
         self.cellx, self.celly = cellx, celly
         self.celltype = celltype
         
+        # Where is the cell located in the level?
         self.xoffset = self.cellx*self.cell_width
         self.yoffset = self.celly*self.cell_height
         
@@ -227,8 +228,9 @@ class town:
         bldg_width = len(lines[0])
         bldg_height = len(lines)
         
-        bldgx = (cell.cell_width - bldg_width)/2 + cell.xoffset
-        bldgy = (cell.cell_height - bldg_height)/2 + cell.yoffset
+        # Add a small jitter to the building placement
+        bldgx = (cell.cell_width - bldg_width)/2 + cell.xoffset + random.randint(-2, 2)
+        bldgy = (cell.cell_height - bldg_height)/2 + cell.yoffset + random.randint(-2, 2)
         
         # Lay down building tiles
         for x in range(bldg_width):
