@@ -65,10 +65,10 @@ class TileBase(colors.withBackgroundColor, Base):
         return self.baseSymbol
     
     def getColor(self):
-        return self.color
+        return super(TileBase, self).getColor()
     
     def getBackgroundColor(self):
-        return self.backgroundColor
+        return super(TileBase, self).getBackgroundColor()
     
     def getDescription(self):
         return self.__str__()
