@@ -18,29 +18,87 @@ import InventoryClass as Inv
 
 Base = db.saveDB.getDeclarativeBase()
 
-# The Tile class
-
-class Tile(colors.withBackgroundColor, Base):
-    # a tile of the map and its properties
+# A parent class for both level and world map tiles
+class TileBase(colors.withBackgroundColor, Base):
     
     __tablename__ = "tiles"
-#    __table_args__ = (UniqueConstraint('x', 'y', 'levelId', name='_tile_location_uc'), {'extend_existing': True})
     __table_args__ = {'extend_existing': True}
-
     
     def __init__(self, x, y, **kwargs):
-        super(Tile, self).__init__(**kwargs)
+        super(TileBase, self).__init__(**kwargs)
         
         self.x = x
         self.y = y
         
         self.blockMove = kwargs.get('blockMove', False)
-        self.blockSight = kwargs.get('blockSight', False)
-       
-        self.baseSymbol = kwargs.get('baseSymbol', ' ')
-        self.lastSeenSymbol = kwargs.get('lastSeenSymbol', ' ')
-        
         self.baseDescription = kwargs.get('baseDescription', '')
+        self.baseSymbol = kwargs.get('baseSymbol', ' ')
+
+
+    id = Column(Integer, primary_key=True, unique=True)
+    
+    x = Column(Integer)
+    y = Column(Integer)
+    
+    tileType = Column(String)
+
+    blockMove = Column(Boolean)
+
+    baseSymbol = Column(String(length=1, convert_unicode = False))
+    baseDescription = Column(String)
+
+    tileType = Column(String)
+
+    __mapper_args__ = {'polymorphic_on': tileType,
+                       'polymorphic_identity': 'tileBase'}
+    
+    def blocksMove(self):
+        raise NotImplementedError("blocksMove() not implemented, use a subclass")
+    
+    def placeCreature(self, creature):
+        raise NotImplementedError("placeCreature() not implemented, use a subclass")
+
+    def removeCreature(self):
+        raise NotImplementedError("removeCreature() not implemented, use a subclass")
+    
+    def getSymbol(self):
+        return self.baseSymbol
+    
+    def getColor(self):
+        return self.color
+    
+    def getBackgroundColor(self):
+        return self.backgroundColor
+    
+    def getDescription(self):
+        return self.__str__()
+    
+    def __str__(self):
+        return self.baseDescription
+    
+    def getX(self):
+        return self.x
+    
+    def getY(self):
+        return self.y
+    
+    def getXY(self):
+        return self.x, self.y
+    
+    def distance(self, other):
+        return U.ChebyshevDistance(self.getX(), other.getX(), self.getY(), other.getY())
+
+
+
+class Tile(TileBase):
+    # a tile of the map and its properties
+    
+    def __init__(self, x, y, **kwargs):
+        super(Tile, self).__init__(x, y, **kwargs)
+        
+        self.blockSight = kwargs.get('blockSight', False)
+
+        self.lastSeenSymbol = kwargs.get('lastSeenSymbol', ' ')
         
         self.level = kwargs.get('level', None)
         self.room = kwargs.get('room', None)
@@ -51,22 +109,12 @@ class Tile(colors.withBackgroundColor, Base):
         self.inventory = None
         
         self.load()
-                
-
-    id = Column(Integer, primary_key=True, unique=True)
     
-    x = Column(Integer)
-    y = Column(Integer)
     
-    blockMove = Column(Boolean)
     blockSight = Column(Boolean)
     explored = Column(Boolean)
     
-    baseSymbol = Column(String(length=1, convert_unicode = False))
-    
     lastSeenSymbol = Column(String(length=1, convert_unicode = False))
-    
-    baseDescription = Column(String)
     
 #    level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
     levelId = Column(Integer, ForeignKey("levels.id"))
@@ -89,10 +137,7 @@ class Tile(colors.withBackgroundColor, Base):
     inventoryId = Column(Integer, ForeignKey("inventories.id"))
     inventory = relationship("Inventory", backref = backref("tile", uselist = False), uselist = False, primaryjoin = "Tile.inventoryId == Inventory.id")
     
-    tileType = Column(String)
-    
-    __mapper_args__ = {'polymorphic_on': tileType,
-                       'polymorphic_identity': 'tile'}
+    __mapper_args__ = {'polymorphic_identity': 'tile'}
     
     def load(self):
         self.visibleTiles = None
@@ -296,21 +341,6 @@ class Tile(colors.withBackgroundColor, Base):
         else:
             self.levelId = None
             
-    def getX(self):
-        return self.x
-    
-    def getY(self):
-        return self.y
-    
-    def getXY(self):
-        return self.x, self.y
-    
-#     def getVisibleTiles(self):
-#         return self.__dict__.get('visibleTiles')
-#     
-#     def setVisibleTiles(self, tiles):
-#         self.visibleTiles = tiles
-    
     def getExplored(self):
         return self.explored
 
@@ -335,13 +365,8 @@ class Tile(colors.withBackgroundColor, Base):
     def setCreature(self, value):
         self.creature = value
         
-    def distance(self, other):
-        return U.ChebyshevDistance(self.getX(), other.getX(), self.getY(), other.getY())
-
     def getInventory(self):
         return self.inventory
-
-
 
 # Some classes representing different kinds of tiles
 
