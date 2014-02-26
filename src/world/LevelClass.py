@@ -28,24 +28,43 @@ import dungeon_builder
 
 Base = db.saveDB.getDeclarativeBase()
 
-
-class Level(Base):
-    '''A class that models a map, essentially an array of tiles.  Holds functionality for drawing itself in a console.  Subclassed into DungeonLevel and FOVMap.'''
+class MapBase(Base):
     
     __tablename__ = "levels"
     __table_args__ = {'extend_existing': True}
-    
+
     def __init__(self, **kwargs):
-        
         self.name = kwargs.get('name', "")
-        self.depth = kwargs.get('depth', 0)
-        
+
         self.width = kwargs.get('width')
         self.height = kwargs.get('height')
-        
+
         if self.width is None or self.height is None:
-            raise ValueError("Level class constructor requires width and height values")
+            raise ValueError("Map class constructor requires width and height values")
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    width = Column(Integer)
+    height = Column(Integer)
+    levelType = Column(String)
+    
+    __mapper_args__ = {'polymorphic_on': levelType,
+                       'polymorphic_identity': 'level'}
+    
+    def getWidth(self):
+        return self.width
+    
+    def getHeight(self):
+        return self.height
+
+class Level(MapBase):
+    '''A class that models a map as an array of tiles.  Subclassed into DungeonLevel and FOVMap.'''
+    
+    def __init__(self, **kwargs):
+        super(Level, self).__init__(**kwargs)
         
+        self.depth = kwargs.get('depth', 0)
+                
         self.tiles = []
         self.rooms = []
         self.creatures = []
@@ -62,21 +81,17 @@ class Level(Base):
 #        self.hasTile = [[False]*C.MAP_HEIGHT]*C.MAP_WIDTH
         
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
     depth = Column(Integer)
-    width = Column(Integer)
-    height = Column(Integer)
     
     dungeonId = Column(Integer, ForeignKey("dungeons.id"))
     
     tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
+    mapTile = relationship("MapTile", backref=backref("connectedLevel", uselist = False), uselist = False, primaryjoin="Level.id==MapTile.connectedLevelId")
     rooms = relationship("Room", backref = "level")
     
-    levelType = Column(String)
-    
-    __mapper_args__ = {'polymorphic_on': levelType,
-                       'polymorphic_identity': 'level'}
+    __mapper_args__ = {'polymorphic_identity': 'level',
+                       'concrete':True}
+
     
     def load(self):
         
@@ -152,11 +167,7 @@ class Level(Base):
     
         return None
     
-    def getWidth(self):
-        return self.width
     
-    def getHeight(self):
-        return self.height
     
     def distance(self, tilea, tileb):
         return U.ChebyshevDistance(tilea.getX(), tileb.getX(), tilea.getY(), tileb.getY())

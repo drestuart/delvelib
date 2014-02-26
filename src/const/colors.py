@@ -57,6 +57,7 @@ blue = (0,0,255)
 lightSkyBlue = (135,206,250)
 lightBlue = (173,216,230)
 darkBlue = (0,0,139)
+deepSkyBlue = (0,191,255)
 
 red = (255,0,0)
 lightRed = (205,92,92)
@@ -65,6 +66,7 @@ darkMagenta = (139,0,139)
 
 green = (0,255,0)
 darkerGreen = (0,100,0)
+forestGreen = (34,139,34)
 
 goldenrod = (218,165,32)
 gold = (255,215,0)
@@ -73,7 +75,6 @@ darkBrown = (139,69,19)
 sienna = (160,82,45)
 
 # UI Colors
-
 blankBackground = black
 
 colorDefaultFG = white
@@ -88,8 +89,8 @@ colorMessagePanelBG = black
 colorCharPanelFG = white
 colorCharPanelBG = black
 
-# Wall and ground colors
-
+# Level tile and feature colors
+colorNotInFOV = grey
 colorWallNotInFOV = (105,105,105)
 colorLightWall = (130, 110, 50)
 colorDarkGround = (50, 50, 150)
@@ -99,9 +100,16 @@ colorWood = sienna
 colorRock = darkBrown
 colorStone = lighterGrey
 colorGrass = darkerGreen
+colorTree = forestGreen
 
-colorNotInFOV = grey
+# World map colors
+colorOcean = darkBlue
+colorRiver = deepSkyBlue
+colorMountain = colorStone
+colorField = colorGrass
+colorForest = colorTree
 
+# Material colors
 colorSteel = lightSkyBlue
 colorGold = gold
 colorMeat = brown

@@ -33,12 +33,16 @@ class TileBase(colors.withBackgroundColor, Base):
         self.blockMove = kwargs.get('blockMove', False)
         self.baseDescription = kwargs.get('baseDescription', '')
         self.baseSymbol = kwargs.get('baseSymbol', ' ')
+        self.creature = kwargs.get('creature', None)
 
 
     id = Column(Integer, primary_key=True, unique=True)
     
     x = Column(Integer)
     y = Column(Integer)
+    
+    creatureId = Column(Integer, ForeignKey('creatures.id'))
+    creature = relationship("Creature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.creatureId == Creature.id")
     
     tileType = Column(String)
 
@@ -91,7 +95,7 @@ class TileBase(colors.withBackgroundColor, Base):
 
 
 class Tile(TileBase):
-    # a tile of the map and its properties
+    # A tile of the map and its properties
     
     def __init__(self, x, y, **kwargs):
         super(Tile, self).__init__(x, y, **kwargs)
@@ -104,7 +108,6 @@ class Tile(TileBase):
         self.room = kwargs.get('room', None)
         
         self.feature = kwargs.get('feature', None)
-        self.creature = kwargs.get('creature', None)
         self.explored = False
         self.inventory = None
         
@@ -121,9 +124,6 @@ class Tile(TileBase):
     
 #    room = relationship("Room", primaryjoin = "Room.id==Tile.roomId")
     roomId = Column(Integer, ForeignKey("rooms.id"))
-    
-    creatureId = Column(Integer, ForeignKey('creatures.id'))
-    creature = relationship("Creature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.creatureId == Creature.id")
     
     featureId = Column(Integer, ForeignKey('dungeon_features.id'))
     feature = relationship("DungeonFeature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.featureId == DungeonFeature.id")

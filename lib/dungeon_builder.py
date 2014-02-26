@@ -152,8 +152,10 @@ class dungeon:
         rand_height = random.randint(4, height)
         
         # boundary checking, thanks
-        rand_width = min(rand_width, self._map_size[0] - x - 1 - C.DUNGEON_MARGIN)
-        rand_height = min(rand_height, self._map_size[1] - y - 1 - C.DUNGEON_MARGIN)
+        rand_width = min(rand_width, self._map_size[0] - x - 2 - C.DUNGEON_MARGIN)
+        rand_height = min(rand_height, self._map_size[1] - y - 2 - C.DUNGEON_MARGIN)
+        
+        
         
  
         direc = 0
