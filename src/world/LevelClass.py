@@ -34,6 +34,8 @@ class MapBase(Base):
     __table_args__ = {'extend_existing': True}
 
     def __init__(self, **kwargs):
+        self.creatures = []
+
         self.name = kwargs.get('name', "")
 
         self.width = kwargs.get('width')
@@ -56,6 +58,12 @@ class MapBase(Base):
     
     def getHeight(self):
         return self.height
+    
+    def setupEventListeners(self):
+        pass
+    
+    def computeFOV(self, x, y):
+        pass
 
 class Level(MapBase):
     '''A class that models a map as an array of tiles.  Subclassed into DungeonLevel and FOVMap.'''
@@ -67,7 +75,6 @@ class Level(MapBase):
                 
         self.tiles = []
         self.rooms = []
-        self.creatures = []
         
         self.load()
         

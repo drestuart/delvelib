@@ -88,6 +88,15 @@ PLAYER_VISION_RADIUS = 10
 
 ########################
 #
+# World Map
+#
+########################
+
+WORLD_MAP_WIDTH = 55
+WORLD_MAP_HEIGHT = 93
+
+########################
+#
 # Dungeon Generation
 #
 ########################

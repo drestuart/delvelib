@@ -103,6 +103,8 @@ class VMap(object):
 						if not (adjReg is thisReg):
 							self.adjacency[thisReg].add(adjReg)
 							self.adjacency[adjReg].add(thisReg)
+							
+		return self.adjacency
 
 	def getAdjacentRegions(self, reg):
 		return self.adjacency[reg]

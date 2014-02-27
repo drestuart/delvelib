@@ -108,6 +108,7 @@ colorRiver = deepSkyBlue
 colorMountain = colorStone
 colorField = colorGrass
 colorForest = colorTree
+colorPlain = goldenrod
 
 # Material colors
 colorSteel = lightSkyBlue

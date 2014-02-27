@@ -10,6 +10,7 @@ from sqlalchemy.types import String, Integer, Boolean
 
 from TileClass import TileBase
 import database as db
+from colors import *
 # import WorldMapClass
 
 Base = db.saveDB.getDeclarativeBase()
@@ -20,12 +21,8 @@ class MapTile(TileBase):
     __table_args__ = {'extend_existing': True}
     
     def __init__(self, x, y, **kwargs):
-        super(MapTile, self).__init__(**kwargs)
+        super(MapTile, self).__init__(x, y, backgroundColor = blankBackground, **kwargs)
         
-        self.x = x
-        self.y = y
-        
-        self.blockMove = kwargs.get('blockMove', False)
         self.connectedLevel = kwargs.get('connectedLevel', None)
         self.worldMap = kwargs.get('worldMap')
 
@@ -35,30 +32,76 @@ class MapTile(TileBase):
     
     isWaterTile = False
     
+    def blocksMove(self):
+        return False
+    
+    def blocksSight(self):
+        return False
+    
     def isWaterTile(self):
         return self.isWaterTile
+    
+    def getLevel(self):  
+        return self.worldMap
+    
+    def getRegion(self):
+        return self.region
+    
+    def getColor(self):
+        # Determine which color to use to draw this tile
+        
+        if self.creature and self.creature.isVisible():
+            return self.creature.getColor()
 
+        else:
+            return super(MapTile, self).getColor()
+    
+    def getSymbol(self):
+        # Determine which symbol to use to draw this tile
+        
+        if self.creature and self.creature.isVisible():
+            toReturn = self.creature.getSymbol()
+            
+        else:
+            toReturn = self.baseSymbol
+        
+#        self.setLastSeenSymbol(toReturn)
+        return toReturn
 
 class Forest(MapTile):
-    pass
+    def __init__(self, *args, **kwargs):
+        super(Forest, self).__init__(*args, baseSymbol = 'T', color = colorForest, **kwargs)
 
 class Plain(MapTile):
-    pass
+    def __init__(self, *args, **kwargs):
+        super(Plain, self).__init__(*args, baseSymbol = '.', color = colorPlain, **kwargs)
+        
+class Field(MapTile):
+    def __init__(self, *args, **kwargs):
+        super(Field, self).__init__(*args, baseSymbol = '.', color = colorField, **kwargs)
 
 class Mountain(MapTile):
-    pass
+    def __init__(self, *args, **kwargs):
+        super(Mountain, self).__init__(*args, baseSymbol = '^', color = colorMountain, **kwargs)
 
 class Ocean(MapTile):
     isWaterTile = True
+    def __init__(self, *args, **kwargs):
+        super(Ocean, self).__init__(*args, baseSymbol = '~', color = colorOcean, **kwargs)
 
 class River(MapTile):
     isWaterTile = True
-    
+    def __init__(self, *args, **kwargs):
+        super(Ocean, self).__init__(*args, baseSymbol = '~', color = colorRiver, **kwargs)
+
 class Bridge(MapTile):
-    pass
+    def __init__(self, *args, **kwargs):
+        super(Bridge, self).__init__(*args, baseSymbol = '=', color = colorWood, **kwargs)
 
 class Town(MapTile):
-    pass
+    def __init__(self, *args, **kwargs):
+        super(Town, self).__init__(*args, baseSymbol = '*', color = colorWood, **kwargs)
+
 
 
 

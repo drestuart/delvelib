@@ -112,6 +112,9 @@ class TileBase(colors.withBackgroundColor, Base):
         
         else:
             return False
+        
+    def getLastSeenSymbol(self):
+        return self.baseSymbol
     
     def distance(self, other):
         return U.ChebyshevDistance(self.getX(), other.getX(), self.getY(), other.getY())
