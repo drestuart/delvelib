@@ -232,7 +232,7 @@ class Level(MapBase):
         return self.getRandomOpenTileInArea(room.x1, room.x2, room.y1, room.y2)
         
     def getTilesToDraw(self, playerx, playery, cameradims, visibility = True):
-        tileArray = []
+        retArray = []
         
         camx, camy, camwidth, camheight = cameradims
         
@@ -274,9 +274,9 @@ class Level(MapBase):
                     background = colors.colorLightWall
                     
                 symbol = symbol.encode('ascii', 'ignore')
-                tileArray.append((x, y, symbol, color, background))
+                retArray.append((x, y, symbol, color, background))
 #                UI.putChar(x, y, symbol, color, background)
-        return tileArray
+        return retArray
                 
     def getTilesInRadius(self, radius, centerX, centerY):
         
@@ -366,21 +366,6 @@ class Level(MapBase):
             
         self.FOVMap.do_fov(x, y, C.FOV_RADIUS)
     
-#     def isInFOV_old(self, fromx, fromy, tox, toy):
-#         if fromx == tox and fromy == toy:
-#             return True
-#         
-#         fromTile = self.getTile(fromx, fromy)
-#         toTile = self.getTile(tox, toy)
-# 
-# #         if fromTile.getVisibleTiles() is None:
-#         visibleTiles = self.getVisibleTilesFromTile(fromTile)
-#         
-# #         else:
-# #             visibleTiles = fromTile.getVisibleTiles()
-#         
-#         return toTile in visibleTiles
-    
     def isInFOV(self, fromx, fromy, tox, toy, radius = C.PLAYER_VISION_RADIUS):
         if fromx == tox and fromy == toy:
             return True
@@ -393,22 +378,6 @@ class Level(MapBase):
             return True
         return False
         
-    
-#     def getVisibleTilesFromTile(self, fromTile, radius = C.PLAYER_VISION_RADIUS):
-#         
-#         retArray = []
-#          
-#         x = fromTile.getX()
-#         y = fromTile.getY()
-#          
-#         self.computeFOV(x, y)
-#          
-#         for tile in self.tiles:
-#             if (radius == 0 or self.distance(fromTile, tile) <= radius) and self.FOVMap.isVisible(tile.getX(), tile.getY()):
-#                 retArray.append(tile)
-#          
-#         return retArray
-    
     def getVisibleCreaturesFromTile(self, fromTile, radius = C.PLAYER_VISION_RADIUS):
         
         fromx, fromy = fromTile.getXY()
@@ -423,16 +392,6 @@ class Level(MapBase):
                 retArray.append(creature)
             
         return retArray
-#         tileArr = self.getVisibleTilesFromTile(fromTile, radius)
-#         
-#         retArray = []
-#         
-#         for tile in tileArr:
-#             creature = tile.getCreature()
-#             if creature and creature.isVisible():
-#                 retArray.append(creature)
-#                 
-#         return retArray
     
     def setupPathing(self):
         mapdata = []
@@ -480,9 +439,6 @@ class Level(MapBase):
         startpoint = fromTile.getXY()
         endpoint = toTile.getXY()
         
-#        print "Computing path from", startpoint, "to", endpoint
-#        print "Blocking:", fromTile.blocksMove(), toTile.blocksMove()
-        
         # Hack to fix issue with starting and ending tiles being blocked
         self.astar.setMovable(fromTile.getX(), fromTile.getY(), True)
         if toTile.blocksMove() and toTile.getCreature(): self.astar.setMovable(toTile.getX(), toTile.getY(), True)
@@ -499,12 +455,9 @@ class Level(MapBase):
             if fromTile.getXY() == path[0]:
                 path.pop(0)
                 
-#            print path
-            
             return path
         
         else:
-#            print "No path found!"
             return None
         
     

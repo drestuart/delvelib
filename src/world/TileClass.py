@@ -59,11 +59,11 @@ class TileBase(colors.withBackgroundColor, Base):
     def blocksMove(self):
         raise NotImplementedError("blocksMove() not implemented, use a subclass")
     
-    def placeCreature(self, creature):
-        raise NotImplementedError("placeCreature() not implemented, use a subclass")
-
-    def removeCreature(self):
-        raise NotImplementedError("removeCreature() not implemented, use a subclass")
+#     def placeCreature(self, creature):
+#         raise NotImplementedError("placeCreature() not implemented, use a subclass")
+# 
+#     def removeCreature(self):
+#         raise NotImplementedError("removeCreature() not implemented, use a subclass")
     
     def getSymbol(self):
         return self.baseSymbol
@@ -88,6 +88,30 @@ class TileBase(colors.withBackgroundColor, Base):
     
     def getXY(self):
         return self.x, self.y
+    
+    def placeCreature(self, creature):
+        if (not self.blocksMove()) and (not self.creature):
+            oldTile = creature.getTile()
+            if oldTile:
+                oldTile.removeCreature()
+                pub.sendMessage("event.removedCreature", tile = oldTile, creature = creature)
+            
+            self.creature = creature
+            self.creature.setTile(self)
+            pub.sendMessage("event.addedCreature", tile = self, creature = creature)
+            return True
+        
+        else:
+            return False
+        
+    def removeCreature(self):
+        if self.creature:
+            self.creature.setTile(None)
+            self.creature = None
+            return True
+        
+        else:
+            return False
     
     def distance(self, other):
         return U.ChebyshevDistance(self.getX(), other.getX(), self.getY(), other.getY())
@@ -222,34 +246,6 @@ class Tile(TileBase):
         # Take some inventory from this tile
         return [self.removeObject(ind) for ind in indices]
     
-    def placeCreature(self, creature):
-#        if self.creature:
-#            print "Move failed, tile", self.getXY(), "is occupied"
-#        if self.blocksMove():
-#            print "Move failed, tile", self.getXY(), "is blocked"
-        if (not self.blocksMove()) and (not self.creature):
-            oldTile = creature.getTile()
-            if oldTile:
-                creature.getTile().removeCreature()
-                pub.sendMessage("event.removedCreature", tile = oldTile, creature = creature)
-            
-            self.creature = creature
-            self.creature.setTile(self)
-            pub.sendMessage("event.addedCreature", tile = self, creature = creature)
-            return True
-        
-        else:
-            return False
-        
-    def removeCreature(self):
-        if self.creature:
-            self.creature.setTile(None)
-            self.creature = None
-            return True
-        
-        else:
-            return False
-            
     def passTime(self, turns = 1):
         '''Pass some time on the inventory and creature on this tile'''
         
