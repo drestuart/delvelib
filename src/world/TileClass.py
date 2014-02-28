@@ -146,7 +146,7 @@ class Tile(TileBase):
     blockSight = Column(Boolean)
     explored = Column(Boolean)
     
-    lastSeenSymbol = Column(String(length=1, convert_unicode = False))
+    lastSeenSymbol = Column(String(length=1, convert_unicode = True))
     
 #    level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
     levelId = Column(Integer, ForeignKey("levels.id"))

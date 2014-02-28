@@ -48,7 +48,7 @@ class Creature(colors.withColor, Base):
 
     id = Column(Integer, primary_key=True, unique=True)
     
-    symbol = Column(String(length=1, convert_unicode = False))
+    symbol = Column(String(length=1, convert_unicode = True))
     
     description = Column(String)
     name = Column(String)

@@ -47,7 +47,7 @@ class Database(object):
             print "Deleted", self.filename
         if not self.__engine or not self.session:
             # Initialize the Database engine
-            self.__engine = create_engine(DB_STR + self.filename, echo=self.echo)
+            self.__engine = create_engine(DB_STR + self.filename, echo=self.echo, convert_unicode=True, encoding="utf-8")
             Session = sessionmaker(bind=self.__engine)
             self.session = Session()
             print "Gentledwarves, start your engines!"

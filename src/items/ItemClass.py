@@ -48,7 +48,7 @@ class Item(colors.withColor, Base):
     itemType = Column(String)
     material = Column(String)
     
-    symbol = Column(String(length=1, convert_unicode = False))
+    symbol = Column(String(length=1, convert_unicode = True))
     
     description = Column(String)
     pluralDescription = Column(String)

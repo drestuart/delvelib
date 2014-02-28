@@ -38,6 +38,7 @@ class Panel(object):
         celly = y + self.y
 #         char = char.encode(C.ENCODING, C.ENCODING_MODE)
         self.window.putchar(char, cellx, celly, fgcolor, bgcolor)
+        print char
         
     def containsPoint(self, x, y):
         return (x >= self.x) and (x < self.x + self.width) and \

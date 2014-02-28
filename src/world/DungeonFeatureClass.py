@@ -33,7 +33,7 @@ class DungeonFeature(colors.withBackgroundColor, Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     description = Column(String)
-    symbol = Column(String(length=1, convert_unicode = False))
+    symbol = Column(String(length=1, convert_unicode = True))
     
     tileId = Column(Integer)
     visible = Column(Boolean)

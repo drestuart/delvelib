@@ -74,6 +74,7 @@ class Forest(MapTile):
     symb = lowerTau
     def __init__(self, *args, **kwargs):
         super(Forest, self).__init__(*args, baseSymbol = self.symb, color = colorForest, **kwargs)
+#         print self.symb
 
 class Plain(MapTile):
     def __init__(self, *args, **kwargs):
@@ -104,7 +105,5 @@ class Bridge(MapTile):
 class Town(MapTile):
     def __init__(self, *args, **kwargs):
         super(Town, self).__init__(*args, baseSymbol = '*', color = colorWood, **kwargs)
-
-
 
 
