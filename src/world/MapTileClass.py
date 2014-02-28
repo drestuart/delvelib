@@ -11,7 +11,8 @@ from sqlalchemy.types import String, Integer, Boolean
 from TileClass import TileBase
 import database as db
 from colors import *
-# import WorldMapClass
+from symbols import *
+import Const as C
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -69,8 +70,10 @@ class MapTile(TileBase):
         return toReturn
 
 class Forest(MapTile):
+#     symb = unichr(120533)
+    symb = lowerTau
     def __init__(self, *args, **kwargs):
-        super(Forest, self).__init__(*args, baseSymbol = 'T', color = colorForest, **kwargs)
+        super(Forest, self).__init__(*args, baseSymbol = self.symb, color = colorForest, **kwargs)
 
 class Plain(MapTile):
     def __init__(self, *args, **kwargs):

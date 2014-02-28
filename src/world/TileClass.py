@@ -48,7 +48,9 @@ class TileBase(colors.withBackgroundColor, Base):
 
     blockMove = Column(Boolean)
 
-    baseSymbol = Column(String(length=1, convert_unicode = False))
+#     baseSymbol = Column(String(length=1, convert_unicode = False))
+    baseSymbol = Column(String(length=1, convert_unicode = True))
+#     baseSymbol = Column(String(length=1))
     baseDescription = Column(String)
 
     tileType = Column(String)

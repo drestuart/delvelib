@@ -10,6 +10,7 @@ import keys
 from pygame.locals import *
 import re
 import textwrap
+from symbols import *
 
 fgdefault = colors.colorMessagePanelFG
 bgdefault = colors.colorMessagePanelBG
@@ -28,14 +29,14 @@ class Panel(object):
         # Add offset for this window
         cellx = x + self.x
         celly = y + self.y
-        chars = chars.encode(C.ENCODING, C.ENCODING_MODE)
+#         chars = chars.encode(C.ENCODING, C.ENCODING_MODE)
         self.window.putchars(chars, cellx, celly, fgcolor, bgcolor)
         
     def putChar(self, char, x, y, fgcolor = None, bgcolor = None, indent = False):
         # Add offset for this window
         cellx = x + self.x
         celly = y + self.y
-        char = char.encode(C.ENCODING, C.ENCODING_MODE)
+#         char = char.encode(C.ENCODING, C.ENCODING_MODE)
         self.window.putchar(char, cellx, celly, fgcolor, bgcolor)
         
     def containsPoint(self, x, y):
@@ -196,6 +197,7 @@ class CharacterPanel(Panel):
     def draw(self, playerx = 0, playery = 0):
         self.render_bar(1, 1, 18, "HP", 15, 20, colors.darkBlue, colors.darkRed)
         self.showCoords(1, 3, playerx, playery)
+        self.putChar(u"\u03c4", 1, 4, fgcolor = colors.white, bgcolor = colors.black)
         
     def showCoords(self, x, y, playerx, playery):
         

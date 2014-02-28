@@ -55,6 +55,7 @@ import copy
 import time
 import sys
 import textwrap
+import unicodedata
 import pygame
 from pygame.locals import *
 
@@ -85,6 +86,12 @@ A "region" defines an area of the surface. It can be the following formats:
 Note about flickering: If your program is experiencing a lot of flicker, than you should disable the self._autoupdate member. By default, this is enabled and the screen is redrawn after each method call that makes a change to the screen.
 """
 
+# Wrapper for compatibility with Python 3.x, which has no unicode() function
+try:
+    unicode
+except NameError:
+    def unicode(string):
+        return str(string)
 
 DEFAULTFGCOLOR = pygame.Color(164, 164, 164, 255) # default foreground color is gray (must be a pygame.Color object)
 DEFAULTBGCOLOR = pygame.Color(0, 0, 0, 255) # default background color is black (must be a pygame.Color object)
@@ -279,7 +286,7 @@ def pygprint(self, *objs): # PY2
     This function can be used as a drop-in replacement of Python's print() to convert a stdio text-based Python program to a graphical Pygcurse program. See the PygcurseWindow class for details.
     """
 
-    self.write(' '.join([str(x) for x in objs]) + '\n')
+    self.write(' '.join(unicode(x) for x in objs) + '\n')
 ''')
     else: # for Python 3 version
         exec(r'''
@@ -301,7 +308,7 @@ def pygprint(self, obj='', *objs, sep=' ', end='\n', fgcolor=None, bgcolor=None,
 
     text = [str(obj)]
     if objs:
-        text.append(str(sep) + str(sep).join([str(x) for x in objs]))
+        text.append(str(sep) + str(sep).join(str(x) for x in objs))
     text.append(str(end))
 
     self.write(''.join(text), writefgcolor, writebgcolor)
@@ -361,6 +368,12 @@ def pygprint(self, obj='', *objs, sep=' ', end='\n', fgcolor=None, bgcolor=None,
         # "Dirty" means that the cell's state has been altered on the backend and it needs to be redrawn on pygame.Surface object (which will make the cell "clean").
         for x in range(self._width):
             for y in range(self._height):
+                # Skip if previous char was a CJK wide char
+                if x > 0 and iswide(self._screenchar[x-1][y]):
+                    # Set this unprinted char to a dummy value. Otherwise, it will screw up following chars (thanks to this same check) if it happened to have the value of a wide char.
+                    self._screenchar[x][y] = None
+                    continue
+
                 if self._screendirty[x][y]: # draw to surfaceobj all the dirty cells.
                     self._screendirty[x][y] = False
 
@@ -382,7 +395,7 @@ def pygprint(self, obj='', *objs, sep=' ', end='\n', fgcolor=None, bgcolor=None,
                     # render the character and draw it to the surface
                     charsurf = self._font.render(self._screenchar[x][y], 1, cellfgcolor, cellbgcolor)
                     charrect = charsurf.get_rect()
-                    charrect.centerx = self._cellwidth * x + int(self._cellwidth / 2)
+                    charrect.centerx = self._cellwidth * x + int(self._cellwidth*getcharwidth(self._screenchar[x][y]) / 2)
                     charrect.bottom = self._cellheight * (y + 1) # TODO - not correct, this would put stuff like g, p, q higher than normal.
                     self._surfaceobj.blit(charsurf, charrect)
 
@@ -1035,8 +1048,8 @@ def pygprint(self, obj='', *objs, sep=' ', end='\n', fgcolor=None, bgcolor=None,
         """
         Print a single character to the coordinates on the surface. This function does not move the cursor.
         """
-        if type(char) != str:
-            raise Exception('Argument 1 must be str, not %s' % (str(type(char))))
+        if type(char) not in (str, unicode):
+            raise Exception('Argument 1 must be str or unicode, not %s' % (type(char)))
 
         if char == '':
             return
@@ -1066,8 +1079,8 @@ def pygprint(self, obj='', *objs, sep=' ', end='\n', fgcolor=None, bgcolor=None,
     def putchars(self, chars, x=None, y=None, fgcolor=None, bgcolor=None, indent=False):
         # doc - does not modify the cursor. That's how putchars is different from print() or write()
         # doc - also, putchars does wrap but doesn't cause scrolls. (if you want a single line, just put putchar() calls in a loop)
-        if type(chars) != str:
-            raise Exception('Argument 1 must be str, not %s' % (str(type(chars))))
+        if type(chars) not in (str, unicode):
+            raise Exception('Argument 1 must be str or unicode, not %s' % (type(chars)))
 
         if x is None:
             x = self._cursorx
@@ -1085,20 +1098,21 @@ def pygprint(self, obj='', *objs, sep=' ', end='\n', fgcolor=None, bgcolor=None,
 
         tempcurx = x
         tempcury = y
-        for i in range(len(chars)):
-            if tempcurx >= self._width or chars[i] in ('\n', '\r'): # TODO - wait, this isn't right. We should be ignoring one of these newlines.
+        for ch in chars:
+            # TODO - wait, this isn't right. We should be ignoring one of these newlines.
+            if tempcurx >= self._width or ch in ('\n', '\r') or (iswide(ch) and tempcurx + 1 == self._width):
                 tempcurx = indent and x or 0
                 tempcury += 1
             if tempcury >= self._height: # putchars() does not cause a scroll.
                 break
 
-            self._screenchar[tempcurx][tempcury] = chars[i]
+            self._screenchar[tempcurx][tempcury] = ch
             self._screendirty[tempcurx][tempcury] = True
             if fgcolor is not None:
                 self._screenfgcolor[tempcurx][tempcury] = fgcolor
             if bgcolor is not None:
                 self._screenbgcolor[tempcurx][tempcury] = bgcolor
-            tempcurx += 1
+            tempcurx += getcharwidth(ch)
 
         if self._autoupdate:
             self.update()
@@ -1244,12 +1258,11 @@ def pygprint(self, obj='', *objs, sep=' ', end='\n', fgcolor=None, bgcolor=None,
 
 
         # replace tabs with appropriate number of spaces
-        i = 0
         tempcursorx = self._cursorx - 1
-        while i < len(text):
-            if text[i] == '\n':
+        for i, ch in enumerate(text):
+            if ch == '\n':
                 tempcursorx = 0
-            elif text[i] == '\t':
+            elif ch == '\t':
                 numspaces = self._tabsize - ((i+1) + tempcursorx % self._tabsize)
                 if tempcursorx + numspaces >= self._width:
                     # tabbed past the edge, just go to first
@@ -1260,11 +1273,10 @@ def pygprint(self, obj='', *objs, sep=' ', end='\n', fgcolor=None, bgcolor=None,
                     text = text[:i] + (' ' * numspaces) + text[i+1:]
                     tempcursorx += numspaces
             else:
-                tempcursorx += 1
+                tempcursorx += getcharwidth(ch)
 
             if tempcursorx >= self._width:
                 tempcursorx = 0
-            i += 1
 
         """
         # create a cache of surface objects for each letter in text
@@ -1280,13 +1292,18 @@ def pygprint(self, obj='', *objs, sep=' ', end='\n', fgcolor=None, bgcolor=None,
                 #letterSurfs['?'] = letterSurfs['?'].convert_alpha()
         """
 
-        for i in range(len(text)):
-            if text[i] in ('\n', '\r'): # TODO - wait, this isn't right. We should be ignoring one of these newlines. Otherwise \r\n shows up as two newlines.
+        for ch in text:
+            if ch in ('\n', '\r'): # TODO - wait, this isn't right. We should be ignoring one of these newlines. Otherwise \r\n shows up as two newlines.
                 self._cursory += 1
                 self._cursorx = 0
             else:
+                # If the second half of a wide char will overflow the line, go to the next line.
+                if iswide(ch) and self._cursorx + 1 == self._width:
+                    self._cursory += 1
+                    self._cursorx = 0
+
                 # set the backend data structures that track the screen state
-                self._screenchar[self._cursorx][self._cursory] = text[i]
+                self._screenchar[self._cursorx][self._cursory] = ch
                 self._screenfgcolor[self._cursorx][self._cursory] = fgcolor
                 self._screenbgcolor[self._cursorx][self._cursory] = bgcolor
                 self._screendirty[self._cursorx][self._cursory] = True
@@ -1294,7 +1311,7 @@ def pygprint(self, obj='', *objs, sep=' ', end='\n', fgcolor=None, bgcolor=None,
                 """
                 r = pygame.Rect(self._cellwidth * self._cursorx, self._cellheight * self._cursory, self._cellwidth, self._cellheight)
                 self._surfaceobj.fill(bgcolor, r)
-                charsurf = letterSurfs[text[i]]
+                charsurf = letterSurfs[ch]
                 charrect = charsurf.get_rect()
                 charrect.centerx = self._cellwidth * self._cursorx + int(self._cellwidth / 2)
                 charrect.bottom = self._cellheight * (self._cursory+1)
@@ -1303,7 +1320,7 @@ def pygprint(self, obj='', *objs, sep=' ', end='\n', fgcolor=None, bgcolor=None,
                 """
 
                 # Move cursor over (and to next line if it moves past the right edge)
-                self._cursorx += 1
+                self._cursorx += getcharwidth(ch)
                 if self._cursorx >= self._width:
                     self._cursorx = 0
                     self._cursory += 1
@@ -1893,7 +1910,7 @@ class PygcurseInput():
         """
         Inserts the string text into the buffer at the position of the cursor. This does not actually use the system's clipboard, it only pastes from the text parameter.
         """
-        text = str(text)
+        text = unicode(text)
         if not self.insertMode and len(text) + len(self.buffer) > self._maxlength:
             text = text[:self._maxlength - len(self.buffer)] # truncate the pasted text (this is what web browsers do, so I'm copying that behavior)
 
@@ -2166,7 +2183,6 @@ class PygcurseTextbox:
 
         # draw the textbox shadow
         if self.shadow is not None:
-#            pygsurf.addshadow(x=x, y=y, width=width, height=height, amount=self.shadowamount, direction=self.shadow, xoffset=self.shadowxoffset, yoffset=self.shadowyoffset)
             pygsurf.addshadow(region = (x, y, width, height), amount=self.shadowamount, direction=self.shadow, xoffset=self.shadowxoffset, yoffset=self.shadowyoffset)
 
 
@@ -2486,3 +2502,9 @@ def regionsoverlap(region1, region2):
 
 def withinregion(x, y, region):
     return x > region[0] and x < region[0] + region[2] and y > region[1] and y < region[1] + region[3]
+
+def iswide(ch):
+    return ch is not None and unicodedata.east_asian_width(unicode(ch)) in ('F', 'W')
+
+def getcharwidth(ch):
+    return 2 if iswide(ch) else 1

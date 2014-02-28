@@ -16,8 +16,11 @@ from PanelClass import *
 import textwrap
 from DungeonFeatureClass import downStair, upStair, Stair, Door
 import database as db
+import os.path
 
 # TODO Abstract out all pygcurse calls into an interface class
+
+fontpath = os.path.join("modules", "delvelib", "fonts", "FreeMono.ttf")
 
 class UI(object):
 
@@ -26,16 +29,14 @@ class UI(object):
         self.currentLevel = kwargs.get('level', None)
         self.player = kwargs.get('player', None)
         self.fullscreen = kwargs.get('fullscreen', False)
-        self.font = kwargs.get('font', None)
 
-        self.window = pygcurse.PygcurseWindow(C.SCREEN_WIDTH, C.SCREEN_HEIGHT, C.TITLE, font = self.font,
+        self.window = pygcurse.PygcurseWindow(C.SCREEN_WIDTH, C.SCREEN_HEIGHT, C.TITLE, #font = self.font,
                                               fgcolor = colors.colorDefaultFG, bgcolor = colors.colorDefaultBG,
                                               fullscreen = self.fullscreen)
         
         self.fontsize = kwargs.get('fontsize')
-        
-        if self.fontsize:
-            self.window.font = pygame.font.Font(None, self.fontsize)
+#         self.window.font = pygame.font.Font(fontpath, self.fontsize)
+        self.window.font = pygame.font.Font(None, self.fontsize)
             
         self.window.autoblit = False
         self.window.autoupdate = False
