@@ -70,11 +70,9 @@ class MapTile(TileBase):
         return toReturn
 
 class Forest(MapTile):
-#     symb = unichr(120533)
     symb = lowerTau
     def __init__(self, *args, **kwargs):
         super(Forest, self).__init__(*args, baseSymbol = self.symb, color = colorForest, **kwargs)
-#         print self.symb
 
 class Plain(MapTile):
     def __init__(self, *args, **kwargs):

@@ -38,7 +38,6 @@ class Panel(object):
         celly = y + self.y
 #         char = char.encode(C.ENCODING, C.ENCODING_MODE)
         self.window.putchar(char, cellx, celly, fgcolor, bgcolor)
-        print char
         
     def containsPoint(self, x, y):
         return (x >= self.x) and (x < self.x + self.width) and \
@@ -304,7 +303,7 @@ class MapPanel(Panel):
         
         for (x, y, symbol, color, background) in tilesToDraw:
             self.putChar(symbol, x - self.camx, y - self.camy, color, background)
-        
+            
         
 class MenuPanel(Panel):
     def __init__(self, *args, **kwargs):

@@ -123,7 +123,8 @@ class WorldMap(L.MapBase):
                 color = tile.getColor()
                 background = tile.getBackgroundColor()
                     
-                symbol = symbol.encode('ascii', 'ignore')
+                # Good lord, what made me think this was a good idea?
+                # symbol = symbol.encode('ascii', 'ignore')
                 retArray.append((x, y, symbol, color, background))
                 
         return retArray

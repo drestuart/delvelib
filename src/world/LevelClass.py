@@ -280,7 +280,7 @@ class Level(MapBase):
                     symbol, color, background = tile.toDraw()
                     background = colors.colorLightWall
                     
-                symbol = symbol.encode('ascii', 'ignore')
+#                 symbol = symbol.encode('ascii', 'ignore')
                 retArray.append((x, y, symbol, color, background))
 #                UI.putChar(x, y, symbol, color, background)
         return retArray

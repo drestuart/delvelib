@@ -160,8 +160,6 @@ if not os.path.exists(SAVE_DIR):
 saveDBFile = os.path.join(SAVE_DIR, "save.db")
 saveDB = Database(saveDBFile, echo=False)  # Test saving db
 
-
-
 def main():
     test = Database("test.db")
     test.start()
