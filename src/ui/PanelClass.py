@@ -197,7 +197,6 @@ class CharacterPanel(Panel):
     def draw(self, playerx = 0, playery = 0):
         self.render_bar(1, 1, 18, "HP", 15, 20, colors.darkBlue, colors.darkRed)
         self.showCoords(1, 3, playerx, playery)
-        self.putChar(u"\u03c4", 1, 4, fgcolor = colors.white, bgcolor = colors.black)
         
     def showCoords(self, x, y, playerx, playery):
         
