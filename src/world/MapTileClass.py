@@ -13,6 +13,7 @@ import database as db
 from colors import *
 from symbols import *
 import Const as C
+import LevelClass as L
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -68,6 +69,17 @@ class MapTile(TileBase):
         
 #        self.setLastSeenSymbol(toReturn)
         return toReturn
+    
+    def getConnectedLevel(self):
+        if not self.connectedLevel:
+            self.generateConnectedLevel()
+        return self.connectedLevel
+    
+    def generateConnectedLevel(self):
+        self.connectedLevel = L.WildernessLevel(width = 60, height = 40)
+        self.connectedLevel.buildLevel()
+        
+        
 
 class Forest(MapTile):
     symb = lowerTau

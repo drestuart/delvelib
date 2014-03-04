@@ -17,6 +17,8 @@ import textwrap
 from DungeonFeatureClass import downStair, upStair, Stair, Door
 import database as db
 import os.path
+import TileClass as T
+import MapTileClass as MT
 
 # TODO Abstract out all pygcurse calls into an interface class
 
@@ -431,31 +433,48 @@ class UI(object):
         
     def takeStairs(self):
         tile = self.player.getTile()
-        feature = tile.getFeature()
         
-        if feature and isinstance(feature, Stair):
-            if isinstance(feature, upStair):
-                G.message("Heading up the stairs!")
-            elif isinstance(feature, downStair):
-                G.message("Heading down the stairs!")
+        if isinstance(tile, T.Tile):
+            feature = tile.getFeature()
             
+            if feature and isinstance(feature, Stair):
+                if isinstance(feature, upStair):
+                    G.message("Heading up the stairs!")
+                elif isinstance(feature, downStair):
+                    G.message("Heading down the stairs!")
+                
+                clevel = self.currentLevel
+                destination = feature.getDestination()
+                if not destination:
+                    return False
+                
+                toLevel = destination.getLevel()
+                
+                if not toLevel:
+                    return False
+                
+                db.saveDB.save(clevel)
+                
+                toLevel.load()
+                self.setCurrentLevel(toLevel)
+                toLevel.placeCreature(self.player, destination)
+                
+                return True
+        
+        elif isinstance(tile, MT.MapTile):
             clevel = self.currentLevel
-            destination = feature.getDestination()
-            if not destination:
-                return False
-            
-            toLevel = destination.getLevel()
+            toLevel = tile.getConnectedLevel()
             
             if not toLevel:
-                return False
-            
+                    return False
+                
             db.saveDB.save(clevel)
             
             toLevel.load()
             self.setCurrentLevel(toLevel)
-            toLevel.placeCreature(self.player, destination)
-            
+            toLevel.placeCreatureAtEntrance(self.player)
             return True
+            
         
         G.message("No stairs here!")
         return False

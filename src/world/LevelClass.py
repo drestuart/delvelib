@@ -663,6 +663,9 @@ class DungeonLevel(Level):
             if tile:
                 self.placeCreature(creature, tile)
                 break
+            
+    def placeCreatureAtEntrance(self, creature):
+        self.placeOnUpStair(creature)
 
 
 class CaveLevel(Level):
@@ -761,6 +764,9 @@ class CaveLevel(Level):
     def placeCreatureAtRandom(self, creature):
         tile = self.getRandomOpenTile()
         self.placeCreature(creature, tile)
+        
+    def placeCreatureAtEntrance(self, creature):
+        self.placeOnUpStair(creature)
 
 class TownLevel(DungeonLevel):
     
@@ -807,5 +813,46 @@ class TownLevel(DungeonLevel):
         # TODO: make more random
         tile = self.getTile(1, 1)
         self.placeCreature(creature, tile)
+        
+    def placeCreatureAtEntrance(self, creature):
+        x, y = self.width/2, self.height - 1
+        tile = self.getTile(x, y)
+        self.placeCreature(creature, tile)
 
 
+class WildernessLevel(Level):
+    __mapper_args__ = {'polymorphic_identity': 'wilderness level'}
+    
+    defaultFloorType = T.GrassFloor
+    
+    def __init__(self, **kwargs):
+        super(WildernessLevel, self).__init__(**kwargs)
+
+    def buildLevel(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                newTile = self.defaultFloorType(x, y)
+                    
+                self.tiles.append(newTile)
+                self.hasTile[x][y] = True
+        
+        print "Building tile array"    
+        self.buildTileArray()    
+        
+        print "Saving open tiles"
+#         db.saveDB.save(self)
+        
+        print "Setting up FOV"
+        self.computeFOVProperties()
+        
+    def placeCreatureAtRandom(self, creature):
+        tile = self.getRandomOpenTile()
+        self.placeCreature(creature, tile)
+        
+    def placeCreatureAtEntrance(self, creature):
+        x, y = self.width/2, self.height - 1
+        tile = self.getTile(x, y)
+        self.placeCreature(creature, tile)
+        
+        
+        
