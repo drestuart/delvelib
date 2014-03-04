@@ -34,14 +34,12 @@ class Player(Cr.Creature):
         newTile = level.getTile(newX, newY)
         
         if newTile is not None and level.placeCreature(self, newTile):
-            
             return True
-        
         elif newTile is not None:
 #             return False
             return newTile.bump(self)
         else:
-            return False
+            return level.bumpEdge(self)
     
     def the(self):
         return self.getName()

@@ -554,6 +554,11 @@ class Level(MapBase):
         
         ustair.setDestination(dstairTile)
         
+    def bumpEdge(self, creature):
+        if self.depth == 0:
+            return self.mapTile
+        return False
+        
 def connectLevels(upper, lower):
     
     # Place a downstair in the upper level

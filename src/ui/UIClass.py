@@ -328,10 +328,13 @@ class UI(object):
                     return 'didnt-take-turn'
                     
                 # Move player
-                if self.player.move(dx, dy):
+                moveres = self.player.move(dx, dy)
+                if moveres == True:
                     # Reset map camera
                     self.mapPanel.resetCameraOffset()
                     return 'took-turn'
+                elif isinstance(moveres, MT.MapTile):
+                    self.enterNewLevel(self.player, moveres)
  
             elif keyStr == '.': # Wait
                 if (KMOD_SHIFT & key_mods): # '>' key
@@ -430,6 +433,21 @@ class UI(object):
                 return ''
         else:
             return ''
+    
+    def enterNewLevel(self, creature, tile):
+        clevel = self.currentLevel
+        toLevel = tile.getLevel()
+        
+        if not toLevel:
+            return False
+        
+        db.saveDB.save(clevel)
+        
+        toLevel.load()
+        self.setCurrentLevel(toLevel)
+        toLevel.placeCreature(self.player, tile)
+        
+        return True
         
     def takeStairs(self):
         tile = self.player.getTile()
@@ -443,30 +461,30 @@ class UI(object):
                 elif isinstance(feature, downStair):
                     G.message("Heading down the stairs!")
                 
-                clevel = self.currentLevel
                 destination = feature.getDestination()
-                if not destination:
-                    return False
-                
-                toLevel = destination.getLevel()
-                
-                if not toLevel:
-                    return False
-                
-                db.saveDB.save(clevel)
-                
-                toLevel.load()
-                self.setCurrentLevel(toLevel)
-                toLevel.placeCreature(self.player, destination)
-                
-                return True
+                return self.enterNewLevel(self.player, destination)
+#                 if not destination:
+#                     return False
+#                 
+#                 toLevel = destination.getLevel()
+#                 
+#                 if not toLevel:
+#                     return False
+#                 
+#                 db.saveDB.save(clevel)
+#                 
+#                 toLevel.load()
+#                 self.setCurrentLevel(toLevel)
+#                 toLevel.placeCreature(self.player, destination)
+#                 
+#                 return True
         
         elif isinstance(tile, MT.MapTile):
             clevel = self.currentLevel
             toLevel = tile.getConnectedLevel()
             
             if not toLevel:
-                    return False
+                return False
                 
             db.saveDB.save(clevel)
             

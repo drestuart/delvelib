@@ -67,6 +67,7 @@ class WorldMap(L.MapBase):
         self.mapTiles.append(tile)
     
     def load(self):
+        self.creatures = []
 
         # Initialize self.hasTile
         self.hasTile = []
