@@ -10,7 +10,8 @@ from sqlalchemy.types import String, Integer, Boolean
 
 import colors
 import database as db
-
+from symbols import *
+import random
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -224,9 +225,9 @@ class Altar(DungeonFeature):
     __mapper_args__ = {'polymorphic_identity': 'altar'}
 
 class Tree(DungeonFeature):
-    
+
     def __init__(self, **kwargs):
-        super(Tree, self).__init__(symbol = 'T', description = 'a tree', color = colors.colorTree, backgroundColor = colors.black, **kwargs)
+        super(Tree, self).__init__(symbol = random.choice([lowerTau, 'T']), description = 'a tree', color = colors.colorTree, backgroundColor = colors.black, **kwargs)
         
     blockMove = True
     blockSight = True

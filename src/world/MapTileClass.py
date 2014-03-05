@@ -33,6 +33,7 @@ class MapTile(TileBase):
     worldMapId = Column(Integer, ForeignKey("world_map.id"))
     
     isWaterTile = False
+    connectedLevelType = L.WildernessLevel
     
     def blocksMove(self):
         return False
@@ -76,13 +77,14 @@ class MapTile(TileBase):
         return self.connectedLevel
     
     def generateConnectedLevel(self):
-        self.connectedLevel = L.WildernessLevel(width = 60, height = 40)
+        self.connectedLevel = self.connectedLevelType(width = 60, height = 40)
         self.connectedLevel.buildLevel()
         
         
 
 class Forest(MapTile):
     symb = lowerTau
+    connectedLevelType = L.ForestLevel
     def __init__(self, *args, **kwargs):
         super(Forest, self).__init__(*args, baseSymbol = self.symb, color = colorForest, **kwargs)
 

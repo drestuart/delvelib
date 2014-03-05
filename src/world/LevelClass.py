@@ -66,7 +66,7 @@ class MapBase(Base):
         pass
 
 class Level(MapBase):
-    '''A class that models a map as an array of tiles.  Subclassed into DungeonLevel and FOVMap.'''
+    '''A class that models a map as an array of tiles.'''
     
     def __init__(self, **kwargs):
         super(Level, self).__init__(**kwargs)
@@ -95,6 +95,9 @@ class Level(MapBase):
     tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
     mapTile = relationship("MapTile", backref=backref("connectedLevel", uselist = False), uselist = False, primaryjoin="Level.id==MapTile.connectedLevelId")
     rooms = relationship("Room", backref = "level")
+    
+    entryPointX = Column(Integer)
+    entryPointY = Column(Integer)
     
     __mapper_args__ = {'polymorphic_identity': 'level',
                        'concrete':True}
@@ -174,7 +177,8 @@ class Level(MapBase):
     
         return None
     
-    
+    def getEntryPoint(self):
+        return self.getTile(self.entryPointX, self.entryPointY)
     
     def distance(self, tilea, tileb):
         return U.ChebyshevDistance(tilea.getX(), tileb.getX(), tilea.getY(), tileb.getY())
@@ -558,6 +562,26 @@ class Level(MapBase):
         if self.depth == 0:
             return self.mapTile
         return False
+    
+    def findEntryPoint(self):
+        x, y = self.width/2, self.height - 1 # Bottom center
+        if not self.getTile(x, y).blocksMove():
+            self.entryPointX, self.entryPointY = x, y
+            return
+        
+        for i in range(1, self.width/2):
+            x = x + i
+            if not self.getTile(x, y).blocksMove():
+                self.entryPointX, self.entryPointY = x, y
+                return
+            
+            x = x - i
+            if not self.getTile(x, y).blocksMove():
+                self.entryPointX, self.entryPointY = x, y
+                return
+        
+        raise Exception("Couldn't find valid entry point")
+
         
 def connectLevels(upper, lower):
     
@@ -800,6 +824,9 @@ class TownLevel(DungeonLevel):
         print "Placing items"
         self.placeItems()
         
+        print "Finding entry point"
+        self.findEntryPoint()
+        
         print "Saving open tiles"
         db.saveDB.save(self)
         
@@ -820,8 +847,7 @@ class TownLevel(DungeonLevel):
         self.placeCreature(creature, tile)
         
     def placeCreatureAtEntrance(self, creature):
-        x, y = self.width/2, self.height - 1
-        tile = self.getTile(x, y)
+        tile = self.getTile(self.entryPointX, self.entryPointY)
         self.placeCreature(creature, tile)
 
 
@@ -844,8 +870,11 @@ class WildernessLevel(Level):
         print "Building tile array"    
         self.buildTileArray()    
         
+        print "Finding entry point"
+        self.findEntryPoint()
+        
         print "Saving open tiles"
-#         db.saveDB.save(self)
+        db.saveDB.save(self)
         
         print "Setting up FOV"
         self.computeFOVProperties()
@@ -855,9 +884,41 @@ class WildernessLevel(Level):
         self.placeCreature(creature, tile)
         
     def placeCreatureAtEntrance(self, creature):
-        x, y = self.width/2, self.height - 1
-        tile = self.getTile(x, y)
+        tile = self.getTile(self.entryPointX, self.entryPointY)
         self.placeCreature(creature, tile)
         
+
+class ForestLevel(WildernessLevel):
+    
+    __mapper_args__ = {'polymorphic_identity': 'forest level'}
+    
+    treeChance = 0.4
+    
+    def __init__(self, **kwargs):
+        super(ForestLevel, self).__init__(**kwargs)
+
+    def buildLevel(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                newTile = self.defaultFloorType(x, y)
+                
+                if random.uniform(0, 1) <= self.treeChance:
+                    tree = F.Tree(tile = newTile)
+                    newTile.setFeature(tree)
+                    
+                self.tiles.append(newTile)
+                self.hasTile[x][y] = True
         
+        print "Building tile array"    
+        self.buildTileArray()    
+        
+        print "Finding entry point"
+        self.findEntryPoint()
+        
+        print "Saving open tiles"
+#         db.saveDB.save(self)
+        
+        print "Setting up FOV"
+        self.computeFOVProperties()
+    
         
