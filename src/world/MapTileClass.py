@@ -4,16 +4,15 @@ Created on Feb 25, 2014
 @author: dstuart
 '''
 
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import String, Integer, Boolean
+from sqlalchemy.schema import ForeignKey
+from sqlalchemy.types import String
 
-from TileClass import TileBase
-import database as db
-from colors import *
-import Const as C
 import LevelClass as L
+from TileClass import TileBase
+from colors import *
+import database as db
 import symbols
+
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -27,13 +26,18 @@ class MapTile(TileBase):
         
         self.connectedLevel = kwargs.get('connectedLevel', None)
         self.worldMap = kwargs.get('worldMap')
-
+        
     connectedLevelId = Column(Integer, ForeignKey("levels.id"))
     regionId = Column(Integer, ForeignKey("regions.id"))
     worldMapId = Column(Integer, ForeignKey("world_map.id"))
     
     isWaterTile = False
     connectedLevelType = L.WildernessLevel
+    
+    tileType = Column(String)
+    
+    __mapper_args__ = {'polymorphic_on': tileType,
+                       'polymorphic_identity': 'maptile'}
     
     def blocksMove(self):
         return False
@@ -85,36 +89,44 @@ class MapTile(TileBase):
 class Forest(MapTile):
     symb = symbols.lowerTau
     connectedLevelType = L.ForestLevel
+    __mapper_args__ = {'polymorphic_identity': 'forest'}
     def __init__(self, *args, **kwargs):
         super(Forest, self).__init__(*args, baseSymbol = self.symb, color = colorForest, **kwargs)
 
 class Plain(MapTile):
+    __mapper_args__ = {'polymorphic_identity': 'plain'}
     def __init__(self, *args, **kwargs):
         super(Plain, self).__init__(*args, baseSymbol = '.', color = colorPlain, **kwargs)
         
 class Field(MapTile):
+    __mapper_args__ = {'polymorphic_identity': 'field'}
     def __init__(self, *args, **kwargs):
         super(Field, self).__init__(*args, baseSymbol = '.', color = colorField, **kwargs)
 
 class Mountain(MapTile):
+    __mapper_args__ = {'polymorphic_identity': 'mountain'}
     def __init__(self, *args, **kwargs):
         super(Mountain, self).__init__(*args, baseSymbol = '^', color = colorMountain, **kwargs)
 
 class Ocean(MapTile):
+    __mapper_args__ = {'polymorphic_identity': 'ocean'}
     isWaterTile = True
     def __init__(self, *args, **kwargs):
-        super(Ocean, self).__init__(*args, baseSymbol = '~', color = colorOcean, **kwargs)
+        super(Ocean, self).__init__(*args, baseSymbol = symbols.doubleWavy, color = colorOcean, **kwargs)
 
 class River(MapTile):
+    __mapper_args__ = {'polymorphic_identity': 'river'}
     isWaterTile = True
     def __init__(self, *args, **kwargs):
         super(Ocean, self).__init__(*args, baseSymbol = '~', color = colorRiver, **kwargs)
 
 class Bridge(MapTile):
+    __mapper_args__ = {'polymorphic_identity': 'bridge'}
     def __init__(self, *args, **kwargs):
         super(Bridge, self).__init__(*args, baseSymbol = '=', color = colorWood, **kwargs)
 
 class Town(MapTile):
+    __mapper_args__ = {'polymorphic_identity': 'town'}
     def __init__(self, *args, **kwargs):
         super(Town, self).__init__(*args, baseSymbol = '*', color = colorWood, **kwargs)
 

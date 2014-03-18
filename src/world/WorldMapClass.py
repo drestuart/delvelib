@@ -9,11 +9,12 @@ from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer
 
 import LevelClass as L
+from MapTileClass import Forest, Field, Plain, Mountain
+from PlayerClass import Player
 import Util as U
 from VoronoiMap import *
 import database as db
-from MapTileClass import *
-from PlayerClass import Player
+
 
 Base = db.saveDB.getDeclarativeBase()
 

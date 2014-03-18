@@ -49,3 +49,4 @@ lowerEth = unichr(273)
 treeshape = u"\U00010149" # Currently non-working
 upperOu = unichr(546)
 lowerOu = unichr(547)
+doubleWavy = u"\u2248" # Approx. equal symbol
