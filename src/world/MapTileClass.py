@@ -11,9 +11,9 @@ from sqlalchemy.types import String, Integer, Boolean
 from TileClass import TileBase
 import database as db
 from colors import *
-from symbols import *
 import Const as C
 import LevelClass as L
+import symbols
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -83,7 +83,7 @@ class MapTile(TileBase):
         
 
 class Forest(MapTile):
-    symb = lowerTau
+    symb = symbols.lowerTau
     connectedLevelType = L.ForestLevel
     def __init__(self, *args, **kwargs):
         super(Forest, self).__init__(*args, baseSymbol = self.symb, color = colorForest, **kwargs)

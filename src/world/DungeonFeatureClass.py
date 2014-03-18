@@ -10,7 +10,7 @@ from sqlalchemy.types import String, Integer, Boolean
 
 import colors
 import database as db
-from symbols import *
+import symbols
 import random
 
 Base = db.saveDB.getDeclarativeBase()
@@ -227,7 +227,7 @@ class Altar(DungeonFeature):
 class Tree(DungeonFeature):
 
     def __init__(self, **kwargs):
-        super(Tree, self).__init__(symbol = random.choice([lowerTau, 'T']), description = 'a tree', color = colors.colorTree, backgroundColor = colors.black, **kwargs)
+        super(Tree, self).__init__(symbol = random.choice([symbols.lowerTau, 'T']), description = 'a tree', color = colors.colorTree, backgroundColor = colors.black, **kwargs)
         
     blockMove = True
     blockSight = True
