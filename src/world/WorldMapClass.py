@@ -9,12 +9,13 @@ from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer
 
 import LevelClass as L
-from MapTileClass import Forest, Field, Plain, Mountain
+from MapTileClass import Forest, Field, Plain, Mountain, Town
 from PlayerClass import Player
 import Util as U
 from VoronoiMap import *
 import database as db
-
+import random
+import Const as C
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -35,6 +36,13 @@ class Region(Base):
     
     def addTile(self, tile):
         self.mapTiles.append(tile)
+        
+    def replaceTile(self, newtile):
+        for tile in self.mapTiles:
+            if tile.getXY() == newtile.getXY():
+                self.mapTiles.remove(tile)
+
+        self.addTile(newtile)
 
     def getTileType(self):
         # More logic goes here
@@ -66,6 +74,15 @@ class WorldMap(L.MapBase):
     
     def addTile(self, tile):
         self.mapTiles.append(tile)
+        self.hasTile[tile.getX()][tile.getY()] = True
+        
+    def replaceTile(self, newtile):
+        if self.hasTile[newtile.getX()][newtile.getY()]:
+            for tile in self.mapTiles:
+                if tile.getXY() == newtile.getXY():
+                    self.mapTiles.remove(tile)
+
+        self.addTile(newtile)
     
     def load(self):
         self.creatures = []
@@ -192,7 +209,18 @@ class WorldMap(L.MapBase):
                     newTile = tiletype(x, y)
                     newRegion.addTile(newTile)
                     self.addTile(newTile)
-                    self.hasTile[x][y] = True
+            
+            # Add some towns to this region
+            numTowns = random.randint(C.MIN_TOWNS_PER_REGION, C.MAX_TOWNS_PER_REGION)
+            townTiles = random.sample(newRegion.mapTiles, numTowns)
+            
+            for tile in townTiles:
+                # More probably needs to happen here
+                townx, towny = tile.getXY()
+                newTownTile = Town(townx, towny)
+                newRegion.replaceTile(newTownTile)
+                self.replaceTile(newTownTile)
+                
 
 
         # Finish up

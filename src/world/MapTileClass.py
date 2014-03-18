@@ -128,6 +128,6 @@ class Bridge(MapTile):
 class Town(MapTile):
     __mapper_args__ = {'polymorphic_identity': 'town'}
     def __init__(self, *args, **kwargs):
-        super(Town, self).__init__(*args, baseSymbol = '*', color = colorWood, **kwargs)
+        super(Town, self).__init__(*args, baseSymbol = symbols.townShape, color = colorWood, **kwargs)
 
 

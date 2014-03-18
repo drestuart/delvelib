@@ -39,6 +39,7 @@ class UI(object):
         self.fontsize = kwargs.get('fontsize')
 #         self.window.font = pygame.font.Font(fontpath, self.fontsize)
         self.window.font = pygame.font.Font(None, self.fontsize)
+#         self.window.font = pygame.font.Font("modules/delvelib/fonts/FreeMono.ttf", self.fontsize)
             
         self.window.autoblit = False
         self.window.autoupdate = False

@@ -3,7 +3,24 @@
 Created on Feb 28, 2014
 
 @author: dstuart
+
+Interesting symbols:
+
+
+Town symbols
+177     ±
+293     ĥ
+294     Ħ
+685     ʭ
+1769    ۩
+
+
+Si symbols
+1758    ۞    # DOOOOOOOOOOOOOOOOOOOOOOOD
+
+
 '''
+
 ######################################
 #
 #   Greek
@@ -40,13 +57,15 @@ lowerEth = unichr(273)
 
 
 
+
 ######################################
 #
 #   Misc
 #
 ######################################
 
-treeshape = u"\U00010149" # Currently non-working
+treeShape = u"\U00010149" # Currently non-working
 upperOu = unichr(546)
 lowerOu = unichr(547)
 doubleWavy = u"\u2248" # Approx. equal symbol
+townShape = unichr(293)
