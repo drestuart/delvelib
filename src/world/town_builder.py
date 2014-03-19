@@ -232,12 +232,25 @@ class town:
         bldgx = (cell.cell_width - bldg_width)/2 + cell.xoffset + random.randint(-2, 2)
         bldgy = (cell.cell_height - bldg_height)/2 + cell.yoffset + random.randint(-2, 2)
         
+        # Check that we can actually put the building here
+        canPlace = True
+        for x in range(bldg_width):
+            for y in range(bldg_height):
+                if self._tiles[x + bldgx][y + bldgy].get_shape() != '':
+                    canPlace = False
+                    break
+        
+        if not canPlace:
+            # Reset building position to center
+            bldgx = (cell.cell_width - bldg_width)/2 + cell.xoffset
+            bldgy = (cell.cell_height - bldg_height)/2 + cell.yoffset
+        
         # Lay down building tiles
         for x in range(bldg_width):
             for y in range(bldg_height):
                 shape = lines[y][x]
                 if self._tiles[x + bldgx][y + bldgy].get_shape() != '': 
-                    # Crash here
+                    # Crash here? Seems to be fixed
                     raise Exception("Tile " + str(x + bldgx) + ", " + str(y + bldgy) + " is occupied: " + self._tiles[x + bldgx][y + bldgy].get_shape())
                 self._tiles[x + bldgx][y + bldgy].set_shape(shape)
 
