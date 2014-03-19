@@ -237,6 +237,7 @@ class town:
             for y in range(bldg_height):
                 shape = lines[y][x]
                 if self._tiles[x + bldgx][y + bldgy].get_shape() != '': 
+                    # Crash here
                     raise Exception("Tile " + str(x + bldgx) + ", " + str(y + bldgy) + " is occupied: " + self._tiles[x + bldgx][y + bldgy].get_shape())
                 self._tiles[x + bldgx][y + bldgy].set_shape(shape)
 

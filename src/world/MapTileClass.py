@@ -12,7 +12,7 @@ from TileClass import TileBase
 from colors import *
 import database as db
 import symbols
-
+import random
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -20,6 +20,9 @@ class MapTile(TileBase):
     
     __tablename__ = "tiles"
     __table_args__ = {'extend_existing': True}
+    
+    connectedLevelWidth = 60
+    connectedLevelHeight = 40
     
     def __init__(self, x, y, **kwargs):
         super(MapTile, self).__init__(x, y, backgroundColor = blankBackground, **kwargs)
@@ -81,7 +84,7 @@ class MapTile(TileBase):
         return self.connectedLevel
     
     def generateConnectedLevel(self):
-        self.connectedLevel = self.connectedLevelType(width = 60, height = 40)
+        self.connectedLevel = self.connectedLevelType(width = self.connectedLevelWidth, height = self.connectedLevelHeight)
         self.connectedLevel.buildLevel()
         
         
@@ -126,8 +129,16 @@ class Bridge(MapTile):
         super(Bridge, self).__init__(*args, baseSymbol = '=', color = colorWood, **kwargs)
 
 class Town(MapTile):
+    symb = symbols.townShape
+    connectedLevelType = L.TownLevel
+    
     __mapper_args__ = {'polymorphic_identity': 'town'}
+    
     def __init__(self, *args, **kwargs):
-        super(Town, self).__init__(*args, baseSymbol = symbols.townShape, color = colorWood, **kwargs)
+        super(Town, self).__init__(*args, baseSymbol = self.symb, color = colorWood, **kwargs)
+        
+    def generateConnectedLevel(self):
+        self.connectedLevel = self.connectedLevelType(cellsWide = random.randint(2, 4), cellsHigh = random.randint(2, 4))
+        self.connectedLevel.buildLevel()
 
 
