@@ -272,7 +272,9 @@ class Tile(TileBase):
     def getSymbol(self):
         # Determine which symbol to use to draw this tile
         
+#         if self.creature and self.creature.isVisible():
         if self.creature and self.creature.isVisible():
+
             toReturn = self.creature.getSymbol()
             
         elif self.inventory and self.inventory.length() > 0:
@@ -441,22 +443,4 @@ class RoadFloor(Floor):
         self.baseSymbol = '~'
         
     __mapper_args__ = {'polymorphic_identity': 'roadfloor'}
-
-            
-def main():
-    
-    import LevelClass
-    import RoomClass
-    
-    db.saveDB.start(True)
-#    db.saveDB.start()
-
-    
-    t2 = StoneFloor(x=3, y=4)
-    print t2.getColor()
-    
-    
-
-if __name__ == '__main__':
-    main()
 
