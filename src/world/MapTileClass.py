@@ -32,7 +32,7 @@ class MapTile(TileBase):
         
     connectedLevelId = Column(Integer, ForeignKey("levels.id"))
     regionId = Column(Integer, ForeignKey("regions.id"))
-    worldMapId = Column(Integer, ForeignKey("world_map.id"))
+    worldMapId = Column(Integer, ForeignKey("levels.id"))
     
     isWaterTile = False
     connectedLevelType = L.WildernessLevel
