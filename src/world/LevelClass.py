@@ -64,6 +64,9 @@ class MapBase(Base):
     
     def computeFOV(self, x, y):
         pass
+    
+    def bumpEdge(self, creature):
+        return False
 
 class Level(MapBase):
     '''A class that models a map as an array of tiles.'''
@@ -112,13 +115,7 @@ class Level(MapBase):
         self.tileArray = []
 
         # Initialize self.hasTile
-        self.hasTile = []
-        
-        for dummyx in range(self.width):
-            newCol = []
-            for dummyy in range(self.height):
-                newCol.append(False)
-            self.hasTile.append(newCol)
+        self.hasTile = U.twoDArray(self.width, self.height, False)
         
         self.findDownStairs()
         self.findUpStairs()

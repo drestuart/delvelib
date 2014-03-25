@@ -34,7 +34,7 @@ class MapTile(TileBase):
     regionId = Column(Integer, ForeignKey("regions.id"))
     worldMapId = Column(Integer, ForeignKey("levels.id"))
     
-    isWaterTile = False
+    waterTile = False
     connectedLevelType = L.WildernessLevel
     
     tileType = Column(String)
@@ -49,7 +49,7 @@ class MapTile(TileBase):
         return False
     
     def isWaterTile(self):
-        return self.isWaterTile
+        return self.waterTile
     
     def getLevel(self):  
         return self.worldMap
@@ -113,13 +113,13 @@ class Mountain(MapTile):
 
 class Ocean(MapTile):
     __mapper_args__ = {'polymorphic_identity': 'ocean'}
-    isWaterTile = True
+    waterTile = True
     def __init__(self, *args, **kwargs):
         super(Ocean, self).__init__(*args, baseSymbol = symbols.doubleWavy, color = colorOcean, **kwargs)
 
 class River(MapTile):
     __mapper_args__ = {'polymorphic_identity': 'river'}
-    isWaterTile = True
+    waterTile = True
     def __init__(self, *args, **kwargs):
         super(Ocean, self).__init__(*args, baseSymbol = '~', color = colorRiver, **kwargs)
 

@@ -33,10 +33,11 @@ class VMapRegion(object):
 
 class VMap(object):
 	
-	def __init__(self, width, height, num_cells):
+	def __init__(self, width, height, num_cells, mask = None):
 		self.width = width
 		self.height = height
 		self.num_cells = num_cells
+		self.mask = mask
 		self.vmap = ""
 		self.centerPoints = []
 		self.adjacency = {}
@@ -51,17 +52,27 @@ class VMap(object):
 		vmap = ""
 		
 		for i in range(self.num_cells):
-			randx = random.randrange(self.width)
-			randy = random.randrange(self.height)
-			
-			if use_symbols:
-				symb = symbols[i]
-			else:
-				symb = str(i)
-
-			centerPoints.append((randx, randy))
-			newRegion = VMapRegion(randx, randy, symb)
-			self.regions.append(newRegion)
+			while True:
+				randx = random.randrange(self.width)
+				randy = random.randrange(self.height)
+				
+				# Make sure the random point is not excluded by the mask
+				if self.mask and not self.mask[randx][randy]:
+					continue
+				
+				# Make sure this isn't a duplicate point!
+				if (randx, randy) in centerPoints:
+					continue
+				
+				if use_symbols:
+					symb = symbols[i]
+				else:
+					symb = str(i)
+	
+				centerPoints.append((randx, randy))
+				newRegion = VMapRegion(randx, randy, symb)
+				self.regions.append(newRegion)
+				break
 
 		for y in range(self.height):
 			for x in range(self.width):
