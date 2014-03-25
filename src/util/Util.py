@@ -63,16 +63,29 @@ def getDirectionNameFromAngle(angle):
         if angle >= mina and angle < maxa:
             return name
 
-def main():
-    print getDirectionName((10, 10), (10,11))
+def readTemplateFile(path): 
     
+    templateFile = open(path, 'r')   
+    lines = []
+        
+    for line in templateFile.readlines():
+        lines.append(line.rstrip())
+        
+    templateFile.close()
     
-if __name__ == '__main__':
-    main()
+    return lines
     
+def twoDArray(width, height, val=True):
+    '''Initialize a 2-D array with values val'''
+    arr = []
+        
+    for dummyx in range(width):
+        newCol = []
+        for dummyy in range(height):
+            newCol.append(val)
+        arr.append(newCol)
     
-    
-    
+    return arr
     
     
     
