@@ -67,6 +67,10 @@ class MapBase(Base):
     
     def bumpEdge(self, creature):
         return False
+    
+    def distance(self, tilea, tileb):
+        return U.ChebyshevDistance(tilea.getX(), tileb.getX(), tilea.getY(), tileb.getY())
+
 
 class Level(MapBase):
     '''A class that models a map as an array of tiles.'''
@@ -176,9 +180,6 @@ class Level(MapBase):
     
     def getEntryPoint(self):
         return self.getTile(self.entryPointX, self.entryPointY)
-    
-    def distance(self, tilea, tileb):
-        return U.ChebyshevDistance(tilea.getX(), tileb.getX(), tilea.getY(), tileb.getY())
     
     def getRandomTile(self):
         randX = random.randint(0, self.width)

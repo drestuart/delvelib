@@ -73,6 +73,7 @@ class WorldMap(L.MapBase):
                     self.mapTiles.remove(tile)
 
         self.addTile(newtile)
+        self.tileArray[newtile.getX()][newtile.getY()] = newtile
     
     def load(self):
         self.creatures = []

@@ -121,7 +121,7 @@ class River(MapTile):
     __mapper_args__ = {'polymorphic_identity': 'river'}
     waterTile = True
     def __init__(self, *args, **kwargs):
-        super(Ocean, self).__init__(*args, baseSymbol = '~', color = colorRiver, **kwargs)
+        super(River, self).__init__(*args, baseSymbol = '~', color = colorRiver, **kwargs)
 
 class Bridge(MapTile):
     __mapper_args__ = {'polymorphic_identity': 'bridge'}
