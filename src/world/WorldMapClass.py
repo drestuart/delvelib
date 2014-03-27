@@ -115,6 +115,48 @@ class WorldMap(L.MapBase):
     def distance(self, tilea, tileb):
         return U.ChebyshevDistance(tilea.getX(), tileb.getX(), tilea.getY(), tileb.getY())
     
+    def getTilesInRadius(self, radius, centerX, centerY):
+        
+        assert radius >= 0 and radius == int(radius) #Do better error checking here.
+        
+        tiles = []
+        
+        for rad in range(0, radius + 1):
+            tiles += self.getTilesAtRadius(rad, centerX, centerY)
+        
+        return tiles
+        
+    
+    def getTilesAtRadius(self, radius, centerX, centerY):
+               
+        assert radius >= 0 and radius == int(radius) #Do better error checking here.
+        
+        centerTile = self.getTile(centerX, centerY)
+        tiles = []
+        
+        if radius == 0:
+            return [centerTile]
+        
+        x1 = max(0, centerX - radius)
+        y1 = max(0, centerY - radius)
+        
+        x2 = min(centerX + radius, self.width)
+        y2 = min(centerY + radius, self.height)
+        
+        for x in range(x1, x2 + 1):
+            tile1 = self.getTile(x, y1)
+            tile2 = self.getTile(x, y2)
+            if tile1: tiles.append(tile1)
+            if tile2: tiles.append(tile2)
+        
+        for y in range(y1 + 1, y2):
+            tile1 = self.getTile(x1, y)
+            tile2 = self.getTile(x2, y)
+            if tile1: tiles.append(tile1)
+            if tile2: tiles.append(tile2)
+        
+        return tiles
+    
     def getTilesToDraw(self, dummyx, dummyy, cameradims, visibility = True):
         retArray = []
         

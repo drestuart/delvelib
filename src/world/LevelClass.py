@@ -293,7 +293,7 @@ class Level(MapBase):
         
         tiles = []
         
-        for rad in range(0, radius):
+        for rad in range(0, radius + 1):
             tiles += self.getTilesAtRadius(rad, centerX, centerY)
         
         return tiles
@@ -315,19 +315,17 @@ class Level(MapBase):
         x2 = min(centerX + radius, self.width)
         y2 = min(centerY + radius, self.height)
         
-        for x in range(x1, x2):
+        for x in range(x1, x2 + 1):
             tile1 = self.getTile(x, y1)
             tile2 = self.getTile(x, y2)
             if tile1: tiles.append(tile1)
             if tile2: tiles.append(tile2)
         
-        for y in range(y1 + 1, y2 - 1):
+        for y in range(y1 + 1, y2):
             tile1 = self.getTile(x1, y)
             tile2 = self.getTile(x2, y)
             if tile1: tiles.append(tile1)
             if tile2: tiles.append(tile2)
-        
-#         assert len(tiles) == 4*radius - 4
         
         return tiles
     
