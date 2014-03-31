@@ -13,6 +13,7 @@ from colors import *
 import database as db
 import symbols
 import random
+import Game
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -33,6 +34,7 @@ class MapTile(TileBase):
     connectedLevelId = Column(Integer, ForeignKey("levels.id"))
     regionId = Column(Integer, ForeignKey("regions.id"))
     worldMapId = Column(Integer, ForeignKey("levels.id"))
+    name = Column(String)
     
     waterTile = False
     connectedLevelType = L.WildernessLevel
@@ -136,6 +138,7 @@ class Town(MapTile):
     
     def __init__(self, *args, **kwargs):
         super(Town, self).__init__(*args, baseSymbol = self.symb, color = colorWood, **kwargs)
+        self.name = Game.getPlaceName()
         
     def generateConnectedLevel(self):
         self.connectedLevel = self.connectedLevelType(cellsWide = random.randint(2, 4), cellsHigh = random.randint(2, 4))
