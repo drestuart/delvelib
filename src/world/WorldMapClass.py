@@ -36,11 +36,9 @@ class Region(Base):
         self.mapTiles.append(tile)
         tile.setRegion(self)
         
-    def replaceTile(self, newtile):
-        for tile in self.mapTiles:
-            if tile.getXY() == newtile.getXY():
-                self.mapTiles.remove(tile)
-
+    def replaceTile(self, oldtile, newtile):
+        assert oldtile.getXY() == newtile.getXY()
+        self.mapTiles.remove(oldtile)
         self.addTile(newtile)
 
     def getTileType(self):
@@ -68,13 +66,14 @@ class WorldMap(L.MapBase):
         self.hasTile[tile.getX()][tile.getY()] = True
         
     def replaceTile(self, newtile):
-        for tile in self.mapTiles:
-            if tile.getXY() == newtile.getXY():
-                self.mapTiles.remove(tile)
-                reg = tile.getRegion()
-                if reg:
-                    reg.replaceTile(newtile)
+        oldtile = self.getTile(newtile.getX(), newtile.getY())
+        assert oldtile.getXY() == newtile.getXY()
 
+        reg = oldtile.getRegion()
+        if reg:
+            reg.replaceTile(oldtile, newtile)
+        
+        self.mapTiles.remove(oldtile)
         self.addTile(newtile)
         self.tileArray[newtile.getX()][newtile.getY()] = newtile
     
