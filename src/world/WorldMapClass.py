@@ -34,6 +34,7 @@ class Region(Base):
     
     def addTile(self, tile):
         self.mapTiles.append(tile)
+        tile.setRegion(self)
         
     def replaceTile(self, newtile):
         for tile in self.mapTiles:
@@ -67,10 +68,12 @@ class WorldMap(L.MapBase):
         self.hasTile[tile.getX()][tile.getY()] = True
         
     def replaceTile(self, newtile):
-        if self.hasTile[newtile.getX()][newtile.getY()]:
-            for tile in self.mapTiles:
-                if tile.getXY() == newtile.getXY():
-                    self.mapTiles.remove(tile)
+        for tile in self.mapTiles:
+            if tile.getXY() == newtile.getXY():
+                self.mapTiles.remove(tile)
+                reg = tile.getRegion()
+                if reg:
+                    reg.replaceTile(newtile)
 
         self.addTile(newtile)
         self.tileArray[newtile.getX()][newtile.getY()] = newtile
@@ -113,7 +116,11 @@ class WorldMap(L.MapBase):
         return None
     
     def distance(self, tilea, tileb):
-        return U.ChebyshevDistance(tilea.getX(), tileb.getX(), tilea.getY(), tileb.getY())
+        return self.coordinateDistance(tilea.getX(), tileb.getX(), tilea.getY(), tileb.getY())
+    
+    def coordinateDistance(self, xa, xb, ya, yb):
+        return U.ChebyshevDistance(xa, xb, ya, yb)
+
     
     def getTilesInRadius(self, radius, centerX, centerY):
         

@@ -59,6 +59,9 @@ class MapTile(TileBase):
     def getRegion(self):
         return self.region
     
+    def setRegion(self, reg):
+        self.region = reg
+    
     def getColor(self):
         # Determine which color to use to draw this tile
         
@@ -128,7 +131,7 @@ class River(MapTile):
 class Bridge(MapTile):
     __mapper_args__ = {'polymorphic_identity': 'bridge'}
     def __init__(self, *args, **kwargs):
-        super(Bridge, self).__init__(*args, baseSymbol = '=', color = colorWood, **kwargs)
+        super(Bridge, self).__init__(*args, baseSymbol = '^', color = colorWood, **kwargs)
 
 class Town(MapTile):
     symb = symbols.townShape
