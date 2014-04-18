@@ -10,10 +10,8 @@ from sqlalchemy.orm import relationship, backref
 from randomChoice import weightedChoice
 from pubsub import pub
 
-import database as db
-import LevelClass as L
-import Const as C
-
+import delvelib.src.database.database as db
+import delvelib.src.world.LevelClass as L
 
 Base = db.saveDB.getDeclarativeBase()
 

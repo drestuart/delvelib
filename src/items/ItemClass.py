@@ -7,7 +7,7 @@ Created on Mar 10, 2013
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer, Float
 import colors
-import database as db
+import delvelib.src.database.database as db
 from randomChoice import weightedChoice
 
 Base = db.saveDB.getDeclarativeBase()

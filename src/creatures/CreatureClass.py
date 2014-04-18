@@ -9,7 +9,7 @@ from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
 from sqlalchemy.types import String, Integer, Boolean
 import AIClass as AI
 import colors
-import database as db
+import delvelib.src.database.database as db
 import Game as G
 import InventoryClass as I
 

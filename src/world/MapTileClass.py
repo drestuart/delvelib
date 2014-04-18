@@ -10,7 +10,7 @@ from sqlalchemy.types import String
 import LevelClass as L
 from TileClass import TileBase
 from colors import *
-import database as db
+import delvelib.src.database.database as db
 import symbols
 import random
 import Game

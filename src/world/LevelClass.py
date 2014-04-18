@@ -13,7 +13,7 @@ from sqlalchemy.types import String, Integer
 
 import AStar
 import Const as C
-from DungeonFeatureClass import upStair, downStair
+from delvelib.src.world.DungeonFeatureClass import upStair, downStair
 import DungeonFeatureClass as F
 import FOVMap as fov
 import ItemClass as I
@@ -22,7 +22,7 @@ import Game as G
 import Util as U
 import ca_cave
 import colors
-import database as db
+import delvelib.src.database.database as db
 import town_builder
 import dungeon_builder
 

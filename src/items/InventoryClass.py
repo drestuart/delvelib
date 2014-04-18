@@ -10,7 +10,7 @@ from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import Integer, String
 import ItemClass as I
 import colors
-import database as db
+import delvelib.src.database.database as db
 
 Base = db.saveDB.getDeclarativeBase()
 

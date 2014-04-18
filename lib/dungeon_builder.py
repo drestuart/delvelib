@@ -7,8 +7,8 @@ Available at: http://roguebasin.roguelikedevelopment.org/index.php?title=Python_
 
 import Const as C
 import random
-import RoomClass as R
-import DungeonFeatureClass as F
+import delvelib.src.world.RoomClass as R
+import delvelib.src.world.DungeonFeatureClass as F
 
 # This is just the basic dungeon tile. It holds a shape.
 class dungeon_tile:

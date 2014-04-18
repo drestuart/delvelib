@@ -12,13 +12,13 @@ import pygcurse
 import pygame
 from pygame.locals import *
 import sys
-from PanelClass import *
+from delvelib.src.ui.PanelClass import *
 import textwrap
-from DungeonFeatureClass import downStair, upStair, Stair, Door
-import database as db
+from delvelib.src.world.DungeonFeatureClass import downStair, upStair, Stair, Door
+import delvelib.src.database.database as db
 import os.path
-import TileClass as T
-import MapTileClass as MT
+import delvelib.src.world.TileClass as T
+import delvelib.src.world.MapTileClass as MT
 
 # TODO Abstract out all pygcurse calls into an interface class
 

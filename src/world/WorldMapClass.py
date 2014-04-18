@@ -12,7 +12,7 @@ import LevelClass as L
 from MapTileClass import Forest, Field, Plain, Mountain, Town
 import Util as U
 from VoronoiMap import VMap
-import database as db
+import delvelib.src.database.database as db
 import random
 import Const as C
 
