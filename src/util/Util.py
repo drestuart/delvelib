@@ -5,6 +5,8 @@ Created on Mar 14, 2013
 '''
 
 import math
+import PIL.Image
+import Const as C
 
 def get_key(key):
     '''
@@ -74,6 +76,33 @@ def readTemplateFile(path):
     templateFile.close()
     
     return lines
+
+def readTemplateImage(path):
+    img = PIL.Image.open(path)
+    rgb_im = img.convert('RGB')
+    
+    sizex, sizey = rgb_im.size
+    
+    assert sizex, sizey == (C.WORLD_MAP_WIDTH, C.WORLD_MAP_HEIGHT)
+    
+    emap = []
+
+    for y in range(sizey):
+        row = []
+        for x in range(sizex):
+            red, blue, green = rgb_im.getpixel((x,y))
+            symbol = '!'
+            if blue > green:
+                symbol = '.'
+            elif green > blue:
+                symbol = '='
+    
+            row.append(symbol)
+        emap.append(row)
+        
+    assert len(emap[0]), len(emap) == (C.WORLD_MAP_WIDTH, C.WORLD_MAP_HEIGHT)
+    
+    return emap
     
 def twoDArray(width, height, val=True):
     '''Initialize a 2-D array with values val'''

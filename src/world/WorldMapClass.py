@@ -102,6 +102,7 @@ class WorldMap(L.MapBase):
             
         # Fill in
         for tile in self.mapTiles:
+            assert tile is not None
             self.tileArray[tile.x][tile.y] = tile
             
     def getTile(self, x, y):
@@ -111,7 +112,7 @@ class WorldMap(L.MapBase):
         
         if x >= 0 and x < self.width and y >= 0 and y < self.height:
             return self.tileArray[x][y]
-    
+        
         return None
     
     def distance(self, tilea, tileb):
