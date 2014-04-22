@@ -77,7 +77,7 @@ def readTemplateFile(path):
     
     return lines
 
-def readTemplateImage(path):
+def readTemplateImage(path, colormap):
     img = PIL.Image.open(path)
     rgb_im = img.convert('RGB')
     
@@ -90,12 +90,12 @@ def readTemplateImage(path):
     for y in range(sizey):
         row = []
         for x in range(sizex):
-            red, blue, green = rgb_im.getpixel((x,y))
+            color = rgb_im.getpixel((x,y))
             symbol = '!'
-            if blue > green:
-                symbol = '.'
-            elif green > blue:
-                symbol = '='
+            if color in colormap:
+                symbol = colormap[color]
+            else:
+                raise ValueError("Bad color value: " + str(color))
     
             row.append(symbol)
         emap.append(row)
