@@ -4,7 +4,7 @@ Created on Feb 25, 2014
 @author: dstuart
 '''
 
-from sqlalchemy.schema import ForeignKey
+from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String
 
 import LevelClass as L
