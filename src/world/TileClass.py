@@ -14,8 +14,6 @@ import delvelib.src.database.database as db
 import InventoryClass as Inv
 import random
 
-#from DungeonFeatureClass import *
-
 Base = db.saveDB.getDeclarativeBase()
 
 # A parent class for both level and world map tiles
@@ -42,7 +40,7 @@ class TileBase(colors.withBackgroundColor, Base):
     y = Column(Integer)
     
     creatureId = Column(Integer, ForeignKey('creatures.id'))
-    creature = relationship("Creature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.creatureId == Creature.id")
+    creature = relationship("Creature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "delvelib.src.world.TileBase.creatureId == Creature.id")
     
     tileType = Column(String)
 
@@ -123,6 +121,8 @@ class TileBase(colors.withBackgroundColor, Base):
 
 class Tile(TileBase):
     # A tile of the map and its properties
+    __tablename__ = "tiles"
+    __table_args__ = {'extend_existing': True}
     
     def __init__(self, x, y, **kwargs):
         super(Tile, self).__init__(x, y, **kwargs)
@@ -141,28 +141,26 @@ class Tile(TileBase):
         self.load()
     
     
-    blockSight = Column(Boolean)
     explored = Column(Boolean)
+    blockSight = Column(Boolean)
     
     lastSeenSymbol = Column(String(length=1, convert_unicode = True))
     
-#    level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
     levelId = Column(Integer, ForeignKey("levels.id"))
     
-#    room = relationship("Room", primaryjoin = "Room.id==Tile.roomId")
     roomId = Column(Integer, ForeignKey("rooms.id"))
     
     featureId = Column(Integer, ForeignKey('dungeon_features.id'))
-    feature = relationship("DungeonFeature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.featureId == DungeonFeature.id")
+    feature = relationship("DungeonFeature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "delvelib.src.world.Tile.featureId == DungeonFeature.id")
     
     destinationOfId = Column(Integer, ForeignKey('dungeon_features.id'))
-    destinationOf = relationship("DungeonFeature", backref=backref("destination", uselist=False), uselist = False, primaryjoin = "Tile.destinationOfId == DungeonFeature.id")
+    destinationOf = relationship("DungeonFeature", backref=backref("destination", uselist=False), uselist = False, primaryjoin = "delvelib.src.world.Tile.destinationOfId == DungeonFeature.id")
     
     goalTileOfId = Column(Integer, ForeignKey('creatures.id'))
-    goalTileOf = relationship("Creature", backref=backref("goalTile", uselist=False), uselist = False, primaryjoin = "Tile.goalTileOfId == Creature.id")
+    goalTileOf = relationship("Creature", backref=backref("goalTile", uselist=False), uselist = False, primaryjoin = "delvelib.src.world.Tile.goalTileOfId == Creature.id")
     
     inventoryId = Column(Integer, ForeignKey("inventories.id"))
-    inventory = relationship("Inventory", backref = backref("tile", uselist = False), uselist = False, primaryjoin = "Tile.inventoryId == Inventory.id")
+    inventory = relationship("Inventory", backref = backref("tile", uselist = False), uselist = False, primaryjoin = "delvelib.src.world.Tile.inventoryId == Inventory.id")
     
     __mapper_args__ = {'polymorphic_identity': 'tile'}
     

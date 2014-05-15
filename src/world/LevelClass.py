@@ -99,8 +99,8 @@ class Level(MapBase):
     
     dungeonId = Column(Integer, ForeignKey("dungeons.id"))
     
-    tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
-    mapTile = relationship("MapTile", backref=backref("connectedLevel", uselist = False), uselist = False, primaryjoin="Level.id==MapTile.connectedLevelId")
+    tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==delvelib.src.world.Tile.levelId")
+    mapTile = relationship("MapTile", backref=backref("connectedLevel", uselist = False), uselist = False, primaryjoin="Level.id==delvelib.src.world.MapTile.connectedLevelId")
     rooms = relationship("Room", backref = "level")
     
     entryPointX = Column(Integer)

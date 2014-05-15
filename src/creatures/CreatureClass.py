@@ -58,6 +58,9 @@ class Creature(colors.withColor, Base):
     maxHP = Column(Integer)
     damageTaken = Column(Integer)
     
+#     tile = relationship("TileBase", backref=backref("creature", uselist=False), uselist = False, primaryjoin = "delvelib.src.creatures.Creature.tileId == TileBase.id")
+#     tileId = Column(Integer, ForeignKey('tiles.id'))
+
     goalEnemy = relationship("Creature", uselist=False)
     goalEnemyId = Column(Integer, ForeignKey('creatures.id'))
     
