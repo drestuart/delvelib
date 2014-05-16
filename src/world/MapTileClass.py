@@ -5,11 +5,15 @@ Created on Feb 25, 2014
 '''
 
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import String, Integer
+from sqlalchemy.types import String
 
+import LevelClass as L
 from TileClass import TileBase
-from colors import blankBackground
+from colors import *
 import delvelib.src.database.database as db
+import symbols
+import random
+import Game
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -33,6 +37,7 @@ class MapTile(TileBase):
     name = Column(String)
     
     waterTile = False
+    connectedLevelType = L.WildernessLevel
     
     tileType = Column(String)
     
@@ -88,3 +93,58 @@ class MapTile(TileBase):
         self.connectedLevel.buildLevel()
         
         
+
+class Forest(MapTile):
+    symb = symbols.lowerTau
+    connectedLevelType = L.ForestLevel
+    __mapper_args__ = {'polymorphic_identity': 'forest'}
+    def __init__(self, *args, **kwargs):
+        super(Forest, self).__init__(*args, baseSymbol = self.symb, color = colorForest, **kwargs)
+
+class Plain(MapTile):
+    __mapper_args__ = {'polymorphic_identity': 'plain'}
+    def __init__(self, *args, **kwargs):
+        super(Plain, self).__init__(*args, baseSymbol = '.', color = colorPlain, **kwargs)
+        
+class Field(MapTile):
+    __mapper_args__ = {'polymorphic_identity': 'field'}
+    def __init__(self, *args, **kwargs):
+        super(Field, self).__init__(*args, baseSymbol = '.', color = colorField, **kwargs)
+
+class Mountain(MapTile):
+    __mapper_args__ = {'polymorphic_identity': 'mountain'}
+    def __init__(self, *args, **kwargs):
+        super(Mountain, self).__init__(*args, baseSymbol = '^', color = colorMountain, **kwargs)
+
+class Ocean(MapTile):
+    __mapper_args__ = {'polymorphic_identity': 'ocean'}
+    waterTile = True
+    def __init__(self, *args, **kwargs):
+        super(Ocean, self).__init__(*args, baseSymbol = symbols.doubleWavy, color = colorOcean, **kwargs)
+
+class River(MapTile):
+    __mapper_args__ = {'polymorphic_identity': 'river'}
+    waterTile = True
+    def __init__(self, *args, **kwargs):
+        super(River, self).__init__(*args, baseSymbol = '~', color = colorRiver, **kwargs)
+
+class Bridge(MapTile):
+    __mapper_args__ = {'polymorphic_identity': 'bridge'}
+    def __init__(self, *args, **kwargs):
+        super(Bridge, self).__init__(*args, baseSymbol = '^', color = colorWood, **kwargs)
+
+class Town(MapTile):
+    symb = symbols.townShape
+    connectedLevelType = L.TownLevel
+    
+    __mapper_args__ = {'polymorphic_identity': 'town'}
+    
+    def __init__(self, *args, **kwargs):
+        super(Town, self).__init__(*args, baseSymbol = self.symb, color = colorWood, **kwargs)
+        self.name = Game.getPlaceName()
+        
+    def generateConnectedLevel(self):
+        self.connectedLevel = self.connectedLevelType(cellsWide = random.randint(2, 4), cellsHigh = random.randint(2, 4))
+        self.connectedLevel.buildLevel()
+
+

@@ -115,7 +115,7 @@ class Room(Rect, Base):
 #    level = relationship("Level", primaryjoin="Level.id==Room.levelId")
     levelId = Column(Integer, ForeignKey("levels.id"))
 
-    tiles = relationship("Tile", backref=backref("room"), primaryjoin="Room.id==delvelib.src.world.Tile.roomId")
+    tiles = relationship("Tile", backref=backref("room"), primaryjoin="Room.id==Tile.roomId")
     
 #    def fillWithTiles(self):
 #        # Create wall tiles

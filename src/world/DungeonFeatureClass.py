@@ -7,7 +7,6 @@ Created on Mar 12, 2013
 from pubsub import pub
 from sqlalchemy.schema import Column
 from sqlalchemy.types import String, Integer, Boolean
-from sqlalchemy.ext.declarative import declared_attr
 
 import colors
 import delvelib.src.database.database as db
@@ -99,14 +98,12 @@ class DungeonFeature(colors.withBackgroundColor, Base):
 
 
 class Door(DungeonFeature):
-
-    __tablename__ = "dungeon_features"
-    __table_args__ = {'extend_existing': True}
     
     def __init__(self, **kwargs):
         super(Door, self).__init__(symbol = '+', description = 'a door', color = colors.colorWood, backgroundColor = colors.black, **kwargs)
         self.closed = True
         self.color = colors.colorWood
+
 
     closed = Column(Boolean)
     

@@ -9,6 +9,7 @@ from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer
 
 import LevelClass as L
+from MapTileClass import Forest, Field, Plain, Mountain, Town
 import Util as U
 from VoronoiMap import VMap
 import delvelib.src.database.database as db
@@ -23,15 +24,13 @@ class Region(Base):
     
     def __init__(self, **kwargs):
         self.mapTiles = []
-        self.centerX = kwargs['centerX']
-        self.centerY = kwargs['centerY']
+        
+        self.tileType = random.choice([Forest, Field, Plain, Mountain])
 
     id = Column(Integer, primary_key=True)
 
     worldMapId = Column(Integer, ForeignKey("levels.id"))
     name = Column(String)
-    centerX = Column(Integer)
-    centerY = Column(Integer)
     
     def addTile(self, tile):
         self.mapTiles.append(tile)
@@ -42,8 +41,9 @@ class Region(Base):
         self.mapTiles.remove(oldtile)
         self.addTile(newtile)
 
-    def getCenter(self):
-        return self.centerX, self.centerY
+    def getTileType(self):
+        # More logic goes here
+        return self.tileType
 
 
 class WorldMap(L.MapBase):
