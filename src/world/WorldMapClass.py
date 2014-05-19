@@ -9,12 +9,8 @@ from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer
 
 import LevelClass as L
-from MapTileClass import Forest, Field, Plain, Mountain, Town
 import Util as U
-from VoronoiMap import VMap
 import delvelib.src.database.database as db
-import random
-import Const as C
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -25,7 +21,6 @@ class Region(Base):
     def __init__(self, **kwargs):
         self.mapTiles = []
         
-        self.tileType = random.choice([Forest, Field, Plain, Mountain])
 
     id = Column(Integer, primary_key=True)
 
