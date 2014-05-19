@@ -31,6 +31,11 @@ class Region(Base):
 
     worldMapId = Column(Integer, ForeignKey("levels.id"))
     name = Column(String)
+    mapTiles = relationship("MapTile", backref=backref("region", uselist=False), primaryjoin="Region.id==MapTile.regionId")
+    regionType = Column(String)
+    
+    __mapper_args__ = {'polymorphic_on': regionType,
+                       'polymorphic_identity': 'region'}
     
     def addTile(self, tile):
         self.mapTiles.append(tile)
