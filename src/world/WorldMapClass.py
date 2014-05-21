@@ -45,7 +45,6 @@ class Region(Base):
         self.addTile(newtile)
 
     def getTileType(self):
-        # More logic goes here
         return self.tileType
 
 
