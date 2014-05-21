@@ -10,7 +10,7 @@ from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer, Boolean
 import Util as U
 import colors
-import delvelib.src.database.database as db
+import database as db
 import InventoryClass as Inv
 import random
 

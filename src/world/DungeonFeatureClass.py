@@ -9,13 +9,14 @@ from sqlalchemy.schema import Column
 from sqlalchemy.types import String, Integer, Boolean
 
 import colors
-import delvelib.src.database.database as db
+import database as db
 import symbols
 import random
 
 Base = db.saveDB.getDeclarativeBase()
 
 class DungeonFeature(colors.withBackgroundColor, Base):
+    # Dummy class right now.  Will eventually represent dungeon features like traps, altars and stairs
     
     __tablename__ = "dungeon_features"
     __table_args__ = {'extend_existing': True}

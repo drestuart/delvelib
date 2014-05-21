@@ -10,7 +10,7 @@ from sqlalchemy.types import String, Integer
 import LevelClass as L
 from TileClass import TileBase
 from colors import colorForest, colorPlain, colorMountain, colorField, colorOcean, colorRiver, colorWood, blankBackground
-import delvelib.src.database.database as db
+import database as db
 import symbols
 import random
 import Game

@@ -7,7 +7,7 @@ Created on Mar 10, 2013
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer, Boolean
-import delvelib.src.database.database as db
+import database as db
 import TileClass as T
 
 Base = db.saveDB.getDeclarativeBase()

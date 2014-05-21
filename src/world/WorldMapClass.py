@@ -10,7 +10,10 @@ from sqlalchemy.types import String, Integer
 
 import LevelClass as L
 import Util as U
-import delvelib.src.database.database as db
+from VoronoiMap import VMap
+import database as db
+import random
+import Const as C
 
 Base = db.saveDB.getDeclarativeBase()
 
