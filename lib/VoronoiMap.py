@@ -101,6 +101,9 @@ class VMap(object):
 			
 		for y in range(self.height):
 			for x in range(self.width):
+				# check that this point isn't in the ocean mask
+				if self.mask and not self.mask[x][y]:
+					continue
 				
 				thisReg = self.pointsToRegions[(x,y)]
 				for i in (-1, 0, 1):
@@ -108,6 +111,9 @@ class VMap(object):
 						if (i == 0 and j == 0):
 							continue
 						if (x + i < 0 or y + j < 0 or x + i > self.width-1 or y + j > self.height-1):
+							continue
+						# check that adjacent point isn't in the ocean mask
+						if self.mask and not self.mask[x + i][y + j]:
 							continue
 						
 						adjReg = self.pointsToRegions[(x + i, y + j)]
