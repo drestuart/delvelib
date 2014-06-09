@@ -9,17 +9,14 @@ from sqlalchemy.types import String, Integer
 
 import LevelClass as L
 from TileClass import TileBase
-from colors import colorForest, colorPlain, colorMountain, colorField, colorOcean, colorRiver, colorWood, blankBackground
+from colors import blankBackground
 import database as db
-import symbols
-import random
-import Game
 
 Base = db.saveDB.getDeclarativeBase()
 
 class MapTile(TileBase):
     
-    __tablename__ = "tiles"
+    __tablename__ = "map_tiles"
     __table_args__ = {'extend_existing': True}
     
     connectedLevelWidth = 60
@@ -31,6 +28,7 @@ class MapTile(TileBase):
         self.connectedLevel = kwargs.get('connectedLevel', None)
         self.worldMap = kwargs.get('worldMap')
         
+    id = Column(Integer, ForeignKey('tiles.id'), primary_key=True)
     connectedLevelId = Column(Integer, ForeignKey("levels.id"))
     regionId = Column(Integer, ForeignKey("regions.id"))
     worldMapId = Column(Integer, ForeignKey("levels.id"))
