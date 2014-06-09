@@ -374,28 +374,36 @@ class Tile(TileBase):
 class Wall(Tile):
     
     def __init__(self, x, y, **kwargs):
-        super(Wall, self).__init__(x, y, blockMove = True, blockSight = True, backgroundColor = colors.black, baseSymbol = '#', **kwargs)
+        super(Wall, self).__init__(x, y, blockMove = True, blockSight = True, baseSymbol = '#', **kwargs)
+    
+    backgroundColor = colors.black
     
     __mapper_args__ = {'polymorphic_identity': 'wall'}
     
 class WoodWall(Wall):
     
     def __init__(self, x, y, **kwargs):
-        super(WoodWall, self).__init__(x, y, baseDescription = "A wooden wall", color = colors.colorWood, **kwargs)
+        super(WoodWall, self).__init__(x, y, baseDescription = "A wooden wall", **kwargs)
+        
+    color = colors.colorWood
     
     __mapper_args__ = {'polymorphic_identity': 'woodwall'}
 
 class RockWall(Wall):
     
     def __init__(self, x, y, **kwargs):
-        super(RockWall, self).__init__(x, y, baseDescription = "A rock wall", color = colors.colorRock, **kwargs)
+        super(RockWall, self).__init__(x, y, baseDescription = "A rock wall", **kwargs)
+    
+    color = colors.colorRock
     
     __mapper_args__ = {'polymorphic_identity': 'rockwall'}
     
 class StoneWall(Wall):
     
     def __init__(self, x, y, **kwargs):
-        super(StoneWall, self).__init__(x, y, baseDescription = "A stone wall", color = colors.colorStone, **kwargs)
+        super(StoneWall, self).__init__(x, y, baseDescription = "A stone wall", **kwargs)
+    
+    color = colors.colorStone
     
     __mapper_args__ = {'polymorphic_identity': 'stonewall'}
 
@@ -404,7 +412,9 @@ class Floor(Tile):
         
     def __init__(self, x, y, **kwargs):
         #print "Floor.__init__"
-        super(Floor, self).__init__(x, y, blockMove = False, blockSight = False, backgroundColor = colors.black, **kwargs)
+        super(Floor, self).__init__(x, y, blockMove = False, blockSight = False, **kwargs)
+    
+    backgroundColor = colors.black
     
     __mapper_args__ = {'polymorphic_identity': 'floor'}
 
@@ -412,35 +422,46 @@ class StoneFloor(Floor):
         
     def __init__(self, x, y, **kwargs):
         #print "StoneFloor.__init__"
-        super(StoneFloor, self).__init__(x, y, baseDescription = "A stone floor", color =  colors.colorStone, baseSymbol = '.', **kwargs)
+        super(StoneFloor, self).__init__(x, y, baseDescription = "A stone floor", baseSymbol = '.', **kwargs)
+        
+    color =  colors.colorStone
     
     __mapper_args__ = {'polymorphic_identity': 'stonefloor'}
 
 class GrassFloor(Floor):
             
     def __init__(self, x, y, **kwargs):
-        super(GrassFloor, self).__init__(x, y, baseDescription = "Grass", color = colors.colorGrass, baseSymbol = random.choice(['.', ',']), **kwargs)
+        super(GrassFloor, self).__init__(x, y, baseDescription = "Grass", baseSymbol = random.choice(['.', ',']), **kwargs)
+        
+    color = colors.colorGrass
+    
     __mapper_args__ = {'polymorphic_identity': 'grassfloor'}
 
 class WoodFloor(Floor):
             
     def __init__(self, x, y, **kwargs):
-        super(WoodFloor, self).__init__(x, y, baseDescription = "A wooden floor", color = colors.colorWood, baseSymbol = '.', **kwargs)
+        super(WoodFloor, self).__init__(x, y, baseDescription = "A wooden floor", baseSymbol = '.', **kwargs)
+    
+    color = colors.colorWood
     
     __mapper_args__ = {'polymorphic_identity': 'woodfloor'}
 
 class RockTunnel(Floor):
     
     def __init__(self, x, y, **kwargs):
-        super(RockTunnel, self).__init__(x, y, baseDescription = "A rocky tunnel", color = colors.colorRock, baseSymbol = '.', **kwargs)
+        super(RockTunnel, self).__init__(x, y, baseDescription = "A rocky tunnel", baseSymbol = '.', **kwargs)
+        
+    color = colors.colorRock
     
     __mapper_args__ = {'polymorphic_identity': 'rocktunnel'}
     
 class RoadFloor(Floor):
     
     def __init__(self, x, y, **kwargs):
-        super(RoadFloor, self).__init__(x, y, baseDescription = "A dirt road", color = colors.brown, baseSymbol = '.', **kwargs)
+        super(RoadFloor, self).__init__(x, y, baseDescription = "A dirt road", baseSymbol = '.', **kwargs)
         self.baseSymbol = '~'
+        
+    color = colors.brown
         
     __mapper_args__ = {'polymorphic_identity': 'roadfloor'}
 

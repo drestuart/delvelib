@@ -100,10 +100,12 @@ class DungeonFeature(colors.withBackgroundColor, Base):
 
 class Door(DungeonFeature):
     
+    color = colors.colorWood
+    backgroundColor = colors.black
+    
     def __init__(self, **kwargs):
-        super(Door, self).__init__(symbol = '+', description = 'a door', color = colors.colorWood, backgroundColor = colors.black, **kwargs)
+        super(Door, self).__init__(symbol = '+', description = 'a door', **kwargs)
         self.closed = True
-        self.color = colors.colorWood
 
 
     closed = Column(Boolean)
@@ -176,10 +178,11 @@ class Stair(DungeonFeature):
 
         
 class upStair(Stair):
-    
+    color = colors.colorStone
+    backgroundColor = colors.black
     def __init__(self, **kwargs):
         
-        super(upStair, self).__init__(symbol = '<', description = 'a stairway leading up', color = colors.colorStone, backgroundColor = colors.black, **kwargs)
+        super(upStair, self).__init__(symbol = '<', description = 'a stairway leading up', **kwargs)
         
         self.destination = kwargs.get('destination', None)
         
@@ -196,9 +199,10 @@ class upStair(Stair):
     
 
 class downStair(Stair):
-    
+    color = colors.colorStone
+    backgroundColor = colors.black
     def __init__(self, **kwargs):
-        super(downStair, self).__init__(symbol = '>', description = 'a stairway leading down', color = colors.colorStone, backgroundColor = colors.black, **kwargs)
+        super(downStair, self).__init__(symbol = '>', description = 'a stairway leading down', **kwargs)
         
         self.destination = kwargs.get('destination', None)
         
@@ -215,9 +219,10 @@ class downStair(Stair):
 
 
 class Altar(DungeonFeature):
-    
+    color = colors.colorStone
+    backgroundColor = colors.black
     def __init__(self, **kwargs):
-        super(Altar, self).__init__(symbol = '_', description = 'an altar', color = colors.colorStone, backgroundColor = colors.black, **kwargs)
+        super(Altar, self).__init__(symbol = '_', description = 'an altar', **kwargs)
         
     blockMove = False
     blockSight = False
@@ -225,9 +230,10 @@ class Altar(DungeonFeature):
     __mapper_args__ = {'polymorphic_identity': 'altar'}
 
 class Tree(DungeonFeature):
-
+    color = colors.colorTree
+    backgroundColor = colors.black
     def __init__(self, **kwargs):
-        super(Tree, self).__init__(symbol = random.choice([symbols.lowerTau, 'T']), description = 'a tree', color = colors.colorTree, backgroundColor = colors.black, **kwargs)
+        super(Tree, self).__init__(symbol = random.choice([symbols.lowerTau, 'T']), description = 'a tree', **kwargs)
         
     blockMove = True
     blockSight = True

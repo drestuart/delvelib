@@ -18,9 +18,10 @@ class LightningWand(I.Wand):
     __mapper_args__ = {
         'polymorphic_identity':'lightning_wand'
     }
+    color = colors.colorSteel
     
     def __init__(self, **kwargs):
-        super(LightningWand, self).__init__(color = colors.colorSteel, description = "wand of lightning", **kwargs)
+        super(LightningWand, self).__init__(description = "wand of lightning", **kwargs)
         
 
 weights = {

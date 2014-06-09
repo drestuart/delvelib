@@ -18,9 +18,10 @@ class Kebab(I.Food):
     __mapper_args__ = {
         'polymorphic_identity':'kebab'
     }
+    color = colors.colorMeat
     
     def __init__(self, **kwargs):
-        super(Kebab, self).__init__(color = colors.colorMeat, description = "kebab", **kwargs)
+        super(Kebab, self).__init__(description = "kebab", **kwargs)
         
         
 weights = {

@@ -19,11 +19,12 @@ class MapTile(TileBase):
     __tablename__ = "map_tiles"
     __table_args__ = {'extend_existing': True}
     
+    backgroundColor = blankBackground
     connectedLevelWidth = 60
     connectedLevelHeight = 40
     
     def __init__(self, x, y, **kwargs):
-        super(MapTile, self).__init__(x, y, backgroundColor = blankBackground, **kwargs)
+        super(MapTile, self).__init__(x, y, **kwargs)
         
         self.connectedLevel = kwargs.get('connectedLevel', None)
         self.worldMap = kwargs.get('worldMap')

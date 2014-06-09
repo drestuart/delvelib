@@ -292,9 +292,9 @@ class Creature(colors.withColor, Base):
     
 
 class Orc(Creature):
-    
+    color = colors.red
     def __init__(self, **kwargs):
-        super(Orc, self).__init__(symbol = 'o', color = colors.red, 
+        super(Orc, self).__init__(symbol = 'o', 
                                   name = 'orc', description = 'a hideous orc', species = 'orc',
                                   maxHP = 10, AIClass = AI.AggressiveAI, **kwargs)
     

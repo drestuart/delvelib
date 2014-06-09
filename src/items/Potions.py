@@ -18,9 +18,10 @@ class PettyHealingPotion(I.Potion):
     __mapper_args__ = {
         'polymorphic_identity':'petty_healing_potion'
     }
+    color = colors.lightBlue
     
     def __init__(self, **kwargs):
-        super(PettyHealingPotion, self).__init__(color = colors.lightBlue, description = "potion of petty healing", **kwargs)
+        super(PettyHealingPotion, self).__init__(description = "potion of petty healing", **kwargs)
         
         
 class ModerateHealingPotion(I.Potion):
@@ -28,9 +29,10 @@ class ModerateHealingPotion(I.Potion):
     __mapper_args__ = {
         'polymorphic_identity':'moderate_healing_potion'
     }
+    color = colors.blue
     
     def __init__(self, **kwargs):
-        super(ModerateHealingPotion, self).__init__(color = colors.blue, description = "potion of moderate healing", **kwargs)
+        super(ModerateHealingPotion, self).__init__(description = "potion of moderate healing", **kwargs)
         
 
 class ColossalHealingPotion(I.Potion):
@@ -38,9 +40,10 @@ class ColossalHealingPotion(I.Potion):
     __mapper_args__ = {
         'polymorphic_identity':'colossal_healing_potion'
     }
+    color = colors.darkBlue
     
     def __init__(self, **kwargs):
-        super(ColossalHealingPotion, self).__init__(color = colors.darkBlue, description = "potion of colossal healing", **kwargs)
+        super(ColossalHealingPotion, self).__init__(description = "potion of colossal healing", **kwargs)
         
         
 class PoisonPotion(I.Potion):
@@ -48,9 +51,10 @@ class PoisonPotion(I.Potion):
     __mapper_args__ = {
         'polymorphic_identity':'poison_potion'
     }
+    color = colors.red
     
     def __init__(self, **kwargs):
-        super(PoisonPotion, self).__init__(color = colors.red, description = "potion of poison", **kwargs)
+        super(PoisonPotion, self).__init__(description = "potion of poison", **kwargs)
         
         
 weights = {

@@ -13,12 +13,10 @@ import colors
 class Player(Cr.Creature):
     
     __tablename__ = "player"
-#    __table_args__ = {'extend_existing': True}
-
-
+    color = colors.white
 
     def __init__(self, **kwargs):
-        super(Player, self).__init__(symbol = '@', color = colors.white, name="player",
+        super(Player, self).__init__(symbol = '@', name="player",
                                      description = 'player', species = 'player', AIClass = AI.PlayerAI, maxHP=10, **kwargs)
         
         

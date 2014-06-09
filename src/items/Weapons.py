@@ -18,9 +18,10 @@ class Longsword(I.Weapon):
     __mapper_args__ = {
         'polymorphic_identity':'longsword'
     }
+    color = colors.colorSteel
     
     def __init__(self, **kwargs):
-        super(Longsword, self).__init__(color = colors.colorSteel, description = "longsword", **kwargs)
+        super(Longsword, self).__init__(description = "longsword", **kwargs)
         
         
 weights = {

@@ -212,13 +212,14 @@ class Armor(Item):
         
 class Coins(Item):
     stackable = True
+    color = colors.colorGold
     
     __mapper_args__ = {
         'polymorphic_identity':'coins'
     }
     
     def __init__(self, **kwargs):
-        super(Coins, self).__init__(symbol = '$', color = colors.colorGold, description = "gold coin", **kwargs)
+        super(Coins, self).__init__(symbol = '$', description = "gold coin", **kwargs)
     
 
 class Food(Item):
@@ -262,13 +263,13 @@ class Ring(Item):
 
 class Scroll(Item):
     readable = True
-    
+    color = colors.white
     __mapper_args__ = {
         'polymorphic_identity':'scroll'
     }
     
     def __init__(self, **kwargs):
-        super(Scroll, self).__init__(symbol = '?', color = colors.white, **kwargs)
+        super(Scroll, self).__init__(symbol = '?', **kwargs)
         
 class Spellbook(Item):
     readable = True

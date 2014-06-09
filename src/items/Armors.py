@@ -18,9 +18,10 @@ class Breastplate(I.Armor):
     __mapper_args__ = {
         'polymorphic_identity':'breastplate'
     }
+    color = colors.colorSteel
     
     def __init__(self, **kwargs):
-        super(Breastplate, self).__init__(color = colors.colorSteel, description = "breastplate", **kwargs)
+        super(Breastplate, self).__init__(description = "breastplate", **kwargs)
         
 weights = {
            Breastplate : 10
