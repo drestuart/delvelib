@@ -45,6 +45,9 @@ class MapTile(TileBase):
     __mapper_args__ = {'polymorphic_identity': 'maptile'}
     
     def blocksMove(self):
+        return self.isWaterTile()
+    
+    def bump(self, bumper):
         return False
     
     def blocksSight(self):

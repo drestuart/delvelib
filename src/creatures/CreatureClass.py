@@ -30,7 +30,6 @@ class Creature(colors.withColor, Base):
         self.symbol = kwargs['symbol']
         
         self.name = kwargs['name']
-        self.species = kwargs['species']
         
         self.maxHP = kwargs['maxHP']
         self.damageTaken = kwargs.get('damageTaken', 0)
@@ -50,7 +49,6 @@ class Creature(colors.withColor, Base):
     symbol = Column(String(length=1, convert_unicode = True))
     
     name = Column(String)
-    species = Column(String)
     creatureType = Column(String)
     
     maxHP = Column(Integer)

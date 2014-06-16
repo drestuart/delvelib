@@ -214,7 +214,7 @@ class WorldMap(L.MapBase):
         return success
     
     def placePlayer(self, player):
-        tile = self.getTile(1, 1)
+        tile = self.getTile(25, 7)
         self.placeCreature(player, tile)
         
     def buildMap(self):
