@@ -212,10 +212,6 @@ class WorldMap(L.MapBase):
         if success and not creature in self.creatures:
             self.creatures.append(creature)
         return success
-    
-    def placePlayer(self, player):
-        tile = self.getTile(25, 7)
-        self.placeCreature(player, tile)
         
     def buildMap(self):
         raise NotImplementedError("buildMap() not implemented, use a subclass")
