@@ -14,10 +14,12 @@ class Player(Cr.Creature):
     
     __tablename__ = "player"
     color = colors.white
+    description = 'player'
+    species = 'player'
 
     def __init__(self, **kwargs):
         super(Player, self).__init__(symbol = '@', name="player",
-                                     description = 'player', species = 'player', AIClass = AI.PlayerAI, maxHP=10, **kwargs)
+                                     AIClass = AI.PlayerAI, maxHP=10, **kwargs)
         
         
     __mapper_args__ = {'polymorphic_identity': 'player'}

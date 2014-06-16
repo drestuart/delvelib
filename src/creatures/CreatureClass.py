@@ -22,7 +22,7 @@ class Creature(colors.withColor, Base):
     __table_args__ = {'extend_existing': True}
     
     blockSight = False
-    
+    description = "creature"
     
     def __init__(self, **kwargs):
         super(Creature, self).__init__(**kwargs)
@@ -30,7 +30,6 @@ class Creature(colors.withColor, Base):
         self.symbol = kwargs['symbol']
         
         self.name = kwargs['name']
-        self.description = kwargs['description']
         self.species = kwargs['species']
         
         self.maxHP = kwargs['maxHP']
@@ -50,7 +49,6 @@ class Creature(colors.withColor, Base):
     
     symbol = Column(String(length=1, convert_unicode = True))
     
-    description = Column(String)
     name = Column(String)
     species = Column(String)
     creatureType = Column(String)
@@ -169,22 +167,11 @@ class Creature(colors.withColor, Base):
     def setName(self, value):
         self.name = value
 
-
-    def setDescription(self, value):
-        self.description = value
-
-
-    def setSpecies(self, value):
-        self.species = value
-
-
     def setMaxHP(self, value):
         self.maxHP = value
 
-
     def setDamageTaken(self, value):
         self.damageTaken = value
-
 
     def setAIClass(self, value):
         self.AIClass = value
@@ -229,12 +216,8 @@ class Creature(colors.withColor, Base):
     def distance(self, other):
         return self.getTile().distance(other.getTile())
 
-
     def getCreatureType(self):
         return self.creatureType
-
-    def setCreatureType(self, value):
-        self.creatureType = value
 
     def getGoalEnemy(self):
         return self.goalEnemy
@@ -293,10 +276,11 @@ class Creature(colors.withColor, Base):
 
 class Orc(Creature):
     color = colors.red
+    species = 'orc'
+    description = 'a hideous orc'
+    
     def __init__(self, **kwargs):
-        super(Orc, self).__init__(symbol = 'o', 
-                                  name = 'orc', description = 'a hideous orc', species = 'orc',
-                                  maxHP = 10, AIClass = AI.AggressiveAI, **kwargs)
+        super(Orc, self).__init__(symbol = 'o', name = 'orc', maxHP = 10, AIClass = AI.AggressiveAI, **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'orc'}
 

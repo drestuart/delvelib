@@ -15,13 +15,12 @@ def getRandomArmor():
 
 class Breastplate(I.Armor):
     
-    __mapper_args__ = {
-        'polymorphic_identity':'breastplate'
-    }
+    __mapper_args__ = {'polymorphic_identity':'breastplate'}
     color = colors.colorSteel
+    description = "breastplate"
     
     def __init__(self, **kwargs):
-        super(Breastplate, self).__init__(description = "breastplate", **kwargs)
+        super(Breastplate, self).__init__(**kwargs)
         
 weights = {
            Breastplate : 10

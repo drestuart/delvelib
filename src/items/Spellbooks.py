@@ -15,13 +15,12 @@ def getRandomSpellbook():
 
 class ObligatoryFireballSpellbook(I.Spellbook):
     
-    __mapper_args__ = {
-        'polymorphic_identity':'obligatory_fireball_spellbook'
-    }
+    __mapper_args__ = {'polymorphic_identity':'obligatory_fireball_spellbook'}
     color = colors.colorLeather
+    description = "spellbook of Obligatory Fireball"
     
     def __init__(self, **kwargs):
-        super(ObligatoryFireballSpellbook, self).__init__(description = "spellbook of Obligatory Fireball", **kwargs)
+        super(ObligatoryFireballSpellbook, self).__init__(**kwargs)
         
 weights = {
            ObligatoryFireballSpellbook : 10

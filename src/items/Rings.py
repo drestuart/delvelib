@@ -15,13 +15,12 @@ def getRandomRing():
 
 class ProtectionRing(I.Ring):
     
-    __mapper_args__ = {
-        'polymorphic_identity':'protection_ring'
-    }
+    __mapper_args__ = {'polymorphic_identity':'protection_ring'}
     color = colors.darkMagenta
+    description = "ring of protection"
     
     def __init__(self, **kwargs):
-        super(ProtectionRing, self).__init__(description = "ring of protection", **kwargs)
+        super(ProtectionRing, self).__init__(**kwargs)
         
         
 weights = {

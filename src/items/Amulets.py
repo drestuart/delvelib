@@ -15,13 +15,12 @@ def getRandomAmulet():
 
 class LuckAmulet(I.Amulet):
     
-    __mapper_args__ = {
-        'polymorphic_identity':'luck_amulet'
-    }
+    __mapper_args__ = {'polymorphic_identity':'luck_amulet'}
     color = colors.red
+    description = "amulet of luck"
     
     def __init__(self, **kwargs):
-        super(LuckAmulet, self).__init__(description = "amulet of luck", **kwargs)
+        super(LuckAmulet, self).__init__(**kwargs)
         
 
 weights = {
