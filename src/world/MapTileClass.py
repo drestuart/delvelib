@@ -23,6 +23,8 @@ class MapTile(TileBase):
     connectedLevelWidth = 60
     connectedLevelHeight = 40
     
+    description = "tile"
+    
     def __init__(self, x, y, **kwargs):
         super(MapTile, self).__init__(x, y, **kwargs)
         
@@ -89,3 +91,6 @@ class MapTile(TileBase):
     def generateConnectedLevel(self):
         self.connectedLevel = self.connectedLevelType(width = self.connectedLevelWidth, height = self.connectedLevelHeight)
         self.connectedLevel.buildLevel()
+        
+    def getDescription(self):
+        return self.description
