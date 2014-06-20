@@ -68,4 +68,4 @@ treeShape = u"\U00010149" # Currently non-working
 upperOu = unichr(546)
 lowerOu = unichr(547)
 doubleWavy = u"\u2248" # Approx. equal symbol
-townShape = unichr(293)
+townShape = unichr(1758) # unichr(293)
