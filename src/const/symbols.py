@@ -16,7 +16,7 @@ Town symbols
 
 
 Si symbols
-1758    ۞    # DOOOOOOOOOOOOOOOOOOOOOOOD
+1758    ۞    # DOOOOOOOOOOOOOOOOOOOOOOOD  # Or for ringfort?
 
 
 '''
