@@ -11,8 +11,8 @@ Town symbols
 177     ±
 293     ĥ
 294     Ħ
-685     ʭ
-1769    ۩
+685     ʭ    \u02ad
+1769    ۩    \u06e9
 
 
 Si symbols
@@ -68,4 +68,4 @@ treeShape = u"\U00010149" # Currently non-working
 upperOu = unichr(546)
 lowerOu = unichr(547)
 doubleWavy = u"\u2248" # Approx. equal symbol
-townShape = unichr(1758) # unichr(293)
+townShape = u"\u02ad"  # unichr(293)
