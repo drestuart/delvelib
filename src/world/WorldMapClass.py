@@ -75,9 +75,15 @@ class WorldMap(L.MapBase):
         if reg:
             reg.replaceTile(oldtile, newtile)
         
+        oldnumtiles = len(self.mapTiles)
         self.mapTiles.remove(oldtile)
+        oldtile.remove()
+        
         self.addTile(newtile)
         self.tileArray[newtile.getX()][newtile.getY()] = newtile
+        
+        newnumtiles = len(self.mapTiles)
+        assert newnumtiles == oldnumtiles
     
     def load(self):
         self.creatures = []
