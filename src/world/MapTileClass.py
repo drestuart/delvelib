@@ -6,6 +6,7 @@ Created on Feb 25, 2014
 
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer
+from sqlalchemy.orm import relationship, backref
 
 import LevelClass as L
 from TileClass import TileBase
@@ -20,25 +21,26 @@ class MapTile(TileBase):
     __table_args__ = {'extend_existing': True}
     
     backgroundColor = blankBackground
-    connectedLevelWidth = 60
-    connectedLevelHeight = 40
     
     description = "tile"
     
     def __init__(self, x, y, **kwargs):
         super(MapTile, self).__init__(x, y, **kwargs)
         
-        self.connectedLevel = kwargs.get('connectedLevel', None)
+        self.connectedArea = kwargs.get('connectedArea', None)
         self.worldMap = kwargs.get('worldMap')
         
     id = Column(Integer, ForeignKey('tiles.id'), primary_key=True)
-    connectedLevelId = Column(Integer, ForeignKey("levels.id"))
+    
+    connectedAreaId = Column(Integer, ForeignKey("areas.id"))
+    
     regionId = Column(Integer, ForeignKey("regions.id"))
+#     worldMapId = Column(Integer, ForeignKey("world_map.id"))
     worldMapId = Column(Integer, ForeignKey("levels.id"))
     name = Column(String)
     
     waterTile = False
-    connectedLevelType = L.WildernessLevel
+    terrainType = L.WildernessLevel
     
     tileType = Column(String)
     
@@ -93,13 +95,14 @@ class MapTile(TileBase):
         return toReturn
     
     def getConnectedLevel(self):
-        if not self.connectedLevel:
-            self.generateConnectedLevel()
-        return self.connectedLevel
+        print "Deprecated getConnectedLevel()"
+        return self.getConnectedArea().getStartingLevel()
     
     def generateConnectedLevel(self):
-        self.connectedLevel = self.connectedLevelType(width = self.connectedLevelWidth, height = self.connectedLevelHeight)
-        self.connectedLevel.buildLevel()
+        raise NotImplementedError("Deprecated generateConnectedLevel()")
+        
+    def getConnectedArea(self):
+        return self.connectedArea
         
     def getDescription(self):
         return self.description

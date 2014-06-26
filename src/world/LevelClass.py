@@ -44,7 +44,7 @@ class MapBase(Base):
         if self.width is None or self.height is None:
             raise ValueError("Map class constructor requires width and height values")
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     width = Column(Integer)
     height = Column(Integer)
@@ -97,10 +97,9 @@ class Level(MapBase):
 
     depth = Column(Integer)
     
-    dungeonId = Column(Integer, ForeignKey("dungeons.id"))
+    areaId = Column(Integer, ForeignKey("areas.id"))
     
     tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
-    mapTile = relationship("MapTile", backref=backref("connectedLevel", uselist = False), uselist = False, primaryjoin="Level.id==MapTile.connectedLevelId")
     rooms = relationship("Room", backref = "level")
     
     entryPointX = Column(Integer)

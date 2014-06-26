@@ -27,6 +27,7 @@ class Region(Base):
 
     id = Column(Integer, primary_key=True)
 
+#     worldMapId = Column(Integer, ForeignKey("world_map.id"))
     worldMapId = Column(Integer, ForeignKey("levels.id"))
     name = Column(String)
     mapTiles = relationship("MapTile", backref=backref("region", uselist=False), primaryjoin="Region.id==MapTile.regionId")
@@ -49,9 +50,14 @@ class Region(Base):
 
 
 class WorldMap(L.MapBase):
+    
+#     __tablename__ = 'world_map'
+#     __table_args__ = {'extend_existing': True}
 
     def __init__(self, **kwargs):
         super(WorldMap, self).__init__(**kwargs)
+        
+#         self.id = 1
         
         self.mapTiles = []
         self.regions = []
@@ -59,9 +65,16 @@ class WorldMap(L.MapBase):
         
         self.load()
     
-    __mapper_args__ = {'polymorphic_identity':'world_map',
-#                        'concrete':True,
-                       'with_polymorphic':'*'}
+#     id = Column(Integer, ForeignKey('levels.id'), primary_key=True, autoincrement=True)
+#     name = Column(String)
+#     width = Column(Integer)
+#     height = Column(Integer)
+#     levelType = Column(String)
+    
+    __mapper_args__ = {#'polymorphic_on': levelType,
+                      'polymorphic_identity':'world_map',
+#                       'concrete':True,
+                      'with_polymorphic':'*'}
     
     def addTile(self, tile):
         self.mapTiles.append(tile)
