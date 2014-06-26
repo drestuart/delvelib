@@ -486,7 +486,7 @@ class UI(object):
         
         elif isinstance(tile, MT.MapTile):
             clevel = self.currentLevel
-            toLevel = tile.getConnectedLevel()
+            toLevel = tile.getStartingLevel()
             
             if not toLevel:
                 return False

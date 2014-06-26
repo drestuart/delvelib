@@ -12,6 +12,7 @@ import LevelClass as L
 from TileClass import TileBase
 from colors import blankBackground
 import database as db
+from AreaClass import Area
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -27,7 +28,7 @@ class MapTile(TileBase):
     def __init__(self, x, y, **kwargs):
         super(MapTile, self).__init__(x, y, **kwargs)
         
-        self.connectedArea = kwargs.get('connectedArea', None)
+        self.connectedArea = self.areaType()
         self.worldMap = kwargs.get('worldMap')
         
     id = Column(Integer, ForeignKey('tiles.id'), primary_key=True)
@@ -35,12 +36,12 @@ class MapTile(TileBase):
     connectedAreaId = Column(Integer, ForeignKey("areas.id"))
     
     regionId = Column(Integer, ForeignKey("regions.id"))
-#     worldMapId = Column(Integer, ForeignKey("world_map.id"))
-    worldMapId = Column(Integer, ForeignKey("levels.id"))
+    worldMapId = Column(Integer, ForeignKey("levels.id", use_alter = True, name="world_map_fk"))
     name = Column(String)
     
     waterTile = False
     terrainType = L.WildernessLevel
+    areaType = Area
     
     tileType = Column(String)
     
@@ -103,6 +104,12 @@ class MapTile(TileBase):
         
     def getConnectedArea(self):
         return self.connectedArea
+    
+    def getStartingLevel(self):
+        return self.getConnectedArea().getStartingLevel()
         
     def getDescription(self):
         return self.description
+    
+    def getTerrainType(self):
+        return self.terrainType

@@ -32,7 +32,7 @@ class Area(Base):
     levels = relationship("Level", backref=backref("area", uselist=False), 
                           primaryjoin="Area.id==Level.areaId")
     
-    startingLevel = relationship("Level", uselist = False, primaryjoin="Area.startingLevelId==Level.id")
+    startingLevel = relationship("Level", uselist = False, primaryjoin="Area.id==Level.startingLevelOfId")
     startingLevelId = Column(Integer, ForeignKey("levels.id", use_alter = True, name="starting_level_fk"))
     
     mapTile = relationship("MapTile", uselist=False, backref=backref("connectedArea", uselist=False), 
@@ -57,6 +57,9 @@ class Area(Base):
     
     def getMapTile(self):
         return self.mapTile
+    
+    def getTerrainType(self):
+        return self.getMapTile().getTerrainType()
         
     
     
