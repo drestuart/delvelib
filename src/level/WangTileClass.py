@@ -119,7 +119,6 @@ class WangTileSet(object):
                 if m:
                     self.tileWidth = int(m.group(1))
                     self.tileHeight = int(m.group(2))
-                    print self.tileWidth, self.tileHeight
                 else:
                     raise Exception("Bad tile description line: " + line + " " + filename + " line " + str(lnum))
                     
@@ -165,7 +164,7 @@ class WangTileSet(object):
                                         filename + " line " + str(lnum))
                 
                 # Check that the line includes only the allowed glyphs
-                if not (re.match("^[" + glyphs + "]+$", line)):
+                if not (re.match("^[" + re.escape(glyphs) + "]+$", line)):
                     raise Exception("Bad map line: " + line + " " + filename + " line " + str(lnum))
                 
                 tileMap.append(line)
@@ -207,8 +206,7 @@ def main():
     wset = SquareWangTileSet()
     wset.readFromFile("wangtiletest.txt")
     
-    for tile in wset.wangTiles:
-        print tile
+    print len(wset.wangTiles)
 
 
 if __name__ == "__main__":
