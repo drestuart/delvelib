@@ -5,6 +5,7 @@
 // Like mapping symbols to level tile types
 
 width: 7 height: 7
+glyphs: .~
 
 // Mark a tile map with *TILE* on the line above
 

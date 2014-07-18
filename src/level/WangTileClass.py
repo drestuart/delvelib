@@ -97,6 +97,7 @@ class WangTileSet(object):
     
     def readFromFile(self, filename):
         tileMap = None
+        glyphs = None
         
         f = open(filename, 'r')
         lnum = 0
@@ -111,13 +112,28 @@ class WangTileSet(object):
             
             # Check for height and width specs before reading any tiles
             if self.tileWidth == None:
+                if not line.startswith('width'):
+                    continue
+                
                 m = re.search(r"^width: (\d+)\s*height: (\d+)", line)
                 if m:
                     self.tileWidth = int(m.group(1))
                     self.tileHeight = int(m.group(2))
                     print self.tileWidth, self.tileHeight
+                else:
+                    raise Exception("Bad tile description line: " + line + " " + filename + " line " + str(lnum))
                     
                 continue
+            
+            if glyphs == None and line.startswith('glyphs'):
+                m = re.search(r"^glyphs: (.+)$", line)
+                if m:
+                    glyphs = m.group(1)
+                else:
+                    raise Exception("Bad glyph line: " + line + " " + filename + " line " + str(lnum))
+                    
+                continue
+            
             
             if tileMap == None:
                 if line == "":
@@ -132,20 +148,25 @@ class WangTileSet(object):
                     # Finish off tile if it's tall enough
                     if len(tileMap) < self.tileHeight:
                         raise Exception("Unexpected end of tile map after only " + len(tileMap) + " lines. " +
-                                        filename + " line " + lnum)
+                                        filename + " line " + str(lnum))
                     
                     elif len(tileMap) > self.tileHeight:
                         raise Exception("Tile map too tall: " + len(tileMap) + " lines. " +
                                         filename + " line " + str(lnum))
-                        
+                    
                     # Add this tile to the list and reset for the next one
                     self.wangTiles.append(tileMap)
                     tileMap = None
                     continue
                 
+                # Check line width
                 if len(line) != self.tileWidth:
                     raise Exception("Tile line is the wrong width: " + line + ": " +
                                         filename + " line " + str(lnum))
+                
+                # Check that the line includes only the allowed glyphs
+                if not (re.match("^[" + glyphs + "]+$", line)):
+                    raise Exception("Bad map line: " + line + " " + filename + " line " + str(lnum))
                 
                 tileMap.append(line)
         else:
