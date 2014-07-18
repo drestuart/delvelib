@@ -180,16 +180,6 @@ class HerringboneWangTileSet(WangTileSet):
     
     def buildTile(self, tilestr):
         pass
-    
-
-class WangTileMap(object):
-    pass
-
-class SquareWangTileMap(WangTileMap):
-    pass
-
-class HerringboneWangTileMap(WangTileMap):
-    pass
 
 
 def main():
