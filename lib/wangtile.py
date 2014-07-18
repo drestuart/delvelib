@@ -3,7 +3,7 @@
 #
 # Created on Jul 11, 2014
 #
-# Adapted by Dan Stuart
+# Implemented by Dan Stuart
 # from the Herringbone Wang Tile algorithm by Sean Barrett:
 # http://nothings.org/gamedev/herringbone/
 # Retrieved 7/11/2014
@@ -13,6 +13,7 @@
 '''
 
 from copy import deepcopy
+import re
 
 class WangTile(object):
     
@@ -89,8 +90,83 @@ class VRectWangTile(WangTile):
 
 class WangTileSet(object):
     
+    def __init__(self):
+        self.tileWidth = None
+        self.tileHeight = None
+        self.wangTiles = []
+    
     def readFromFile(self, filename):
-        pass
+        tileMap = None
+        
+        f = open(filename, 'r')
+        lnum = 0
+        
+        for line in f:
+            line = line.strip()
+            lnum += 1
+            
+            # Skip comments
+            if re.match(r"//", line):
+                continue
+            
+            # Check for height and width specs before reading any tiles
+            if self.tileWidth == None:
+                m = re.search(r"^width: (\d+)\s*height: (\d+)", line)
+                if m:
+                    self.tileWidth = int(m.group(1))
+                    self.tileHeight = int(m.group(2))
+                    print self.tileWidth, self.tileHeight
+                    
+                continue
+            
+            if tileMap == None:
+                if line == "":
+                    continue
+                
+                if line == "*TILE*":
+                    tileMap = []
+                    continue
+            
+            else:
+                if line == "":
+                    # Finish off tile if it's tall enough
+                    if len(tileMap) < self.tileHeight:
+                        raise Exception("Unexpected end of tile map after only " + len(tileMap) + " lines. " +
+                                        filename + " line " + lnum)
+                    
+                    elif len(tileMap) > self.tileHeight:
+                        raise Exception("Tile map too tall: " + len(tileMap) + " lines. " +
+                                        filename + " line " + str(lnum))
+                        
+                    # Add this tile to the list and reset for the next one
+                    self.wangTiles.append(tileMap)
+                    tileMap = None
+                    continue
+                
+                if len(line) != self.tileWidth:
+                    raise Exception("Tile line is the wrong width: " + line + ": " +
+                                        filename + " line " + str(lnum))
+                
+                tileMap.append(line)
+        else:
+            # At the end of the file, save the last tileMap if we haven't already
+            f.close()
+            
+            if tileMap == None:
+                return
+            
+            if len(tileMap) < self.tileHeight:
+                raise Exception("Unexpected end of tile map after only " + len(tileMap) + " lines. " +
+                                filename + " line " + lnum)
+            
+            elif len(tileMap) > self.tileHeight:
+                raise Exception("Tile map too tall: " + len(tileMap) + " lines. " +
+                                filename + " line " + str(lnum))
+                
+            # Add this tile to the list and reset for the next one
+            self.wangTiles.append(tileMap)
+            tileMap = None
+        
     
     def getTileWithConstraints(self, constraints):
         pass
@@ -114,3 +190,15 @@ class SquareWangTileMap(WangTileMap):
 
 class HerringboneWangTileMap(WangTileMap):
     pass
+
+
+def main():
+    wset = SquareWangTileSet()
+    wset.readFromFile("wangtiletest.txt")
+    
+    for tile in wset.wangTiles:
+        print tile
+
+
+if __name__ == "__main__":
+    main()
