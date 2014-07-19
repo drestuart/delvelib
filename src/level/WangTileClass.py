@@ -18,6 +18,8 @@ import random
 
 class WangTile(object):
     
+    defaultConstraint = None
+
     def __init__(self, tiles, **kwargs):
         self.width = kwargs['width']
         self.height = kwargs['height']
@@ -43,6 +45,7 @@ class WangTile(object):
     
     def satisfiesConstraints(self, constraints):
         raise NotImplementedError()
+    
 
 class SquareWangTile(WangTile):
     
@@ -58,7 +61,9 @@ class SquareWangTile(WangTile):
         raise NotImplementedError
     
 class TownWangTile(SquareWangTile):
-        
+    
+    defaultConstraint = None
+    
     def readConstraints(self):
         '''
         ---B---
@@ -83,7 +88,7 @@ class TownWangTile(SquareWangTile):
         
     def satisfiesConstraints(self, constraints):
         for k, v in constraints.items():
-            if self.constraints[k] != v:
+            if v is not None and self.constraints[k] != v:
                 return False
         
         return True
@@ -114,12 +119,16 @@ class VRectWangTile(WangTile):
 
 
 class WangTileSet(object):
-    
+
     def __init__(self, tileClass):
         self.tileClass = tileClass
+        self.defaultConstraint = tileClass.defaultConstraint
         self.tileWidth = None
         self.tileHeight = None
         self.wangTiles = []
+        
+    def getDefaultConstraint(self):
+        return self.defaultConstraint
     
     def readFromFile(self, filename):
         tileMap = None
@@ -234,6 +243,8 @@ def main():
     wset = WangTileSet(TownWangTile)
     wset.readFromFile("wangtiletest.txt")
     
+    print wset.getRandomTileWithConstraints({'A' : None, 'B' : 1, 'C' : 2, 'D' : None}).getTiles()
+
 
 if __name__ == "__main__":
     main()
