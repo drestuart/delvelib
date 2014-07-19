@@ -14,14 +14,14 @@
 
 from copy import deepcopy
 import re
+import random
 
 class WangTile(object):
     
-    def __init__(self, width, height, tiles):
-        self.width = width
-        self.height = height
+    def __init__(self, tiles, **kwargs):
+        self.width = kwargs['width']
+        self.height = kwargs['height']
         self.tiles = tiles
-        self.constraints = dict()
 
     def getTiles(self):
         return self.tiles
@@ -42,12 +42,12 @@ class WangTile(object):
         return deepcopy(self)
     
     def satisfiesConstraints(self, constraints):
-        pass
+        raise NotImplementedError()
 
 class SquareWangTile(WangTile):
     
-    def __init__(self, width, tiles):
-        super(SquareWangTile, self).__init__(width, width, tiles)
+    def __init__(self, tiles, **kwargs):
+        super(SquareWangTile, self).__init__(tiles, **kwargs)
         
         # Initialize constraints dict
         self.constraints = {'A' : None, 'B' : None, 'C' : None, 'D' : None}
@@ -55,42 +55,68 @@ class SquareWangTile(WangTile):
         self.readConstraints()
         
     def readConstraints(self):
-        pass
+        raise NotImplementedError
     
+class TownWangTile(SquareWangTile):
+        
+    def readConstraints(self):
+        '''
+        ---B---
+        |     |
+        A     C
+        |     |
+        ---D---
+        '''
+        self.centerx, self.centery = self.width/2, self.height/2
+        
+        constraintLocations = { 'A' : (0, self.centery),
+                                'B' : (self.centerx, 0),
+                                'C' : (self.width - 1, self.centery),
+                                'D' : (self.centerx, self.height - 1)}
+        
+        constraintTypes = {'.' : 1, '~' : 2}
+        
+        for k in constraintLocations.keys():
+            loc = constraintLocations[k]
+            tile = self.getTile(loc[0], loc[1])
+            self.constraints[k] = constraintTypes[tile]
+        
+    def satisfiesConstraints(self, constraints):
+        for k, v in constraints.items():
+            if self.constraints[k] != v:
+                return False
+        
+        return True
+
 
 class HRectWangTile(WangTile):
     
-    def __init__(self, width, tiles):
-        super(HRectWangTile, self).__init__(width, width/2., tiles)
+    def __init__(self, tiles, **kwargs):
+        super(HRectWangTile, self).__init__(tiles, **kwargs)
         
         # Initialize constraints dict
         self.constraints = {'A' : None, 'B' : None, 'C' : None,
                             'D' : None, 'E' : None, 'F' : None}
         
         self.readConstraints()
-        
-    def readConstraints(self):
-        pass
 
 
 class VRectWangTile(WangTile):
     
-    def __init__(self, width, tiles):
-        super(VRectWangTile, self).__init__(width, width*2, tiles)
+    def __init__(self, tiles, **kwargs):
+        super(VRectWangTile, self).__init__(tiles, **kwargs)
         
         # Initialize constraints dict
         self.constraints = {'G' : None, 'H' : None, 'I' : None,
                             'J' : None, 'K' : None, 'L' : None}
         
         self.readConstraints()
-        
-    def readConstraints(self):
-        pass
 
 
 class WangTileSet(object):
     
-    def __init__(self):
+    def __init__(self, tileClass):
+        self.tileClass = tileClass
         self.tileWidth = None
         self.tileHeight = None
         self.wangTiles = []
@@ -154,7 +180,7 @@ class WangTileSet(object):
                                         filename + " line " + str(lnum))
                     
                     # Add this tile to the list and reset for the next one
-                    self.wangTiles.append(tileMap)
+                    self.buildTile(tileMap)
                     tileMap = None
                     continue
                 
@@ -184,30 +210,30 @@ class WangTileSet(object):
                                 filename + " line " + str(lnum))
                 
             # Add this tile to the list and reset for the next one
-            self.wangTiles.append(tileMap)
+            self.buildTile(tileMap)
             tileMap = None
         
     
-    def getTileWithConstraints(self, constraints):
-        pass
+    def getTilesWithConstraints(self, constraints):
+        goodTiles = []
+        for tile in self.wangTiles:
+            if tile.satisfiesConstraints(constraints):
+                goodTiles.append(tile)
+                
+        return goodTiles
 
-class SquareWangTileSet(WangTileSet):
-    
-    def buildTile(self, tilestr):
-        pass
+    def getRandomTileWithConstraints(self, constraints):
+        return random.choice(self.getTilesWithConstraints(constraints))
 
-class HerringboneWangTileSet(WangTileSet):
-    
-    def buildTile(self, tilestr):
-        pass
+    def buildTile(self, squares):
+        newTile = self.tileClass(squares, width = self.tileWidth, height = self.tileHeight)
+        self.wangTiles.append(newTile)
 
 
 def main():
-    wset = SquareWangTileSet()
+    wset = WangTileSet(TownWangTile)
     wset.readFromFile("wangtiletest.txt")
     
-    print len(wset.wangTiles)
-
 
 if __name__ == "__main__":
     main()
