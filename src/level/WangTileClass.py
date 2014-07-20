@@ -20,10 +20,11 @@ class WangTile(object):
     
     defaultConstraint = None
 
-    def __init__(self, tiles, **kwargs):
+    def __init__(self, tiles, constraints, **kwargs):
         self.width = kwargs['width']
         self.height = kwargs['height']
         self.tiles = tiles
+        self.constraints = constraints
 
     def getTiles(self):
         return self.tiles
@@ -48,75 +49,33 @@ class WangTile(object):
     
 
 class SquareWangTile(WangTile):
-    
-    def __init__(self, tiles, **kwargs):
-        super(SquareWangTile, self).__init__(tiles, **kwargs)
-        
-        # Initialize constraints dict
-        self.constraints = {'A' : None, 'B' : None, 'C' : None, 'D' : None}
-        
-        self.readConstraints()
-        
-    def readConstraints(self):
-        raise NotImplementedError
+
+    # Initialize constraints dict
+    constraintSites = {'A' : None, 'B' : None, 'C' : None, 'D' : None}
     
 class TownWangTile(SquareWangTile):
     
     defaultConstraint = None
     
-    def readConstraints(self):
-        '''
-        ---B---
-        |     |
-        A     C
-        |     |
-        ---D---
-        '''
-        self.centerx, self.centery = self.width/2, self.height/2
-        
-        constraintLocations = { 'A' : (0, self.centery),
-                                'B' : (self.centerx, 0),
-                                'C' : (self.width - 1, self.centery),
-                                'D' : (self.centerx, self.height - 1)}
-        
-        constraintTypes = {'.' : 1, '~' : 2}
-        
-        for k in constraintLocations.keys():
-            loc = constraintLocations[k]
-            tile = self.getTile(loc[0], loc[1])
-            self.constraints[k] = constraintTypes[tile]
-        
     def satisfiesConstraints(self, constraints):
         for k, v in constraints.items():
             if v is not None and self.constraints[k] != v:
                 return False
-        
         return True
 
 
 class HRectWangTile(WangTile):
     
-    def __init__(self, tiles, **kwargs):
-        super(HRectWangTile, self).__init__(tiles, **kwargs)
-        
-        # Initialize constraints dict
-        self.constraints = {'A' : None, 'B' : None, 'C' : None,
-                            'D' : None, 'E' : None, 'F' : None}
-        
-        self.readConstraints()
+    # Initialize constraints dict
+    constraintSites = {'A' : None, 'B' : None, 'C' : None,
+                       'D' : None, 'E' : None, 'F' : None}
 
 
 class VRectWangTile(WangTile):
     
-    def __init__(self, tiles, **kwargs):
-        super(VRectWangTile, self).__init__(tiles, **kwargs)
-        
-        # Initialize constraints dict
-        self.constraints = {'G' : None, 'H' : None, 'I' : None,
-                            'J' : None, 'K' : None, 'L' : None}
-        
-        self.readConstraints()
-
+    # Initialize constraints dict
+    constraintSites = {'G' : None, 'H' : None, 'I' : None,
+                       'J' : None, 'K' : None, 'L' : None}
 
 class WangTileSet(object):
 
@@ -126,6 +85,7 @@ class WangTileSet(object):
         self.tileWidth = None
         self.tileHeight = None
         self.wangTiles = []
+        self.specialTiles = {}
         
     def getDefaultConstraint(self):
         return self.defaultConstraint
@@ -133,6 +93,8 @@ class WangTileSet(object):
     def readFromFile(self, filename):
         tileMap = None
         glyphs = None
+        tileType = None
+        constraintDict = None
         
         f = open(filename, 'r')
         lnum = 0
@@ -173,7 +135,10 @@ class WangTileSet(object):
                 if line == "":
                     continue
                 
-                if line == "*TILE*":
+#                 if line == "*TILE*":
+                m = re.match(r"\*(\w+)\*$", line)
+                if m:
+                    tileType = m.group(1)
                     tileMap = []
                     continue
             
@@ -189,9 +154,23 @@ class WangTileSet(object):
                                         filename + " line " + str(lnum))
                     
                     # Add this tile to the list and reset for the next one
-                    self.buildTile(tileMap)
+                    self.buildTile(tileMap, constraintDict, tileType)
                     tileMap = None
+                    tileType = None
+                    constraintDict = None
                     continue
+                
+                m = re.match(r"constraints: (\d+)$", line)
+                if m:
+                    constraintStr = m.group(1)
+                    constraintDict = deepcopy(self.tileClass.constraintSites)
+                    
+                    i = 0
+                    for k in sorted(constraintDict.keys()):
+                        constraintDict[k] = constraintStr[i]
+                        i += 1
+                    continue
+                    
                 
                 # Check line width
                 if len(line) != self.tileWidth:
@@ -219,8 +198,12 @@ class WangTileSet(object):
                                 filename + " line " + str(lnum))
                 
             # Add this tile to the list and reset for the next one
-            self.buildTile(tileMap)
+            self.buildTile(tileMap, constraintDict, tileType)
             tileMap = None
+            tileType = None
+            constraintDict = None
+        
+        print len(self.wangTiles)
         
     
     def getTilesWithConstraints(self, constraints):
@@ -234,16 +217,19 @@ class WangTileSet(object):
     def getRandomTileWithConstraints(self, constraints):
         return random.choice(self.getTilesWithConstraints(constraints))
 
-    def buildTile(self, squares):
-        newTile = self.tileClass(squares, width = self.tileWidth, height = self.tileHeight)
-        self.wangTiles.append(newTile)
+    def buildTile(self, squares, constraints, tileType):
+        newTile = self.tileClass(squares, constraints, width = self.tileWidth, height = self.tileHeight)
+        if (tileType.lower() == "tile"):
+            self.wangTiles.append(newTile)
+        else:
+            self.specialTiles[tileType] = newTile
 
 
 def main():
     wset = WangTileSet(TownWangTile)
     wset.readFromFile("wangtiletest.txt")
     
-    print wset.getRandomTileWithConstraints({'A' : None, 'B' : 1, 'C' : 2, 'D' : None}).getTiles()
+    print wset.getRandomTileWithConstraints({'A' : None, 'B' : '1', 'C' : '2', 'D' : None}).getTiles()
 
 
 if __name__ == "__main__":
