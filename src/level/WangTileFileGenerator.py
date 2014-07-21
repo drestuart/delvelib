@@ -7,9 +7,9 @@ Created on Jul 21, 2014
 from itertools import product
 
 # File header parameters
-width = 7
-height = 7
-glyphs = '.~'
+width = 21
+height = 21
+glyphs = '.~#+'
 
 print "width:", width, "height:", height
 print "glyphs:", glyphs
