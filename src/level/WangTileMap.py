@@ -7,7 +7,7 @@ Created on Jul 18, 2014
 from WangTileClass import WangTileSet, TownWangTile
 
 townset = WangTileSet(TownWangTile)
-townset.readFromFile("wangtiletest.txt")
+townset.readFromFile("towntiles.txt")
 
 
 class WangTileMap(object):
