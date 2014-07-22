@@ -38,11 +38,11 @@ class WangTile(object):
     def setCoords(self, coords):
         self.x, self.y = coords # Top-left corner coords
     
+    def getConstraints(self):
+        return self.constraints
+    
     def getConstraintValue(self, constraint):
         return self.constraints[constraint]
-    
-    def copy(self):
-        return deepcopy(self)
     
     def satisfiesConstraints(self, constraints):
         raise NotImplementedError()
@@ -63,19 +63,103 @@ class TownWangTile(SquareWangTile):
                 return False
         return True
 
+class RectangularWangTile(WangTile):
+    defaultConstraint = None
+    tileClass = SquareWangTile
 
-class HRectWangTile(WangTile):
+    def getTile(self, x, y):
+        raise NotImplementedError
+    
+    def getConstraintValue(self, constraint):
+        raise NotImplementedError
+    
+    def satisfiesConstraints(self, constraints):
+        raise NotImplementedError()
+    
+    
+
+class HorzWangTile(RectangularWangTile):
     
     # Initialize constraints dict
     constraintSites = {'A' : None, 'B' : None, 'C' : None,
                        'D' : None, 'E' : None, 'F' : None}
+    
+    def __init__(self, tiles, constraints, **kwargs):
+        self.width = kwargs['width']
+        self.height = kwargs['height']
+        self.constraints = constraints
+        
+        # Divide tiles into left and right halves
+        leftTiles = []
+        rightTiles = []
+        for row in tiles:
+            leftTiles.append(row[:self.width/2])
+            rightTiles.append(row[self.width/2:])
+            
+        leftTileConstraints = {'A' : constraints['A'], 'B' : constraints['B'], 'C' : None, 'D' : constraints['F']}
+        rightTileConstraints = {'A' : None, 'B' : constraints['C'], 'C' : constraints['D'], 'D' : constraints['E']}
+        
+        # Initialize left and right tiles
+        self.leftTile = self.tileClass(leftTiles, leftTileConstraints, width = self.width/2, height = self.height)
+        self.rightTile = self.tileClass(rightTiles, rightTileConstraints, width = self.width/2, height = self.height)
+        
+
+    def getLeftTile(self):
+        return self.leftTile
+    
+    def getRightTile(self):
+        return self.rightTile
+    
+    def getConstraintValue(self, constraint):
+        if constraint in 'ABF':
+            newConstraint = {'A' : 'A', 'B': 'B', 'F' : 'D'}[constraint]
+            return self.leftTile.getConstraintValue(newConstraint)
+        elif constraint in 'CDE':
+            newConstraint = {'C' : 'B', 'D': 'C', 'E' : 'D'}[constraint]
+            return self.rightTile.getConstraintValue(newConstraint)
+        else:
+            raise ValueError(constraint)
 
 
-class VRectWangTile(WangTile):
+class VertWangTile(RectangularWangTile):
     
     # Initialize constraints dict
     constraintSites = {'G' : None, 'H' : None, 'I' : None,
                        'J' : None, 'K' : None, 'L' : None}
+    
+    def __init__(self, tiles, constraints, **kwargs):
+        self.width = kwargs['width']
+        self.height = kwargs['height']
+        self.constraints = constraints
+        
+        # Divide tiles into top and bottom halves
+        topTiles = tiles[:self.height/2]
+        bottomTiles = tiles[self.height/2:]
+        
+        # Translate constraints
+        topTileConstraints = {'A' : constraints['G'], 'B': constraints['H'], 'C' : constraints['I'], 'D': None}
+        bottomTileConstraints = {'A' : constraints['L'], 'B': None, 'C' : constraints['J'], 'D': constraints['K']}
+        
+        # Initialize top and bottom tiles
+        self.topTile = self.tileClass(topTiles, topTileConstraints, width = self.width, height = self.height/2)
+        self.bottomTile = self.tileClass(bottomTiles, bottomTileConstraints, width = self.width, height = self.height/2)
+        
+        
+    def getTopTile(self):
+        return self.topTile
+    
+    def getBottomTile(self):
+        return self.bottomTile
+    
+    def getConstraintValue(self, constraint):
+        if constraint in 'GHI':
+            newConstraint = {'G' : 'A', 'H': 'B', 'I' : 'C'}[constraint]
+            return self.topTile.getConstraintValue(newConstraint)
+        elif constraint in 'JKL':
+            newConstraint = {'J' : 'C', 'K': 'D', 'L' : 'A'}[constraint]
+            return self.bottomTile.getConstraintValue(newConstraint)
+        else:
+            raise ValueError(constraint)
 
 class WangTileSet(object):
 
@@ -226,11 +310,37 @@ class WangTileSet(object):
 
 
 def main():
-    wset = WangTileSet(TownWangTile)
-    wset.readFromFile("wangtiletest.txt")
+    vertRows = ['..+..',
+                '..+..',
+                '..+..',
+                '..+..',
+                '+++++',
+                '+++++',
+                '..+..',
+                '..+..',
+                '..+..',
+                '..+..']
     
-    print wset.getRandomTileWithConstraints({'A' : None, 'B' : '1', 'C' : '2', 'D' : None}).getTiles()
-
+    horzRows = ['....++....',
+                '....++....',
+                '++++++++++',
+                '....++....',
+                '....++....']
+    
+    vtile = VertWangTile(vertRows, {'G' : 1, 'H' : 2, 'I' : 1, 'J' : 1, 'K' : 2, 'L' : 1}, width = 5, height = 10)
+    htile = HorzWangTile(horzRows, {'A' : 2, 'B' : 1, 'C' : 1, 'D' : 2, 'E' : 1, 'F' : 1}, width = 10, height = 5)
+    
+    print vertRows
+    print vtile.getTopTile().getTiles()
+    print vtile.getBottomTile().getTiles()
+    print vtile.getConstraintValue('G')
+    
+    print
+    
+    print horzRows
+    print htile.getLeftTile().getTiles()
+    print htile.getRightTile().getTiles()
+    print htile.getConstraintValue('D')
 
 if __name__ == "__main__":
     main()

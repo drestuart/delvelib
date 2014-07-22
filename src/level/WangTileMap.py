@@ -82,7 +82,6 @@ class SquareWangTileMap(WangTileMap):
                 print row
 
 class TownWangTileMap(SquareWangTileMap):
-    
     tileset = townset
     
 
