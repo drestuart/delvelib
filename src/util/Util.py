@@ -8,17 +8,6 @@ import math
 import PIL.Image
 import Const as C
 
-def get_key(key):
-    '''
-    A convenience method for libtcod's draconian keyboard support
-    '''
-    raise Exception("Deprecated Util.get_key")
-    
-#     if key.vk == libtcod.KEY_CHAR:
-#         return chr(key.c)
-#     else:
-#         return key.vk
-
 def ManhattanDistance(x1, x2, y1, y2):
     return abs(x1-x2) + abs(y1-y2)
 
@@ -115,6 +104,36 @@ def twoDArray(width, height, val=True):
         arr.append(newCol)
     
     return arr
+
+def rotateCW(arr):
+    return zip(*arr[::-1])
+
+def rotateCCW(arr):
+    return zip(*arr)[::-1]
     
+def printArray(arr):
+    for row in arr:
+        rowStr = ''
+        for item in row:
+            rowStr += str(item)
+        print rowStr
+    print
+
+def main():
+    arr = [ '*...++...$',
+            '....++....',
+            '++++++++++',
+            '....++....',
+            '?...++...!']
+    cw = rotateCW(arr)
+    ccw = rotateCCW(arr)
     
+    printArray(arr)
+    printArray(cw)
+    printArray(ccw)
+
+
+if __name__ == '__main__':
+    main()
+
     
