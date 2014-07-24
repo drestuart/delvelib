@@ -37,31 +37,31 @@ for cons in prod:
         tile[height/8][0] = glyphs[1]
     
     # H:
-    if constraints[0] == '1':
+    if constraints[1] == '1':
         tile[0][width/2] = glyphs[1]
     else:
         tile[0][width/4] = glyphs[1]
     
     # I:
-    if constraints[0] == '1':
+    if constraints[2] == '1':
         tile[height/4][width - 1] = glyphs[1]
     else:
         tile[height/8][width - 1] = glyphs[1]
     
     # J:
-    if constraints[0] == '1':
+    if constraints[3] == '1':
         tile[3*height/4][width - 1] = glyphs[1]
     else:
         tile[7*height/8][width - 1] = glyphs[1]
     
     # K:
-    if constraints[0] == '1':
+    if constraints[4] == '1':
         tile[height - 1][width/2] = glyphs[1]
     else:
         tile[height - 1][3*width/4] = glyphs[1]
     
     # L:
-    if constraints[0] == '1':
+    if constraints[5] == '1':
         tile[3*height/4][0] = glyphs[1]
     else:
         tile[7*height/8][0] = glyphs[1]
