@@ -413,15 +413,19 @@ def main():
                "......#####", \
                "......#####", \
                "#...#+#####"]
-    constraints = {'G' : '2', 'H' : '1', 'I': '2', 'J' : '1', 'K' : '1', 'L': '1'}
+    constraints = {'G' : '2', 'H' : '1', 'I': '2', 'J' : '1', 'K' : '1', 'L': '2'}
     
     rset.buildTile(squares, constraints, "tile")
     
     printArray(rset.vWangTiles[0].getTiles())
+    print rset.vWangTiles[0].getConstraints()
     printArray(rset.vWangTiles[1].getTiles())
+    print rset.vWangTiles[1].getConstraints()
     
     printArray(rset.hWangTiles[0].getTiles())
+    print rset.hWangTiles[0].getConstraints()
     printArray(rset.hWangTiles[1].getTiles())
-    
+    print rset.hWangTiles[1].getConstraints()
+
 if __name__ == "__main__":
     main()
