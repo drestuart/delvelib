@@ -15,6 +15,7 @@
 from copy import deepcopy
 import re
 import random
+from Util import rotateCW, rotateCCW
 
 class WangTile(object):
     
@@ -120,6 +121,8 @@ class HorzWangTile(RectangularWangTile):
         else:
             raise ValueError(constraint)
 
+class dungeonHTile(HorzWangTile):
+    pass
 
 class VertWangTile(RectangularWangTile):
     
@@ -160,16 +163,15 @@ class VertWangTile(RectangularWangTile):
             return self.bottomTile.getConstraintValue(newConstraint)
         else:
             raise ValueError(constraint)
+        
+class dungeonVTile(VertWangTile):
+    pass
 
 class WangTileSet(object):
 
-    def __init__(self, tileClass):
-        self.tileClass = tileClass
-        self.defaultConstraint = tileClass.defaultConstraint
+    def __init__(self):
         self.tileWidth = None
         self.tileHeight = None
-        self.wangTiles = []
-        self.specialTiles = {}
         
     def getDefaultConstraint(self):
         return self.defaultConstraint
@@ -287,7 +289,7 @@ class WangTileSet(object):
             tileType = None
             constraintDict = None
         
-        print len(self.wangTiles)
+#         print len(self.wangTiles)
         
     
     def getTilesWithConstraints(self, constraints):
@@ -300,6 +302,16 @@ class WangTileSet(object):
 
     def getRandomTileWithConstraints(self, constraints):
         return random.choice(self.getTilesWithConstraints(constraints))
+    
+class SquareWangTileSet(WangTileSet):
+    
+    def __init__(self, tileClass):
+        super(SquareWangTileSet, self).__init__()
+        self.tileClass = tileClass
+        self.defaultConstraint = tileClass.defaultConstraint
+        self.wangTiles = []
+        self.specialTiles = {}
+
 
     def buildTile(self, squares, constraints, tileType):
         newTile = self.tileClass(squares, constraints, width = self.tileWidth, height = self.tileHeight)
@@ -307,40 +319,62 @@ class WangTileSet(object):
             self.wangTiles.append(newTile)
         else:
             self.specialTiles[tileType] = newTile
+            
+class RectWangTileSet(WangTileSet):
+    
+    def __init__(self, vTileClass, hTileClass):
+        super(RectWangTileSet, self).__init__()
+        self.vTileClass = vTileClass
+        self.tileClass = vTileClass
+        self.hTileClass = hTileClass
+        self.defaultConstraint = vTileClass.defaultConstraint
+        self.vWangTiles = []
+        self.hWangTiles = []
+        self.specialTiles = {}
+
+    
+    def buildTile(self, squares, constraints, tileType):
+        # Build vertical tiles
+        newVTile = self.vTileClass(squares, constraints, width = self.tileWidth, height = self.tileHeight)
+        
+        constraints180 = self.rotateConstraints(constraints, 180)
+        newVTile180 = self.vTileClass(rotateCW(rotateCW(squares)), constraints180, width = self.tileWidth, height = self.tileHeight)
+        
+        # Build horizontal tiles
+        constraints90 = self.rotateConstraints(constraints, 90)
+        newHTile90 = self.hTileClass(rotateCW(squares), constraints90, width = self.tileWidth, height = self.tileHeight)
+        
+        constraints270 = self.rotateConstraints(constraints, 270)
+        newHTile270 = self.hTileClass(rotateCCW(squares), constraints270, width = self.tileWidth, height = self.tileHeight)
+        
+        if (tileType.lower() == "tile"):
+            self.vWangTiles += [newVTile, newVTile180]
+            self.hWangTiles += [newHTile90, newHTile270]
+            
+    def rotateConstraints(self, constraints, angle):
+        newConstraints = {}
+        
+        if angle == 90:
+            newConstraints = {'A' : constraints['K'], 'B' : constraints['L'], 'C' : constraints['G'],
+                              'D' : constraints['H'], 'E' : constraints['I'], 'F' : constraints['J']}
+            
+        elif angle == 180:
+            newConstraints = {'G' : constraints['J'], 'H' : constraints['K'], 'I' : constraints['L'],
+                              'J' : constraints['G'], 'K' : constraints['H'], 'L' : constraints['I']}
+            
+        elif angle == 270:
+            newConstraints = {'A' : constraints['H'], 'B' : constraints['I'], 'C' : constraints['J'],
+                              'D' : constraints['K'], 'E' : constraints['L'], 'F' : constraints['G']}
+            
+        else:
+            raise ValueError(angle)
+        
+        return newConstraints
+    
 
 
 def main():
-    vertRows = ['..+..',
-                '..+..',
-                '..+..',
-                '..+..',
-                '+++++',
-                '+++++',
-                '..+..',
-                '..+..',
-                '..+..',
-                '..+..']
-    
-    horzRows = ['....++....',
-                '....++....',
-                '++++++++++',
-                '....++....',
-                '....++....']
-    
-    vtile = VertWangTile(vertRows, {'G' : 1, 'H' : 2, 'I' : 1, 'J' : 1, 'K' : 2, 'L' : 1}, width = 5, height = 10)
-    htile = HorzWangTile(horzRows, {'A' : 2, 'B' : 1, 'C' : 1, 'D' : 2, 'E' : 1, 'F' : 1}, width = 10, height = 5)
-    
-    print vertRows
-    print vtile.getTopTile().getTiles()
-    print vtile.getBottomTile().getTiles()
-    print vtile.getConstraintValue('G')
-    
-    print
-    
-    print horzRows
-    print htile.getLeftTile().getTiles()
-    print htile.getRightTile().getTiles()
-    print htile.getConstraintValue('D')
+    pass
 
 if __name__ == "__main__":
     main()

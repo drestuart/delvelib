@@ -4,10 +4,16 @@ Created on Jul 18, 2014
 @author: dstuart
 '''
 
-from WangTileClass import WangTileSet, TownWangTile
+from WangTileClass import SquareWangTileSet, TownWangTile, RectWangTileSet, dungeonVTile, dungeonHTile
 
-townset = WangTileSet(TownWangTile)
+townset = SquareWangTileSet(TownWangTile)
 townset.readFromFile("towntiles.txt")
+print len(townset.wangTiles)
+
+dungeonset = RectWangTileSet(dungeonVTile, dungeonHTile)
+dungeonset.readFromFile("dungeon_vtiles.txt")
+print len(dungeonset.vWangTiles) + len(dungeonset.hWangTiles)
+
 
 
 class WangTileMap(object):
