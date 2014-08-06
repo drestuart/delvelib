@@ -6,14 +6,6 @@ Created on Jul 18, 2014
 
 from WangTileClass import SquareWangTileSet, TownWangTile, RectWangTileSet, dungeonVTile, dungeonHTile
 
-townset = SquareWangTileSet(TownWangTile)
-townset.readFromFile("towntiles.txt")
-print len(townset.wangTiles)
-
-dungeonset = RectWangTileSet(dungeonVTile, dungeonHTile)
-dungeonset.readFromFile("dungeon_vtiles.txt")
-print len(dungeonset.vWangTiles) + len(dungeonset.hWangTiles)
-
 
 
 class WangTileMap(object):
@@ -87,18 +79,35 @@ class SquareWangTileMap(WangTileMap):
                     row += wtile.getTiles()[i]
                 print row
 
-class TownWangTileMap(SquareWangTileMap):
-    tileset = townset
+class TownMap(SquareWangTileMap):
+    def __init__(self, *args):
+        super(TownMap, self).__init__(*args)
+        self.tileset = SquareWangTileSet(TownWangTile)
+        self.tileset.readFromFile("towntiles.txt")
+        print len(self.tileset.wangTiles)
     
 
 class HerringboneWangTileMap(WangTileMap):
-    pass
+    def __init__(self, tilesWide, tilesHigh):
+        super(HerringboneWangTileMap, self).__init__()
+        self.tilesWide = tilesWide
+        self.tilesHigh = tilesHigh
+
+
+class DungeonMap(HerringboneWangTileMap):
+    def __init__(self, *args):
+        super(DungeonMap, self).__init__(*args)
+        self.tileset = RectWangTileSet(dungeonVTile, dungeonHTile)
+        self.tileset.readFromFile("dungeon_vtiles.txt")
+        print len(self.tileset.vWangTiles) + len(self.tileset.hWangTiles)
 
 
 def main():
-    townMap = TownWangTileMap(5, 5)
+    townMap = TownMap(5, 5)
     townMap.buildMap()
     townMap.printMap()
+    
+    dungeonMap = DungeonMap(5, 5)
 
 if __name__ == "__main__":
     main()
