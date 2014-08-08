@@ -9,8 +9,9 @@ from WangTileClass import SquareWangTileSet, TownWangTile, RectWangTileSet, dung
 
 
 class WangTileMap(object):
-    def __init__(self):
-        pass
+    def __init__(self, tilesWide, tilesHigh):
+        self.tilesWide = tilesWide
+        self.tilesHigh = tilesHigh
     
     def getWangTile(self, x, y):
         try:
@@ -20,13 +21,14 @@ class WangTileMap(object):
         
     def addWangTile(self, x, y, tile):
         self.wangTiles[y][x] = tile
+        
+    def inBounds(self, x, y):
+        return (x >= 0 and x < self.tilesWide and y >= 0 and y < self.tilesHigh)
 
 
 class SquareWangTileMap(WangTileMap):
     def __init__(self, tilesWide, tilesHigh):
-        super(SquareWangTileMap, self).__init__()
-        self.tilesWide = tilesWide
-        self.tilesHigh = tilesHigh
+        super(SquareWangTileMap, self).__init__(tilesWide, tilesHigh)
         
         self.wangTiles = []
         for y in range(self.tilesHigh):
@@ -89,10 +91,45 @@ class TownMap(SquareWangTileMap):
 
 class HerringboneWangTileMap(WangTileMap):
     def __init__(self, tilesWide, tilesHigh):
-        super(HerringboneWangTileMap, self).__init__()
-        self.tilesWide = tilesWide
-        self.tilesHigh = tilesHigh
+        super(HerringboneWangTileMap, self).__init__(tilesWide, tilesHigh)
+        
+        
+    def buildMap(self):
+        print "buildMap"
+        
+    def placeTile(self, tile, x, y):
+        
+        # Vertical tile
+        if isinstance(tile, self.tileset.vTileClass):
+            topTile = tile.getTopTile()
+            bottomTile = tile.getBottomTile()
+            
+            # Place top tile
+            if self.inBounds(x, y) and not self.getWangTile(x, y):
+                self.addWangTile(x, y, topTile)
+                
+            # Place bottom tile
+            if self.inBounds(x, y + 1) and not self.getWangTile(x, y + 1):
+                self.addWangTile(x, y + 1, bottomTile)
+        
+        
+        # Horizontal tile
+        elif isinstance(tile, self.tileset.hTileClass):
+            leftTile = tile.getLeftTile()
+            rightTile = tile.getRightTile()
+            
+            # Place left tile
+            if self.inBounds(x, y) and not self.getWangTile(x, y):
+                self.addWangTile(x, y, leftTile)
+                
+            # Place right tile
+            if self.inBounds(x + 1, y) and not self.getWangTile(x + 1, y):
+                self.addWangTile(x + 1, y, rightTile)
+        
+    
 
+    def printMap(self):
+        print "printMap"
 
 class DungeonMap(HerringboneWangTileMap):
     def __init__(self, *args):
@@ -108,6 +145,8 @@ def main():
     townMap.printMap()
     
     dungeonMap = DungeonMap(5, 5)
+    dungeonMap.buildMap()
+    dungeonMap.printMap()
 
 if __name__ == "__main__":
     main()
