@@ -118,7 +118,42 @@ class HerringboneWangTileMap(WangTileMap):
         self.rTiles[y][x] = tile
         
     def buildMap(self):
-        print "buildMap"
+        
+        startingStepsAndOffsets = [
+                                   ("placeHorz", 0),
+                                   ("placeVert", 0),
+                                   ("placeHorz", -1),
+                                   ]
+        
+        step, offset = startingStepsAndOffsets[0]
+        
+        currentX = offset
+        currentY = 0
+        
+        while currentY < self.tilesHigh:
+            if step == "placeHorz":
+                # Do some stuuuuuuff
+                
+                print (currentX, currentY)
+                
+                currentX += 3
+                step = "placeVert"
+            elif step == "placeVert":
+                # Do some different stuuuuuuuuff
+                
+                print (currentX, currentY)
+                
+                currentX += 1
+                step = "placeHorz"
+                
+            # Move to the next row
+            if currentX >= self.tilesWide:
+                currentY += 1
+                # Get the next set of offset and first step.
+                # This starts over in the list after the last element
+                step, offset = startingStepsAndOffsets[currentY % len(startingStepsAndOffsets)]
+                currentX = offset
+        
         
     def placeTile(self, tile, x, y):
         
@@ -176,13 +211,13 @@ class DungeonMap(HerringboneWangTileMap):
 
 
 def main():
-    townMap = TownMap(5, 5)
-    townMap.buildMap()
-    townMap.printMap()
+#     townMap = TownMap(5, 5)
+#     townMap.buildMap()
+#     townMap.printMap()
     
     dungeonMap = DungeonMap(5, 5)
     dungeonMap.buildMap()
-    dungeonMap.printMap()
+#     dungeonMap.printMap()
 
 if __name__ == "__main__":
     main()
