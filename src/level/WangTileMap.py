@@ -93,7 +93,6 @@ class HerringboneWangTileMap(WangTileMap):
     def __init__(self, tilesWide, tilesHigh):
         super(HerringboneWangTileMap, self).__init__(tilesWide, tilesHigh)
         
-        
     def buildMap(self):
         print "buildMap"
         
@@ -126,10 +125,19 @@ class HerringboneWangTileMap(WangTileMap):
             if self.inBounds(x + 1, y) and not self.getWangTile(x + 1, y):
                 self.addWangTile(x + 1, y, rightTile)
         
-    
 
     def printMap(self):
-        print "printMap"
+        '''
+        Copied from SquareWangTileMap.  Could work?
+        '''
+        for tiley in range(self.tilesHigh):
+            for i in range(self.tileset.tileHeight):
+                row = ""
+                for tilex in range(self.tilesWide):
+                    wtile = self.getWangTile(tilex, tiley)
+                    row += wtile.getTiles()[i]
+                print row
+    
 
 class DungeonMap(HerringboneWangTileMap):
     def __init__(self, *args):
