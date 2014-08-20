@@ -312,7 +312,7 @@ class WangTileSet(object):
                 
         return goodTiles
 
-    def getRandomTileWithConstraints(self, constraints):
+    def getRandomTile(self, constraints):
         return random.choice(self.getTilesWithConstraints(constraints))
     
 class SquareWangTileSet(WangTileSet):
@@ -383,7 +383,20 @@ class RectWangTileSet(WangTileSet):
         
         return newConstraints
     
-
+    def getTilesWithConstraints(self, constraints, tileList):
+        goodTiles = []
+        for tile in tileList:
+            if tile.satisfiesConstraints(constraints):
+                goodTiles.append(tile)
+                
+        return goodTiles
+    
+    def getRandomVTile(self, constraints):
+        return random.choice(self.getTilesWithConstraints(constraints, self.vWangTiles))
+    
+    def getRandomHTile(self, constraints):
+        return random.choice(self.getTilesWithConstraints(constraints, self.hWangTiles))
+    
 
 def main():
     rset = RectWangTileSet(dungeonVTile, dungeonHTile)
@@ -391,27 +404,27 @@ def main():
     rset.tileHeight = 22
     rset.glyphs = "#,."
     
-    squares = ["#####,#####", \
-               "#####,#####", \
-               ",,##,,#,,,,", \
-               "#,##,##,###", \
-               "#,##,##,###", \
-               "#,##,##,,##", \
-               "#,##,,##,##", \
-               "#,###,##,##", \
-               "#+###+##+##", \
-               "#.........#", \
-               "#.........#", \
-               "#.........#", \
-               "#.........#", \
-               "###########", \
-               "###########", \
-               "######,,,##", \
-               "####,,,#,,,", \
-               "####+######", \
-               "......#####", \
-               "......#####", \
-               "......#####", \
+    squares = ["#####,#####",
+               "#####,#####",
+               ",,##,,#,,,,",
+               "#,##,##,###",
+               "#,##,##,###",
+               "#,##,##,,##",
+               "#,##,,##,##",
+               "#,###,##,##",
+               "#+###+##+##",
+               "#.........#",
+               "#.........#",
+               "#.........#",
+               "#.........#",
+               "###########",
+               "###########",
+               "######,,,##",
+               "####,,,#,,,",
+               "####+######",
+               "......#####",
+               "......#####",
+               "......#####",
                "#...#+#####"]
     constraints = {'G' : '2', 'H' : '1', 'I': '2', 'J' : '1', 'K' : '1', 'L': '2'}
     

@@ -69,7 +69,7 @@ class SquareWangTileMap(WangTileMap):
         for y in range(self.tilesHigh):
             for x in range(self.tilesWide):
                 constraints = self.getConstriants(x, y)
-                newTile = self.tileset.getRandomTileWithConstraints(constraints)
+                newTile = self.tileset.getRandomTile(constraints)
                 self.addWangTile(x, y, newTile)
                 
     def printMap(self):
