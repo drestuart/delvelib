@@ -19,6 +19,9 @@ class WangTileMap(object):
         except IndexError:
             return None
         
+    def hasTile(self, x, y):
+        return (True if self.getWangTile(x, y) else False)
+        
     def addWangTile(self, x, y, tile):
         self.wangTiles[y][x] = tile
         
@@ -93,6 +96,27 @@ class HerringboneWangTileMap(WangTileMap):
     def __init__(self, tilesWide, tilesHigh):
         super(HerringboneWangTileMap, self).__init__(tilesWide, tilesHigh)
         
+        # Initialize wang tile structure for underlying square tiles
+        # To simplify reading out map data
+        self.wangTiles = []
+        for y in range(self.tilesHigh):
+            row = []
+            for x in range(self.tilesWide):
+                row.append(None)
+            self.wangTiles.append(row)
+            
+        # Initialize a similar structure to keep track of the rectangular tiles
+        # For constraint purposes
+        self.rTiles = []
+        for y in range(self.tilesHigh):
+            row = []
+            for x in range(self.tilesWide):
+                row.append(None)
+            self.rTiles.append(row)
+            
+    def addRTile(self, tile, x, y):
+        self.rTiles[y][x] = tile
+        
     def buildMap(self):
         print "buildMap"
         
@@ -106,10 +130,12 @@ class HerringboneWangTileMap(WangTileMap):
             # Place top tile
             if self.inBounds(x, y) and not self.getWangTile(x, y):
                 self.addWangTile(x, y, topTile)
+                self.addRTile(x, y, tile)
                 
             # Place bottom tile
             if self.inBounds(x, y + 1) and not self.getWangTile(x, y + 1):
                 self.addWangTile(x, y + 1, bottomTile)
+                self.addRTile(x, y + 1, tile)
         
         
         # Horizontal tile
@@ -120,10 +146,12 @@ class HerringboneWangTileMap(WangTileMap):
             # Place left tile
             if self.inBounds(x, y) and not self.getWangTile(x, y):
                 self.addWangTile(x, y, leftTile)
+                self.addRTile(x, y, tile)
                 
             # Place right tile
             if self.inBounds(x + 1, y) and not self.getWangTile(x + 1, y):
                 self.addWangTile(x + 1, y, rightTile)
+                self.addRTile(x + 1, y, tile)
         
 
     def printMap(self):
