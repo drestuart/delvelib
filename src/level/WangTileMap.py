@@ -127,8 +127,10 @@ class HerringboneWangTileMap(WangTileMap):
         return (True if self.getRTile(x, y) else False)
     
     def getConstraintAtPosition(self, x, y, constraintName):
+        print "Getting constraint", constraintName, "at position", (x, y)
         tile = self.getRTile(x, y)
         if tile:
+            print tile.__class__
             return tile.getConstraintValue(constraintName)
         return None
         
@@ -136,6 +138,7 @@ class HerringboneWangTileMap(WangTileMap):
         
         startingStepsAndOffsets = [("placeHorz", 0),
                                    ("placeVert", 0),
+                                   ("placeHorz", -2),
                                    ("placeHorz", -1)]
         
         vConstraintCoords = {"G" : (-1, 0, "J"),
@@ -157,12 +160,16 @@ class HerringboneWangTileMap(WangTileMap):
         currentX = offset
         currentY = 0
         
+        print "New row:", (currentX, currentY)
+        
         while currentY < self.tilesHigh:
+            print step
             if step == "placeHorz":
-#                 print (currentX, currentY)
 
                 # Place horizontal tile
                 if not self.hasTile(currentX, currentY):
+                    print "Placing horz:", (currentX, currentY)
+                    
                     # Read constraints from adjacent tiles
                     constraints = {}
                     
@@ -183,6 +190,7 @@ class HerringboneWangTileMap(WangTileMap):
                 tilex, tiley = currentX, currentY - 1
                 
                 if not self.hasTile(tilex, tiley):
+                    print "Placing vert up:", (currentX, currentY)
                     # Read constraints from adjacent tiles
                     constraints = {}
                     
@@ -201,9 +209,9 @@ class HerringboneWangTileMap(WangTileMap):
                 step = "placeVert"
                 
             elif step == "placeVert":
-#                 print (currentX, currentY)
                 
                 if not self.hasTile(currentX, currentY):
+                    print "Placing vert down:", (currentX, currentY)
                     # Read constraints from adjacent tiles
                     constraints = {}
                     
@@ -223,10 +231,13 @@ class HerringboneWangTileMap(WangTileMap):
             # Move to the next row
             if currentX >= self.tilesWide:
                 currentY += 1
+                
                 # Get the next set of offset and first step.
                 # This starts over in the list after the last element
                 step, offset = startingStepsAndOffsets[currentY % len(startingStepsAndOffsets)]
                 currentX = offset
+                
+                print "New row:", (currentX, currentY)
         
         
     def placeTile(self, tile, x, y):
@@ -309,7 +320,7 @@ def main():
     testTileSet.tileHeight = 6
     testTileSet.buildTile(vTileSq, vTileCon, "tile")
      
-    hmap = HerringboneWangTileMap(3, 3)
+    hmap = HerringboneWangTileMap(5, 5)
     hmap.tileset = testTileSet
     hmap.buildMap()
     hmap.printMap()
