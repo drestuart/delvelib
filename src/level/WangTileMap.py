@@ -114,16 +114,43 @@ class HerringboneWangTileMap(WangTileMap):
                 row.append(None)
             self.rTiles.append(row)
             
-    def addRTile(self, tile, x, y):
+    def addRTile(self, x, y, tile):
         self.rTiles[y][x] = tile
+        
+    def getRTile(self, x, y):
+        try:
+            return self.rTiles[y][x]
+        except IndexError:
+            return None
+        
+    def hasRTile(self, x, y):
+        return (True if self.getRTile(x, y) else False)
+    
+    def getConstraintAtPosition(self, x, y, constraintName):
+        tile = self.getRTile(x, y)
+        if tile:
+            return tile.getConstraintValue(constraintName)
+        return None
         
     def buildMap(self):
         
-        startingStepsAndOffsets = [
-                                   ("placeHorz", 0),
+        startingStepsAndOffsets = [("placeHorz", 0),
                                    ("placeVert", 0),
-                                   ("placeHorz", -1),
-                                   ]
+                                   ("placeHorz", -1)]
+        
+        vConstraintCoords = {"G" : (-1, 0, "J"),
+                             "H" : (0, -1, "F"),
+                             "I" : (1, 0, "A"),
+                             "J" : (1, 1, "G"),
+                             "K" : (0, 2, "C"),
+                             "L" : (-1, 1, "D")}
+        
+        hConstraintCoords = {"A" : (-1, 0, "I"),
+                             "B" : (0, -1, "E"),
+                             "C" : (1, -1, "K"),
+                             "D" : (2, 0, "L"),
+                             "E" : (1, 1, "B"),
+                             "F" : (0, 1, "H")}
         
         step, offset = startingStepsAndOffsets[0]
         
@@ -132,16 +159,63 @@ class HerringboneWangTileMap(WangTileMap):
         
         while currentY < self.tilesHigh:
             if step == "placeHorz":
-                # Do some stuuuuuuff
+#                 print (currentX, currentY)
+
+                # Place horizontal tile
+                if not self.hasTile(currentX, currentY):
+                    # Read constraints from adjacent tiles
+                    constraints = {}
+                    
+                    for k, v in hConstraintCoords.items():
+                        dx, dy, constraintName = v
+                        constraints[k] = self.getConstraintAtPosition(currentX + dx, currentY + dy, constraintName)
+
+                    # Get random tile
+                    tile = self.tileset.getRandomHTile(constraints)
+                    
+                    # Place it
+                    self.placeTile(tile, currentX, currentY)
                 
-                print (currentX, currentY)
+                currentX += 2
                 
-                currentX += 3
+                # Place vertical tile up
+                # Top-left corner is one row up!
+                tilex, tiley = currentX, currentY - 1
+                
+                if not self.hasTile(tilex, tiley):
+                    # Read constraints from adjacent tiles
+                    constraints = {}
+                    
+                    for k, v in vConstraintCoords.items():
+                        dx, dy, constraintName = v
+                        constraints[k] = self.getConstraintAtPosition(tilex + dx, tiley + dy, constraintName)
+
+                    # Get random tile
+                    tile = self.tileset.getRandomVTile(constraints)
+                    
+                    # Place it
+                    self.placeTile(tile, tilex, tiley)
+                
+                currentX += 1
+                
                 step = "placeVert"
-            elif step == "placeVert":
-                # Do some different stuuuuuuuuff
                 
-                print (currentX, currentY)
+            elif step == "placeVert":
+#                 print (currentX, currentY)
+                
+                if not self.hasTile(currentX, currentY):
+                    # Read constraints from adjacent tiles
+                    constraints = {}
+                    
+                    for k, v in vConstraintCoords.items():
+                        dx, dy, constraintName = v
+                        constraints[k] = self.getConstraintAtPosition(currentX + dx, currentY + dy, constraintName)
+
+                    # Get random tile
+                    tile = self.tileset.getRandomVTile(constraints)
+                    
+                    # Place it
+                    self.placeTile(tile, currentX, currentY)
                 
                 currentX += 1
                 step = "placeHorz"
@@ -194,11 +268,14 @@ class HerringboneWangTileMap(WangTileMap):
         Copied from SquareWangTileMap.  Could work?
         '''
         for tiley in range(self.tilesHigh):
-            for i in range(self.tileset.tileHeight):
+            for i in range(self.tileset.tileWidth):
                 row = ""
                 for tilex in range(self.tilesWide):
                     wtile = self.getWangTile(tilex, tiley)
-                    row += wtile.getTiles()[i]
+                    if wtile:
+                        row += "".join(wtile.getTiles()[i])
+                    else:
+                        row += "x"*self.tileset.tileWidth
                 print row
     
 
@@ -215,9 +292,27 @@ def main():
 #     townMap.buildMap()
 #     townMap.printMap()
     
-    dungeonMap = DungeonMap(5, 5)
-    dungeonMap.buildMap()
+#     dungeonMap = DungeonMap(5, 5)
+#     dungeonMap.buildMap()
 #     dungeonMap.printMap()
+
+    vTileSq = ["###",
+               "#.#",
+               "#.#",
+               "#.#",
+               "#.#",
+               "###"]
+    vTileCon = {"G":"1", "H":"1", "I":"1", "J":"1", "K":"1", "L":"1"}
+         
+    testTileSet = RectWangTileSet(dungeonVTile, dungeonHTile)
+    testTileSet.tileWidth = 3
+    testTileSet.tileHeight = 6
+    testTileSet.buildTile(vTileSq, vTileCon, "tile")
+     
+    hmap = HerringboneWangTileMap(3, 3)
+    hmap.tileset = testTileSet
+    hmap.buildMap()
+    hmap.printMap()
 
 if __name__ == "__main__":
     main()
