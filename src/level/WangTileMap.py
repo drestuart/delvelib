@@ -16,7 +16,7 @@ class WangTileMap(object):
     def getWangTile(self, x, y):
         try:
             return self.wangTiles[y][x]
-        except IndexError:
+        except (KeyError, IndexError):
             return None
         
     def hasTile(self, x, y):
@@ -98,21 +98,19 @@ class HerringboneWangTileMap(WangTileMap):
         
         # Initialize wang tile structure for underlying square tiles
         # To simplify reading out map data
-        self.wangTiles = []
-        for y in range(self.tilesHigh):
-            row = []
-            for x in range(self.tilesWide):
-                row.append(None)
-            self.wangTiles.append(row)
+        self.wangTiles = {}
+        for y in range(-1, self.tilesHigh + 1):
+            self.wangTiles[y] = {}
+            for x in range(-1, self.tilesWide + 1):
+                self.wangTiles[y][x] = None
             
         # Initialize a similar structure to keep track of the rectangular tiles
         # For constraint purposes
-        self.rTiles = []
-        for y in range(self.tilesHigh):
-            row = []
-            for x in range(self.tilesWide):
-                row.append(None)
-            self.rTiles.append(row)
+        self.rTiles = {}
+        for y in range(-1, self.tilesHigh + 1):
+            self.rTiles[y] = {}
+            for x in range(-1, self.tilesWide + 1):
+                self.rTiles[y][x] = None
             
     def addRTile(self, x, y, tile):
         self.rTiles[y][x] = tile
@@ -120,17 +118,17 @@ class HerringboneWangTileMap(WangTileMap):
     def getRTile(self, x, y):
         try:
             return self.rTiles[y][x]
-        except IndexError:
+        except KeyError:
             return None
         
     def hasRTile(self, x, y):
         return (True if self.getRTile(x, y) else False)
     
     def getConstraintAtPosition(self, x, y, constraintName):
-        print "Getting constraint", constraintName, "at position", (x, y)
+#         print "Getting constraint", constraintName, "at position", (x, y)
         tile = self.getRTile(x, y)
         if tile:
-            print tile.__class__
+#             print tile.__class__
             return tile.getConstraintValue(constraintName)
         return None
         
@@ -138,7 +136,7 @@ class HerringboneWangTileMap(WangTileMap):
         
         startingStepsAndOffsets = [("placeHorz", 0),
                                    ("placeVert", 0),
-                                   ("placeHorz", -2),
+                                   ("placeHorz", 2),
                                    ("placeHorz", -1)]
         
         vConstraintCoords = {"G" : (-1, 0, "J"),
@@ -160,15 +158,13 @@ class HerringboneWangTileMap(WangTileMap):
         currentX = offset
         currentY = 0
         
-        print "New row:", (currentX, currentY)
-        
-        while currentY < self.tilesHigh:
-            print step
+        # In some cases an extra row is required to fill in the last desired row!
+        # Specifically when self.tilesHigh % 4 == 3
+        while currentY < self.tilesHigh + 1: 
             if step == "placeHorz":
 
                 # Place horizontal tile
                 if not self.hasTile(currentX, currentY):
-                    print "Placing horz:", (currentX, currentY)
                     
                     # Read constraints from adjacent tiles
                     constraints = {}
@@ -190,7 +186,7 @@ class HerringboneWangTileMap(WangTileMap):
                 tilex, tiley = currentX, currentY - 1
                 
                 if not self.hasTile(tilex, tiley):
-                    print "Placing vert up:", (currentX, currentY)
+                    
                     # Read constraints from adjacent tiles
                     constraints = {}
                     
@@ -211,7 +207,7 @@ class HerringboneWangTileMap(WangTileMap):
             elif step == "placeVert":
                 
                 if not self.hasTile(currentX, currentY):
-                    print "Placing vert down:", (currentX, currentY)
+
                     # Read constraints from adjacent tiles
                     constraints = {}
                     
@@ -237,8 +233,6 @@ class HerringboneWangTileMap(WangTileMap):
                 step, offset = startingStepsAndOffsets[currentY % len(startingStepsAndOffsets)]
                 currentX = offset
                 
-                print "New row:", (currentX, currentY)
-        
         
     def placeTile(self, tile, x, y):
         
@@ -275,9 +269,6 @@ class HerringboneWangTileMap(WangTileMap):
         
 
     def printMap(self):
-        '''
-        Copied from SquareWangTileMap.  Could work?
-        '''
         for tiley in range(self.tilesHigh):
             for i in range(self.tileset.tileWidth):
                 row = ""
@@ -303,27 +294,27 @@ def main():
 #     townMap.buildMap()
 #     townMap.printMap()
     
-#     dungeonMap = DungeonMap(5, 5)
-#     dungeonMap.buildMap()
-#     dungeonMap.printMap()
+    dungeonMap = DungeonMap(5, 5)
+    dungeonMap.buildMap()
+    dungeonMap.printMap()
 
-    vTileSq = ["###",
-               "#.#",
-               "#.#",
-               "#.#",
-               "#.#",
-               "###"]
-    vTileCon = {"G":"1", "H":"1", "I":"1", "J":"1", "K":"1", "L":"1"}
-         
-    testTileSet = RectWangTileSet(dungeonVTile, dungeonHTile)
-    testTileSet.tileWidth = 3
-    testTileSet.tileHeight = 6
-    testTileSet.buildTile(vTileSq, vTileCon, "tile")
-     
-    hmap = HerringboneWangTileMap(5, 5)
-    hmap.tileset = testTileSet
-    hmap.buildMap()
-    hmap.printMap()
+#     vTileSq = ["###",
+#                "#.#",
+#                "#.#",
+#                "#.#",
+#                "#.#",
+#                "###"]
+#     vTileCon = {"G":"1", "H":"1", "I":"1", "J":"1", "K":"1", "L":"1"}
+#          
+#     testTileSet = RectWangTileSet(dungeonVTile, dungeonHTile)
+#     testTileSet.tileWidth = 3
+#     testTileSet.tileHeight = 6
+#     testTileSet.buildTile(vTileSq, vTileCon, "tile")
+#      
+#     hmap = HerringboneWangTileMap(10, 10)
+#     hmap.tileset = testTileSet
+#     hmap.buildMap()
+#     hmap.printMap()
 
 if __name__ == "__main__":
     main()
