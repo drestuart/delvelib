@@ -274,7 +274,7 @@ class HerringboneWangTileMap(WangTileMap):
             print row
     
     def getMapGlyphs(self):
-        wallGlyph = self.tileset.glyphs[0]
+        wallGlyph = self.tileset.wallGlyph
         retMap = []
         tileWidth = self.tileset.tileWidth
         

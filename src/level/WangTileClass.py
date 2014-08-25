@@ -223,6 +223,7 @@ class WangTileSet(object):
                     
                 continue
             
+            # Read glyph list
             if self.glyphs == None and line.startswith('glyphs'):
                 m = re.search(r"^glyphs: (.+)$", line)
                 if m:
@@ -232,7 +233,26 @@ class WangTileSet(object):
                     
                 continue
             
+            # Read special glyphs
+            if self.glyphs != None and line.startswith('wallglyph'):
+                m = re.search(r"^wallglyph: (.)$", line)
+                if m:
+                    self.wallGlyph = m.group(1)
+                else:
+                    raise Exception("Bad wallglyph line: " + line + " " + filename + " line " + str(lnum))
+                    
+                continue
             
+            if self.glyphs != None and line.startswith('roomglyphs'):
+                m = re.search(r"^roomglyphs: (.+)$", line)
+                if m:
+                    self.roomGlyphs = m.group(1)
+                else:
+                    raise Exception("Bad roomglyphs line: " + line + " " + filename + " line " + str(lnum))
+                    
+                continue
+            
+            # Look for a new tile
             if tileMap == None:
                 if line == "":
                     continue
@@ -244,6 +264,7 @@ class WangTileSet(object):
                     tileMap = []
                     continue
             
+            # Continue reading current tile
             else:
                 if line == "":
                     # Finish off tile if it's tall enough
