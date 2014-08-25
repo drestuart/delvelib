@@ -326,8 +326,6 @@ class WangTileSet(object):
             tileType = None
             constraintDict = None
         
-#         print len(self.wangTiles)
-        
     
     def getTilesWithConstraints(self, constraints):
         goodTiles = []

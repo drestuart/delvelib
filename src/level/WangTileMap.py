@@ -76,20 +76,27 @@ class SquareWangTileMap(WangTileMap):
                 self.addWangTile(x, y, newTile)
                 
     def printMap(self):
+        for row in self.getMapGlyphs():
+            print row
+    
+    def getMapGlyphs(self):
+        retMap = []
+        
         for tiley in range(self.tilesHigh):
             for i in range(self.tileset.tileHeight):
                 row = ""
                 for tilex in range(self.tilesWide):
                     wtile = self.getWangTile(tilex, tiley)
                     row += wtile.getTiles()[i]
-                print row
+                retMap.append(row)
+        
+        return retMap
 
 class TownMap(SquareWangTileMap):
     def __init__(self, *args):
         super(TownMap, self).__init__(*args)
         self.tileset = SquareWangTileSet(TownWangTile)
         self.tileset.readFromFile("towntiles.txt")
-        print len(self.tileset.wangTiles)
     
 
 class HerringboneWangTileMap(WangTileMap):
@@ -317,13 +324,14 @@ class DungeonMap(HerringboneWangTileMap):
         super(DungeonMap, self).__init__(*args, **kwargs)
         self.tileset = RectWangTileSet(dungeonVTile, dungeonHTile)
         self.tileset.readFromFile("dungeon_vtiles.txt")
-        print len(self.tileset.vWangTiles) + len(self.tileset.hWangTiles)
 
 
 def main():
-#     townMap = TownMap(5, 5)
-#     townMap.buildMap()
-#     townMap.printMap()
+    townMap = TownMap(3, 3)
+    townMap.buildMap()
+    townMap.printMap()
+    
+    print
     
     dungeonMap = DungeonMap(5, 5, margin = 1)
     dungeonMap.buildMap()
