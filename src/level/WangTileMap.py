@@ -93,8 +93,9 @@ class TownMap(SquareWangTileMap):
     
 
 class HerringboneWangTileMap(WangTileMap):
-    def __init__(self, tilesWide, tilesHigh):
+    def __init__(self, tilesWide, tilesHigh, **kwargs):
         super(HerringboneWangTileMap, self).__init__(tilesWide, tilesHigh)
+        self.margin = kwargs.get("margin", 0)
         
         # Initialize wang tile structure for underlying square tiles
         # To simplify reading out map data
@@ -269,21 +270,51 @@ class HerringboneWangTileMap(WangTileMap):
         
 
     def printMap(self):
+        for row in self.getMapGlyphs():
+            print row
+    
+    def getMapGlyphs(self):
+        wallGlyph = self.tileset.glyphs[0]
+        retMap = []
+        tileWidth = self.tileset.tileWidth
+        
+        # Top wall margin
+        if self.margin:
+            for dummy in range(self.margin):
+                retMap.append(wallGlyph*(self.tilesWide * tileWidth + 2*self.margin))
+        
         for tiley in range(self.tilesHigh):
-            for i in range(self.tileset.tileWidth):
+            for i in range(tileWidth):
                 row = ""
+                
+                # Left wall margin
+                if self.margin:
+                    row += wallGlyph*self.margin
+                
                 for tilex in range(self.tilesWide):
                     wtile = self.getWangTile(tilex, tiley)
                     if wtile:
                         row += "".join(wtile.getTiles()[i])
                     else:
                         row += "x"*self.tileset.tileWidth
-                print row
+                        
+                # Right wall margin
+                if self.margin:
+                    row += wallGlyph*self.margin
+                    
+                retMap.append(row)
+                
+        # Bottom wall margin
+        if self.margin:
+            for dummy in range(self.margin):
+                retMap.append(wallGlyph*(self.tilesWide * tileWidth + 2*self.margin))
+                
+        return retMap
     
 
 class DungeonMap(HerringboneWangTileMap):
-    def __init__(self, *args):
-        super(DungeonMap, self).__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super(DungeonMap, self).__init__(*args, **kwargs)
         self.tileset = RectWangTileSet(dungeonVTile, dungeonHTile)
         self.tileset.readFromFile("dungeon_vtiles.txt")
         print len(self.tileset.vWangTiles) + len(self.tileset.hWangTiles)
@@ -294,27 +325,10 @@ def main():
 #     townMap.buildMap()
 #     townMap.printMap()
     
-    dungeonMap = DungeonMap(5, 5)
+    dungeonMap = DungeonMap(5, 5, margin = 1)
     dungeonMap.buildMap()
     dungeonMap.printMap()
 
-#     vTileSq = ["###",
-#                "#.#",
-#                "#.#",
-#                "#.#",
-#                "#.#",
-#                "###"]
-#     vTileCon = {"G":"1", "H":"1", "I":"1", "J":"1", "K":"1", "L":"1"}
-#          
-#     testTileSet = RectWangTileSet(dungeonVTile, dungeonHTile)
-#     testTileSet.tileWidth = 3
-#     testTileSet.tileHeight = 6
-#     testTileSet.buildTile(vTileSq, vTileCon, "tile")
-#      
-#     hmap = HerringboneWangTileMap(10, 10)
-#     hmap.tileset = testTileSet
-#     hmap.buildMap()
-#     hmap.printMap()
 
 if __name__ == "__main__":
     main()

@@ -188,13 +188,13 @@ class WangTileSet(object):
     def __init__(self):
         self.tileWidth = None
         self.tileHeight = None
+        self.glyphs = None
         
     def getDefaultConstraint(self):
         return self.defaultConstraint
     
     def readFromFile(self, filename):
         tileMap = None
-        glyphs = None
         tileType = None
         constraintDict = None
         
@@ -223,10 +223,10 @@ class WangTileSet(object):
                     
                 continue
             
-            if glyphs == None and line.startswith('glyphs'):
+            if self.glyphs == None and line.startswith('glyphs'):
                 m = re.search(r"^glyphs: (.+)$", line)
                 if m:
-                    glyphs = m.group(1)
+                    self.glyphs = m.group(1)
                 else:
                     raise Exception("Bad glyph line: " + line + " " + filename + " line " + str(lnum))
                     
@@ -280,7 +280,7 @@ class WangTileSet(object):
                                         filename + " line " + str(lnum))
                 
                 # Check that the line includes only the allowed glyphs
-                if not (re.match("^[" + re.escape(glyphs) + "]+$", line)):
+                if not (re.match("^[" + re.escape(self.glyphs) + "]+$", line)):
                     raise Exception("Bad map line: " + line + " " + filename + " line " + str(lnum))
                 
                 tileMap.append(line)
