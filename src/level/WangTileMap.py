@@ -12,6 +12,7 @@ class WangTileMap(object):
     def __init__(self, tilesWide, tilesHigh):
         self.tilesWide = tilesWide
         self.tilesHigh = tilesHigh
+        self.levelMap = None
     
     def getWangTile(self, x, y):
         try:
@@ -80,6 +81,9 @@ class SquareWangTileMap(WangTileMap):
             print row
     
     def getMapGlyphs(self):
+        if self.levelMap != None:
+            return self.levelMap
+        
         retMap = []
         
         for tiley in range(self.tilesHigh):
@@ -90,6 +94,7 @@ class SquareWangTileMap(WangTileMap):
                     row += wtile.getTiles()[i]
                 retMap.append(row)
         
+        self.levelMap = retMap
         return retMap
 
 class TownMap(SquareWangTileMap):
@@ -103,6 +108,7 @@ class HerringboneWangTileMap(WangTileMap):
     def __init__(self, tilesWide, tilesHigh, **kwargs):
         super(HerringboneWangTileMap, self).__init__(tilesWide, tilesHigh)
         self.margin = kwargs.get("margin", 0)
+        self.rooms = None
         
         # Initialize wang tile structure for underlying square tiles
         # To simplify reading out map data
@@ -281,6 +287,9 @@ class HerringboneWangTileMap(WangTileMap):
             print row
     
     def getMapGlyphs(self):
+        if self.levelMap != None:
+            return self.levelMap
+        
         wallGlyph = self.tileset.wallGlyph
         retMap = []
         tileWidth = self.tileset.tileWidth
@@ -315,8 +324,121 @@ class HerringboneWangTileMap(WangTileMap):
         if self.margin:
             for dummy in range(self.margin):
                 retMap.append(wallGlyph*(self.tilesWide * tileWidth + 2*self.margin))
-                
+        
+        self.levelMap = retMap
         return retMap
+    
+    def getRooms(self):
+        return self.rooms
+    
+    def findRooms(self):
+        if self.rooms != None:
+            return self.rooms
+        
+        if self.levelMap == None:
+            self.getMapGlyphs()
+        
+        roomGlyphs = self.tileset.roomGlyphs
+        
+        self.mapHeight = len(self.levelMap)
+        self.mapWidth = len(self.levelMap[0])
+        
+        squaresSeen = []
+        roomCoords = []
+        
+        # Recursive function aaaaaaaaaah
+        def getConnectedRoomSquares(x, y):
+            squaresSeen.append((x, y))
+            toSearch = []
+            thisRoom = [(x, y)]
+            
+            # Get adjacent (valid) coordinates
+            if x > 0:
+                toSearch.append((x-1, y))
+                if y > 0:
+                    toSearch.append((x-1, y-1))
+            if x < self.mapWidth - 1:
+                toSearch.append((x+1, y))
+                if y < self.mapHeight - 1:
+                    toSearch.append((x+1, y+1))
+            
+            if y > 0:
+                toSearch.append((x, y-1))
+                if x < self.mapWidth - 1:
+                    toSearch.append((x+1, y-1))
+            if y < self.mapHeight - 1:
+                toSearch.append((x, y+1))
+                if x > 0:
+                    toSearch.append((x-1, y+1))
+                
+            for coords in toSearch:
+                sx, sy = coords
+                
+                # Check that this is a valid square that we haven't seen before
+                if not (sx, sy) in squaresSeen and self.levelMap[sy][sx] in roomGlyphs:
+                    thisRoom += getConnectedRoomSquares(sx, sy)
+            
+            return thisRoom
+        
+        for y in range(self.mapHeight):
+            row = self.levelMap[y]
+            for x in range(self.mapWidth):
+                square = row[x]
+                if (x, y) in squaresSeen: continue
+                if square not in roomGlyphs:
+                    squaresSeen.append((x, y))
+                    continue
+                
+                roomCoords.append(getConnectedRoomSquares(x, y))
+        
+        self.rooms = roomCoords
+        return roomCoords
+                
+    def enforceConnectivity(self):
+        # Set up AStar algo
+        import AStar
+        
+        wallGlyph = self.tileset.wallGlyph
+        mapdata = []
+
+        for y in range(self.mapHeight):
+            for x in range(self.mapWidth):
+                square = self.levelMap[y][x]
+                if square == wallGlyph:
+                    mapdata.append(-1)
+                else:
+                    mapdata.append(1)
+        
+        self.astar = AStar.setUpMap(mapdata, self.mapWidth, self.mapHeight)
+        
+        # Find connected components
+        connectedComponents = []
+        
+        # Start with first room
+        connectedComponents.append([self.rooms[0]])
+        
+        # Look at all the others
+        for room in self.rooms[1:]:
+            connected = False
+            fromx, fromy = room[0] # All rooms are simply connected, so choose the first square in each room
+            
+            for comp in connectedComponents:
+                roomToFind = comp[0]
+                tox, toy = roomToFind[0]
+                
+                path = AStar.findPath((fromx, fromy), (tox, toy), self.astar)
+                
+                if path is not None:
+                    comp.append(room)
+                    connected = True
+                    break
+            
+            if connected == False:
+                connectedComponents.append([room])
+                
+        for comp in connectedComponents:
+            print comp
+        print "Connected components:", len(connectedComponents)
     
 
 class DungeonMap(HerringboneWangTileMap):
@@ -327,16 +449,21 @@ class DungeonMap(HerringboneWangTileMap):
 
 
 def main():
-    townMap = TownMap(3, 3)
-    townMap.buildMap()
-    townMap.printMap()
+#     townMap = TownMap(3, 3)
+#     townMap.buildMap()
+#     townMap.printMap()
     
-    print
+#     print
     
-    dungeonMap = DungeonMap(5, 5, margin = 1)
+    dungeonMap = DungeonMap(3, 3, margin = 1)
     dungeonMap.buildMap()
     dungeonMap.printMap()
-
+    
+#     for room in dungeonMap.findRooms():
+#         print room
+    
+    print "Rooms:", len(dungeonMap.findRooms())
+    dungeonMap.enforceConnectivity()
 
 if __name__ == "__main__":
     main()

@@ -202,16 +202,9 @@ class SQ_MapHandler:
 maphandler = None
 
 def setUpMap(mapdata, width, height):
-    # Unroll mapdata
-#     mapdataflat = []
-#     for x in range(width):
-#         for y in range(height):
-#             mapdataflat.append(mapdata[x][y])
-    
-#     maphandler = SQ_MapHandler(mapdataflat, width, height)
     maphandler = SQ_MapHandler(mapdata, width, height)
     astar = AStar(maphandler)
-#    dumpMap(astar)
+#     dumpMap(astar)
     return astar
 
 def findPath(startpoint, endpoint, astar):
@@ -226,7 +219,6 @@ def dumpMap(astar):
     height = astar.mh.h
     
     for y in range(height):
-#        print [('#' if d==-1 else '.') for d in mapdata[y*width:(y+1)*width - 1]]
         for d in mapdata[y*width:(y+1)*width - 1]:
             if d == -1:
                 print '#',
