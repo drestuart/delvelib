@@ -5,8 +5,9 @@ Created on Jul 18, 2014
 '''
 
 from WangTileClass import SquareWangTileSet, TownWangTile, RectWangTileSet, dungeonVTile, dungeonHTile
-
-
+from sys import maxint
+from Util import ManhattanDistance
+import random
 
 class WangTileMap(object):
     def __init__(self, tilesWide, tilesHigh):
@@ -40,6 +41,8 @@ class SquareWangTileMap(WangTileMap):
             for x in range(self.tilesWide):
                 row.append(None)
             self.wangTiles.append(row)
+        
+        self.buildMap()
                 
     def getConstriants(self, x, y):
         '''
@@ -99,9 +102,9 @@ class SquareWangTileMap(WangTileMap):
 
 class TownMap(SquareWangTileMap):
     def __init__(self, *args):
-        super(TownMap, self).__init__(*args)
         self.tileset = SquareWangTileSet(TownWangTile)
         self.tileset.readFromFile("towntiles.txt")
+        super(TownMap, self).__init__(*args)
     
 
 class HerringboneWangTileMap(WangTileMap):
@@ -125,6 +128,11 @@ class HerringboneWangTileMap(WangTileMap):
             self.rTiles[y] = {}
             for x in range(-1, self.tilesWide + 1):
                 self.rTiles[y][x] = None
+                
+        # Build the map!
+        self.buildMap()
+        self.findRooms()
+        self.enforceConnectivity()
             
     def addRTile(self, x, y, tile):
         self.rTiles[y][x] = tile
@@ -436,34 +444,107 @@ class HerringboneWangTileMap(WangTileMap):
             if connected == False:
                 connectedComponents.append([room])
                 
+        if len(connectedComponents) == 1:
+            # Nothing left to do
+            return
+        
+        # Find the largest component by # of squares
+        largestComp = None
+        largestSize = 0
+        
         for comp in connectedComponents:
-            print comp
-        print "Connected components:", len(connectedComponents)
-    
+            size = 0
+            for room in comp:
+                size += len(room)
+            
+            if size > largestSize:
+                largestSize = size
+                largestComp = comp
+                
+        # Connect each component to the largest one
+        for comp in connectedComponents:
+            if comp is largestComp:
+                continue
+            
+            # Find the closest pairs of points in comp and largestComp
+            closestPoints = []
+            minDist = maxint
+            
+            # Loop over points in largestComp
+            for p1 in [point for room in largestComp for point in room]:
+                # Loop over points in comp
+                for p2 in [point for room in comp for point in room]:
+                    x1, y1 = p1
+                    x2, y2 = p2
+                    distance = ManhattanDistance(x1, x2, y1, y2)
+                    
+                    if distance < minDist:
+                        closestPoints = [[p1, p2]]
+                        minDist = distance
+                    elif distance == minDist:
+                        closestPoints.append([p1, p2])
+            
+            toPoint, fromPoint = random.choice(closestPoints)
+            tox, toy = toPoint
+            
+            currentx, currenty = fromPoint
+            tunnelGlyph = self.tileset.tunnelGlyph
+            # Random-walk toward toPoint
+            while True:
+                dx = 0
+                dy = 0
+                
+                if currentx < tox:
+                    dx = 1
+                elif currentx > tox:
+                    dx = -1
+                
+                if currenty < toy:
+                    dy = 1
+                elif currenty > toy:
+                    dy = -1
+                    
+                if dy == 0 or random.random() > 0.5:
+                    # Step horizontally
+                    nextx, nexty = currentx + dx, currenty
+                else:
+                    # Step vertically
+                    nextx, nexty = currentx, currenty + dy
+                
+                # End if we're next to the goal square
+                if (nextx, nexty) == (tox, toy):
+                    break
+                
+                # Place a tunnel square
+#                 self.levelMap[nexty][nextx] = tunnelGlyph
+                # Silly stuff we have to do because strings are immutable
+                row = self.levelMap[nexty]
+                
+                # Only replace wall squares
+                if row[nextx] == wallGlyph:
+                    rowl = list(row)
+                    rowl[nextx] = tunnelGlyph
+                    self.levelMap[nexty] = ''.join(rowl)
+                
+                currentx, currenty = nextx, nexty
+                
+                
 
 class DungeonMap(HerringboneWangTileMap):
     def __init__(self, *args, **kwargs):
-        super(DungeonMap, self).__init__(*args, **kwargs)
         self.tileset = RectWangTileSet(dungeonVTile, dungeonHTile)
         self.tileset.readFromFile("dungeon_vtiles.txt")
+        super(DungeonMap, self).__init__(*args, **kwargs)
 
 
 def main():
-#     townMap = TownMap(3, 3)
-#     townMap.buildMap()
-#     townMap.printMap()
-    
-#     print
+    townMap = TownMap(3, 3)
+    townMap.printMap()
+     
+    print
     
     dungeonMap = DungeonMap(3, 3, margin = 1)
-    dungeonMap.buildMap()
     dungeonMap.printMap()
     
-#     for room in dungeonMap.findRooms():
-#         print room
-    
-    print "Rooms:", len(dungeonMap.findRooms())
-    dungeonMap.enforceConnectivity()
-
 if __name__ == "__main__":
     main()
