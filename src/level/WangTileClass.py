@@ -252,6 +252,15 @@ class WangTileSet(object):
                     
                 continue
             
+            if self.glyphs != None and line.startswith('tunnelglyph'):
+                m = re.search(r"^tunnelglyph: (.+)$", line)
+                if m:
+                    self.tunnelGlyph = m.group(1)
+                else:
+                    raise Exception("Bad tunnelglyph line: " + line + " " + filename + " line " + str(lnum))
+                    
+                continue
+            
             # Look for a new tile
             if tileMap == None:
                 if line == "":

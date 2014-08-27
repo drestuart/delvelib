@@ -1,6 +1,7 @@
 width: 11 height: 22
 glyphs: #,+.&_
 wallglyph: #
+tunnelglyph: ,
 roomglyphs: .&_
 
 *TILE*
