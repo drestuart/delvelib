@@ -62,12 +62,6 @@ class TownWangTile(SquareWangTile):
     
     defaultConstraint = None
     
-#     def satisfiesConstraints(self, constraints):
-#         for k, v in constraints.items():
-#             if v is not None and self.constraints[k] != v:
-#                 return False
-#         return True
-
 class RectangularWangTile(WangTile):
     defaultConstraint = None
     tileClass = SquareWangTile
@@ -77,9 +71,6 @@ class RectangularWangTile(WangTile):
     
     def getConstraintValue(self, constraint):
         raise NotImplementedError
-    
-#     def satisfiesConstraints(self, constraints):
-#         raise NotImplementedError()
     
     
 

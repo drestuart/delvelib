@@ -1,5 +1,7 @@
 width: 21 height: 21
 glyphs: .~#+,
+wallglyph: #
+roomglyphs: ,
 
 *TILE*
 constraints: 1111

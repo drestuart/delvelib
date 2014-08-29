@@ -237,6 +237,20 @@ class Altar(DungeonFeature):
     blockSight = False
         
     __mapper_args__ = {'polymorphic_identity': 'altar'}
+    
+class Statue(DungeonFeature):
+    color = colors.colorStone
+    backgroundColor = colors.black
+    description = 'an statue'
+    
+    def __init__(self, **kwargs):
+        super(Statue, self).__init__(symbol = '&', **kwargs)
+        
+    blockMove = True
+    blockSight = False
+        
+    __mapper_args__ = {'polymorphic_identity': 'statue'}
+
 
 class Tree(DungeonFeature):
     color = colors.colorTree

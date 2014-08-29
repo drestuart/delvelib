@@ -23,8 +23,11 @@ import Util as U
 import ca_cave
 import colors
 import database as db
-import town_builder
-import dungeon_builder
+# import town_builder
+# import dungeon_builder
+from RoomClass import Room
+from WangTileMap import DungeonMap, TownMap
+from randomChoice import weightedChoice
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -84,7 +87,12 @@ class Level(MapBase):
         self.tiles = []
         self.rooms = []
         
-        self.load()
+        self.FOVMap = None
+        self.astar = None
+        self.upStairs = []
+        self.downStairs = []
+        self.tileArray = []
+#         self.load()
         
 ##########################################################################
 #
@@ -113,12 +121,6 @@ class Level(MapBase):
     
     def load(self):
         
-        self.FOVMap = None
-        self.astar = None
-        self.upStairs = []
-        self.downStairs = []
-        self.tileArray = []
-
         # Initialize self.hasTile
         self.hasTile = U.twoDArray(self.width, self.height, False)
         
@@ -236,10 +238,17 @@ class Level(MapBase):
                 
             
     def getRandomTileInRoom(self, room):
-        return self.getRandomTileInArea(room.x1, room.x2, room.y1, room.y2)
+#         return self.getRandomTileInArea(room.x1, room.x2, room.y1, room.y2)
+        return random.choice(room.getTiles())
     
     def getRandomOpenTileInRoom(self, room):
-        return self.getRandomOpenTileInArea(room.x1, room.x2, room.y1, room.y2)
+#         return self.getRandomOpenTileInArea(room.x1, room.x2, room.y1, room.y2)
+        openTiles = []
+        for tile in room.getTiles():
+            if tile and not tile.blocksMove():
+                openTiles.append(tile)
+                
+        return random.choice(openTiles)
         
     def getTilesToDraw(self, playerx, playery, cameradims, visibility = True):
         retArray = []
@@ -606,19 +615,30 @@ class DungeonLevel(Level):
 
     defaultFloorType = T.StoneFloor
     defaultWallType = T.StoneWall
-    defaultTunnelFloorType = T.StoneFloor
-    defaultTunnelWallType = T.StoneWall
+    defaultTunnelType = T.StoneFloor
+    MapBuilderType = DungeonMap
     
-    def __init__(self, **kwargs):
+    def __init__(self, tilesWide, tilesHigh, **kwargs):
+        self.tilesWide = tilesWide
+        self.tilesHigh = tilesHigh
+        
+        # Fill in default width values if necessary
+        self.width = kwargs.get('width', tilesWide * self.MapBuilderType.tileset.tileWidth + 2)
+        self.height = kwargs.get('height', tilesHigh * self.MapBuilderType.tileset.tileHeight + 2)
+        
+        kwargs['width'] = self.width
+        kwargs['height'] = self.height
+        
         super(DungeonLevel, self).__init__(**kwargs)
     
     def buildLevel(self):
 
-        d = dungeon_builder.dungeon(self.width, self.height, C.MAX_ROOMS_AND_CORRIDORS, C.ROOM_CHANCE, self)
-        d.addTiles(self)
+        # Initialize self.hasTile
+        self.hasTile = U.twoDArray(self.width, self.height, False)
         
-        print "Building tile array"    
-        self.buildTileArray()    
+        # Generate level using wang tiles
+        dmap = self.MapBuilderType(self.tilesWide, self.tilesHigh, margin = 1)
+        self.addTiles(dmap)
         
         # Place items
         print "Placing items"
@@ -636,6 +656,62 @@ class DungeonLevel(Level):
         print "Finding the stairs"
         self.findUpStairs()
         self.findDownStairs()
+        
+    def getTileType(self, glyph):
+        tileDict = {'.' : (self.defaultFloorType, None),
+                    ',' : (self.defaultTunnelType, None),
+                    '#' : (self.defaultWallType, None),
+                    '_' : (self.defaultFloorType, F.Altar),
+                    '+' : {(self.defaultTunnelType, F.Door) : 0.75, 
+                           (self.defaultTunnelType, None) : 0.25},
+                    '?' : {(self.defaultFloorType, None) : 0.5,
+                           (self.defaultWallType, None) : 0.5},
+                    '&' : (self.defaultFloorType, F.Statue),}
+        
+        types = tileDict[glyph]
+        if isinstance(types, tuple):
+            return types
+        
+        return weightedChoice(types)
+    
+    def addTiles(self, dmap):
+        
+        tiles = dmap.getMapGlyphs()
+        height = len(tiles)
+        width = len(tiles[0])
+        
+        # Construct tiles
+        for y in range(height):
+            for x in range(width):
+                glyph = tiles[y][x]
+                newTileType, featureType = self.getTileType(glyph)
+                
+                newTile = newTileType(x, y)
+                
+                if featureType:
+                    feature = featureType()
+                    newTile.setFeature(feature)
+                
+                self.tiles.append(newTile)
+                self.hasTile[x][y] = True
+                
+        print "Building tile array"    
+        self.buildTileArray() 
+                
+        # Add rooms
+        rooms = dmap.getRooms()
+        
+        for room in rooms:
+            newRoom = Room()
+            
+            for x, y in room:
+                tile = self.getTile(x, y)
+                newRoom.addTile(tile)
+            
+            self.addRoom(newRoom)
+            
+    def addRoom(self, room):
+        self.rooms.append(room)
         
     def placeItems(self):
         
@@ -801,24 +877,43 @@ class TownLevel(DungeonLevel):
     
     __mapper_args__ = {'polymorphic_identity': 'town level'}
     
-    def __init__(self, **kwargs):
-        super(TownLevel, self).__init__(width = kwargs['cellsWide'] * C.TOWN_CELL_WIDTH, 
-                                        height = kwargs['cellsHigh'] * C.TOWN_CELL_HEIGHT, 
-                                        **kwargs)
-        self.cellsWide = max(1, kwargs['cellsWide'])
-        self.cellsHigh = max(1, kwargs['cellsHigh'])
+    def __init__(self, tilesWide, tilesHigh, **kwargs):
+        self.width = tilesWide * self.MapBuilderType.tileset.tileWidth
+        self.height = tilesHigh * self.MapBuilderType.tileset.tileHeight
+        super(TownLevel, self).__init__(tilesWide, tilesHigh, width = self.width, height = self.height, **kwargs)
         
     buildingWallTile = T.WoodWall
     buildingFloorTile = T.WoodFloor
     outsideFloorTile = T.GrassFloor
     roadTile = T.RoadFloor
     
+    MapBuilderType = TownMap
+    
+    def getTileType(self, glyph):
+        tileDict = {'.' : (self.outsideFloorTile, None),
+                    ',' : (self.buildingFloorTile, None),
+                    '#' : (self.buildingWallTile, None),
+                    '+' : (self.buildingFloorTile, F.Door),
+                    '~' : (self.roadTile, None)}
+        
+        types = tileDict[glyph]
+        if isinstance(types, tuple):
+            return types
+        
+        return weightedChoice(types)
+    
     def buildLevel(self):
-        t = town_builder.town(self.cellsWide, self.cellsHigh, self)
-        t.addTiles(self)
+#         t = town_builder.town(self.cellsWide, self.cellsHigh, self)
+#         t.addTiles(self)
 
-        print "Building tile array"    
-        self.buildTileArray()    
+        # Initialize self.hasTile
+        self.hasTile = U.twoDArray(self.width, self.height, False)
+
+        tmap = self.MapBuilderType(self.tilesWide, self.tilesHigh)
+        self.addTiles(tmap)
+
+#         print "Building tile array"    
+#         self.buildTileArray()    
         
         # Place items
         print "Placing items"

@@ -8,6 +8,7 @@ from WangTileClass import SquareWangTileSet, TownWangTile, RectWangTileSet, dung
 from sys import maxint
 from Util import ManhattanDistance
 import random
+import os
 
 class WangTileMap(object):
     def __init__(self, tilesWide, tilesHigh):
@@ -29,13 +30,80 @@ class WangTileMap(object):
         
     def inBounds(self, x, y):
         return (x >= 0 and x < self.tilesWide and y >= 0 and y < self.tilesHigh)
+    
+    def getRooms(self):
+        return self.rooms
+    
+    def findRooms(self):
+        if self.rooms != None:
+            return self.rooms
+        
+        if self.levelMap == None:
+            self.getMapGlyphs()
+        
+        roomGlyphs = self.tileset.roomGlyphs
+        
+        self.mapHeight = len(self.levelMap)
+        self.mapWidth = len(self.levelMap[0])
+        
+        squaresSeen = []
+        roomCoords = []
+        
+        # Recursive function aaaaaaaaaah
+        def getConnectedRoomSquares(x, y):
+            squaresSeen.append((x, y))
+            toSearch = []
+            thisRoom = [(x, y)]
+            
+            # Get adjacent (valid) coordinates
+            if x > 0:
+                toSearch.append((x-1, y))
+                if y > 0:
+                    toSearch.append((x-1, y-1))
+            if x < self.mapWidth - 1:
+                toSearch.append((x+1, y))
+                if y < self.mapHeight - 1:
+                    toSearch.append((x+1, y+1))
+            
+            if y > 0:
+                toSearch.append((x, y-1))
+                if x < self.mapWidth - 1:
+                    toSearch.append((x+1, y-1))
+            if y < self.mapHeight - 1:
+                toSearch.append((x, y+1))
+                if x > 0:
+                    toSearch.append((x-1, y+1))
+                
+            for coords in toSearch:
+                sx, sy = coords
+                
+                # Check that this is a valid square that we haven't seen before
+                if not (sx, sy) in squaresSeen and self.levelMap[sy][sx] in roomGlyphs:
+                    thisRoom += getConnectedRoomSquares(sx, sy)
+            
+            return thisRoom
+        
+        for y in range(self.mapHeight):
+            row = self.levelMap[y]
+            for x in range(self.mapWidth):
+                square = row[x]
+                if (x, y) in squaresSeen: continue
+                if square not in roomGlyphs:
+                    squaresSeen.append((x, y))
+                    continue
+                
+                roomCoords.append(getConnectedRoomSquares(x, y))
+        
+        self.rooms = roomCoords
+        return roomCoords
 
 
 class SquareWangTileMap(WangTileMap):
     def __init__(self, tilesWide, tilesHigh):
         super(SquareWangTileMap, self).__init__(tilesWide, tilesHigh)
-        
+        self.rooms = None
         self.wangTiles = []
+        
         for y in range(self.tilesHigh):
             row = []
             for x in range(self.tilesWide):
@@ -43,6 +111,7 @@ class SquareWangTileMap(WangTileMap):
             self.wangTiles.append(row)
         
         self.buildMap()
+        self.findRooms()
                 
     def getConstriants(self, x, y):
         '''
@@ -101,9 +170,11 @@ class SquareWangTileMap(WangTileMap):
         return retMap
 
 class TownMap(SquareWangTileMap):
+    tileset = SquareWangTileSet(TownWangTile)
+    tileset.readFromFile(os.path.join("modules", "delvelib", "src", "level", "towntiles.txt"))
+#     tileset.readFromFile("towntiles.txt")
+        
     def __init__(self, *args):
-        self.tileset = SquareWangTileSet(TownWangTile)
-        self.tileset.readFromFile("towntiles.txt")
         super(TownMap, self).__init__(*args)
     
 
@@ -336,72 +407,6 @@ class HerringboneWangTileMap(WangTileMap):
         self.levelMap = retMap
         return retMap
     
-    def getRooms(self):
-        return self.rooms
-    
-    def findRooms(self):
-        if self.rooms != None:
-            return self.rooms
-        
-        if self.levelMap == None:
-            self.getMapGlyphs()
-        
-        roomGlyphs = self.tileset.roomGlyphs
-        
-        self.mapHeight = len(self.levelMap)
-        self.mapWidth = len(self.levelMap[0])
-        
-        squaresSeen = []
-        roomCoords = []
-        
-        # Recursive function aaaaaaaaaah
-        def getConnectedRoomSquares(x, y):
-            squaresSeen.append((x, y))
-            toSearch = []
-            thisRoom = [(x, y)]
-            
-            # Get adjacent (valid) coordinates
-            if x > 0:
-                toSearch.append((x-1, y))
-                if y > 0:
-                    toSearch.append((x-1, y-1))
-            if x < self.mapWidth - 1:
-                toSearch.append((x+1, y))
-                if y < self.mapHeight - 1:
-                    toSearch.append((x+1, y+1))
-            
-            if y > 0:
-                toSearch.append((x, y-1))
-                if x < self.mapWidth - 1:
-                    toSearch.append((x+1, y-1))
-            if y < self.mapHeight - 1:
-                toSearch.append((x, y+1))
-                if x > 0:
-                    toSearch.append((x-1, y+1))
-                
-            for coords in toSearch:
-                sx, sy = coords
-                
-                # Check that this is a valid square that we haven't seen before
-                if not (sx, sy) in squaresSeen and self.levelMap[sy][sx] in roomGlyphs:
-                    thisRoom += getConnectedRoomSquares(sx, sy)
-            
-            return thisRoom
-        
-        for y in range(self.mapHeight):
-            row = self.levelMap[y]
-            for x in range(self.mapWidth):
-                square = row[x]
-                if (x, y) in squaresSeen: continue
-                if square not in roomGlyphs:
-                    squaresSeen.append((x, y))
-                    continue
-                
-                roomCoords.append(getConnectedRoomSquares(x, y))
-        
-        self.rooms = roomCoords
-        return roomCoords
-                
     def enforceConnectivity(self):
         # Set up AStar algo
         import AStar
@@ -531,16 +536,20 @@ class HerringboneWangTileMap(WangTileMap):
                 
 
 class DungeonMap(HerringboneWangTileMap):
+    
+    tileset = RectWangTileSet(dungeonVTile, dungeonHTile)
+    tileset.readFromFile(os.path.join("modules", "delvelib", "src", "level", "dungeon_vtiles.txt"))
+#     tileset.readFromFile("dungeon_vtiles.txt")
+    
     def __init__(self, *args, **kwargs):
-        self.tileset = RectWangTileSet(dungeonVTile, dungeonHTile)
-        self.tileset.readFromFile("dungeon_vtiles.txt")
+        
         super(DungeonMap, self).__init__(*args, **kwargs)
 
 
 def main():
     townMap = TownMap(3, 3)
     townMap.printMap()
-     
+
     print
     
     dungeonMap = DungeonMap(3, 3, margin = 1)
