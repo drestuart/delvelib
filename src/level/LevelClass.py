@@ -170,6 +170,9 @@ class Level(MapBase):
         # Fill in
         for tile in self.tiles:
             self.tileArray[tile.x][tile.y] = tile
+            
+    def getDepth(self):
+        return self.depth
         
     def getTile(self, x, y):
         if not self.__dict__.get('tileArray'):

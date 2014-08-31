@@ -194,14 +194,14 @@ class CharacterPanel(Panel):
     def __init__(self, *args):
         super(CharacterPanel, self).__init__(*args)
         
-    def draw(self, playerx = 0, playery = 0):
+    def draw(self, playerx, playery, depth):
         self.render_bar(1, 1, 18, "HP", 15, 20, colors.darkBlue, colors.darkRed)
-        self.showCoords(1, 3, playerx, playery)
+        self.showCoords(1, 3, playerx, playery, depth)
         
-    def showCoords(self, x, y, playerx, playery):
+    def showCoords(self, x, y, playerx, playery, depth):
         
         self.putChars("Position: " + str(playerx) + ", " + str(playery), x, y, fgcolor = colors.white, bgcolor = colors.black)
-        
+        self.putChars("Depth: " + str(depth), x, y+1, fgcolor = colors.white, bgcolor = colors.black)
     
     def render_bar(self, barx, bary, totalWidth, name, value, maximum, barColor, backColor):
         #draw a bar (HP, experience, etc). first calculate the width of the bar
