@@ -15,7 +15,7 @@
 from copy import deepcopy
 import re
 import random
-from Util import rotateCW, rotateCCW, printArray
+from Util import rotateCW, rotateCCW
 
 class WangTile(object):
     
@@ -54,13 +54,8 @@ class WangTile(object):
         return True
 
 class SquareWangTile(WangTile):
-
     # Initialize constraints dict
     constraintSites = {'A' : None, 'B' : None, 'C' : None, 'D' : None}
-    
-class TownWangTile(SquareWangTile):
-    
-    defaultConstraint = None
     
 class RectangularWangTile(WangTile):
     defaultConstraint = None
@@ -71,8 +66,6 @@ class RectangularWangTile(WangTile):
     
     def getConstraintValue(self, constraint):
         raise NotImplementedError
-    
-    
 
 class HorzWangTile(RectangularWangTile):
     
@@ -125,9 +118,6 @@ class HorzWangTile(RectangularWangTile):
         else:
             raise ValueError(constraint)
 
-class dungeonHTile(HorzWangTile):
-    pass
-
 class VertWangTile(RectangularWangTile):
     
     # Initialize constraints dict
@@ -171,9 +161,6 @@ class VertWangTile(RectangularWangTile):
         else:
             raise ValueError(constraint)
         
-class dungeonVTile(VertWangTile):
-    pass
-
 class WangTileSet(object):
 
     def __init__(self):
@@ -420,48 +407,3 @@ class RectWangTileSet(WangTileSet):
     def getRandomHTile(self, constraints):
         return random.choice(self.getTilesWithConstraints(constraints, self.hWangTiles))
     
-
-def main():
-    rset = RectWangTileSet(dungeonVTile, dungeonHTile)
-    rset.tileWidth = 11
-    rset.tileHeight = 22
-    rset.glyphs = "#,."
-    
-    squares = ["#####,#####",
-               "#####,#####",
-               ",,##,,#,,,,",
-               "#,##,##,###",
-               "#,##,##,###",
-               "#,##,##,,##",
-               "#,##,,##,##",
-               "#,###,##,##",
-               "#+###+##+##",
-               "#.........#",
-               "#.........#",
-               "#.........#",
-               "#.........#",
-               "###########",
-               "###########",
-               "######,,,##",
-               "####,,,#,,,",
-               "####+######",
-               "......#####",
-               "......#####",
-               "......#####",
-               "#...#+#####"]
-    constraints = {'G' : '2', 'H' : '1', 'I': '2', 'J' : '1', 'K' : '1', 'L': '2'}
-    
-    rset.buildTile(squares, constraints, "tile")
-    
-    printArray(rset.vWangTiles[0].getTiles())
-    print rset.vWangTiles[0].getConstraints()
-    printArray(rset.vWangTiles[1].getTiles())
-    print rset.vWangTiles[1].getConstraints()
-    
-    printArray(rset.hWangTiles[0].getTiles())
-    print rset.hWangTiles[0].getConstraints()
-    printArray(rset.hWangTiles[1].getTiles())
-    print rset.hWangTiles[1].getConstraints()
-
-if __name__ == "__main__":
-    main()

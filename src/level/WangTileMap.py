@@ -4,7 +4,6 @@ Created on Jul 18, 2014
 @author: dstuart
 '''
 
-from WangTileClass import SquareWangTileSet, TownWangTile, RectWangTileSet, dungeonVTile, dungeonHTile
 from sys import maxint
 from Util import ManhattanDistance
 import random
@@ -168,15 +167,6 @@ class SquareWangTileMap(WangTileMap):
         
         self.levelMap = retMap
         return retMap
-
-class TownMap(SquareWangTileMap):
-    tileset = SquareWangTileSet(TownWangTile)
-    tileset.readFromFile(os.path.join("modules", "delvelib", "src", "level", "towntiles.txt"))
-#     tileset.readFromFile("towntiles.txt")
-        
-    def __init__(self, *args):
-        super(TownMap, self).__init__(*args)
-    
 
 class HerringboneWangTileMap(WangTileMap):
     def __init__(self, tilesWide, tilesHigh, **kwargs):
@@ -532,28 +522,3 @@ class HerringboneWangTileMap(WangTileMap):
                     self.levelMap[nexty] = ''.join(rowl)
                 
                 currentx, currenty = nextx, nexty
-                
-                
-
-class DungeonMap(HerringboneWangTileMap):
-    
-    tileset = RectWangTileSet(dungeonVTile, dungeonHTile)
-    tileset.readFromFile(os.path.join("modules", "delvelib", "src", "level", "dungeon_vtiles.txt"))
-#     tileset.readFromFile("dungeon_vtiles.txt")
-    
-    def __init__(self, *args, **kwargs):
-        
-        super(DungeonMap, self).__init__(*args, **kwargs)
-
-
-def main():
-    townMap = TownMap(3, 3)
-    townMap.printMap()
-
-    print
-    
-    dungeonMap = DungeonMap(3, 3, margin = 1)
-    dungeonMap.printMap()
-    
-if __name__ == "__main__":
-    main()
