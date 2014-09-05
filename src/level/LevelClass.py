@@ -23,10 +23,7 @@ import Util as U
 import ca_cave
 import colors
 import database as db
-# import town_builder
-# import dungeon_builder
 from RoomClass import Room
-from WangTileMap import DungeonMap, TownMap
 from randomChoice import weightedChoice
 
 Base = db.saveDB.getDeclarativeBase()
@@ -619,15 +616,14 @@ class DungeonLevel(Level):
     defaultFloorType = T.StoneFloor
     defaultWallType = T.StoneWall
     defaultTunnelType = T.StoneFloor
-    MapBuilderType = DungeonMap
     
-    def __init__(self, tilesWide, tilesHigh, **kwargs):
-        self.tilesWide = tilesWide
-        self.tilesHigh = tilesHigh
+    def __init__(self, **kwargs):
+        self.tilesWide = kwargs['tilesWide']
+        self.tilesHigh = kwargs['tilesHigh']
         
         # Fill in default width values if necessary
-        self.width = kwargs.get('width', tilesWide * self.MapBuilderType.tileset.tileWidth + 2)
-        self.height = kwargs.get('height', tilesHigh * self.MapBuilderType.tileset.tileHeight + 2)
+        self.width = kwargs.get('width', self.tilesWide * self.MapBuilderType.tileset.tileWidth + 2)
+        self.height = kwargs.get('height', self.tilesHigh * self.MapBuilderType.tileset.tileHeight + 2)
         
         kwargs['width'] = self.width
         kwargs['height'] = self.height
@@ -788,6 +784,9 @@ class CaveLevel(Level):
 
     def buildLevel(self):
         
+        # Initialize self.hasTile
+        self.hasTile = U.twoDArray(self.width, self.height, False)
+        
         levelGrid = ca_cave.generateMap(self.width, self.height)
         rows = levelGrid.split("\n")
 
@@ -880,17 +879,17 @@ class TownLevel(DungeonLevel):
     
     __mapper_args__ = {'polymorphic_identity': 'town level'}
     
-    def __init__(self, tilesWide, tilesHigh, **kwargs):
-        self.width = tilesWide * self.MapBuilderType.tileset.tileWidth
-        self.height = tilesHigh * self.MapBuilderType.tileset.tileHeight
-        super(TownLevel, self).__init__(tilesWide, tilesHigh, width = self.width, height = self.height, **kwargs)
+    def __init__(self, **kwargs):
+        self.tilesWide = kwargs['tilesWide']
+        self.tilesHigh = kwargs['tilesHigh']
+        self.width = self.tilesWide * self.MapBuilderType.tileset.tileWidth
+        self.height = self.tilesHigh * self.MapBuilderType.tileset.tileHeight
+        super(TownLevel, self).__init__(width = self.width, height = self.height, **kwargs)
         
     buildingWallTile = T.WoodWall
     buildingFloorTile = T.WoodFloor
     outsideFloorTile = T.GrassFloor
     roadTile = T.RoadFloor
-    
-    MapBuilderType = TownMap
     
     def getTileType(self, glyph):
         tileDict = {'.' : (self.outsideFloorTile, None),
@@ -906,8 +905,6 @@ class TownLevel(DungeonLevel):
         return weightedChoice(types)
     
     def buildLevel(self):
-#         t = town_builder.town(self.cellsWide, self.cellsHigh, self)
-#         t.addTiles(self)
 
         # Initialize self.hasTile
         self.hasTile = U.twoDArray(self.width, self.height, False)
@@ -915,9 +912,6 @@ class TownLevel(DungeonLevel):
         tmap = self.MapBuilderType(self.tilesWide, self.tilesHigh)
         self.addTiles(tmap)
 
-#         print "Building tile array"    
-#         self.buildTileArray()    
-        
         # Place items
         print "Placing items"
         self.placeItems()
@@ -958,6 +952,9 @@ class WildernessLevel(Level):
         super(WildernessLevel, self).__init__(**kwargs)
 
     def buildLevel(self):
+        # Initialize self.hasTile
+        self.hasTile = U.twoDArray(self.width, self.height, False)
+        
         for y in range(self.height):
             for x in range(self.width):
                 newTile = self.defaultFloorType(x, y)
@@ -985,6 +982,29 @@ class WildernessLevel(Level):
         tile = self.getTile(self.entryPointX, self.entryPointY)
         self.placeCreature(creature, tile)
         
+    def placeDownStair(self):
+        if not self.__dict__.get('downStairs'):
+            self.downStairs = []
+        
+        # TODO: Make sure stair is only placed inside dungeon entrance
+        
+        while True:
+            downTile = self.getRandomOpenTile()
+            
+            if downTile and not downTile.getFeature():
+                
+                downStair = F.downStair()
+                downTile.setFeature(downStair)
+                self.downStairs.append(downTile)
+                
+                break
+            
+        return downTile
+    
+    def placeDungeonEntrance(self):
+        pass
+        
+        
 
 class ForestLevel(WildernessLevel):
     
@@ -996,6 +1016,9 @@ class ForestLevel(WildernessLevel):
         super(ForestLevel, self).__init__(**kwargs)
 
     def buildLevel(self):
+        # Initialize self.hasTile
+        self.hasTile = U.twoDArray(self.width, self.height, False)
+        
         for y in range(self.height):
             for x in range(self.width):
                 newTile = self.defaultFloorType(x, y)

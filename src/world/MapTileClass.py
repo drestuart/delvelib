@@ -105,6 +105,9 @@ class MapTile(TileBase):
     def getConnectedArea(self):
         return self.connectedArea
     
+    def setConnectedArea(self, area):
+        self.connectedArea = area
+    
     def getStartingLevel(self):
         return self.getConnectedArea().getStartingLevel()
         
