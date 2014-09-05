@@ -179,7 +179,18 @@ class Level(MapBase):
         if x >= 0 and x < self.width and y >= 0 and y < self.height:
             return self.tileArray[x][y]
     
+        print "Bad coordinates: ", (x, y)
         return None
+    
+    def replaceTile(self, oldtile, newtile):
+        assert oldtile.getXY() == newtile.getXY()
+        self.tiles.remove(oldtile)
+        self.tiles.append(newtile)
+        
+        # TODO: Move any items from the old tile to the new tile
+        
+    def addRoom(self, room):
+        self.rooms.append(room)
     
     def getEntryPoint(self):
         return self.getTile(self.entryPointX, self.entryPointY)
@@ -709,9 +720,6 @@ class DungeonLevel(Level):
             
             self.addRoom(newRoom)
             
-    def addRoom(self, room):
-        self.rooms.append(room)
-        
     def placeItems(self):
         
         for room in self.rooms:
@@ -947,6 +955,8 @@ class WildernessLevel(Level):
     __mapper_args__ = {'polymorphic_identity': 'wilderness level'}
     
     defaultFloorType = T.GrassFloor
+    buildingWallType = T.StoneWall
+    buildingFloorType = T.StoneFloor
     
     def __init__(self, **kwargs):
         super(WildernessLevel, self).__init__(**kwargs)
@@ -986,10 +996,9 @@ class WildernessLevel(Level):
         if not self.__dict__.get('downStairs'):
             self.downStairs = []
         
-        # TODO: Make sure stair is only placed inside dungeon entrance
-        
         while True:
-            downTile = self.getRandomOpenTile()
+            downRoom = random.choice(self.rooms)
+            downTile = self.getRandomOpenTileInRoom(downRoom)
             
             if downTile and not downTile.getFeature():
                 
@@ -1002,8 +1011,49 @@ class WildernessLevel(Level):
         return downTile
     
     def placeDungeonEntrance(self):
-        pass
+        # TODO Read in templates from a file, choose a random one
         
+        template = ["...........",
+                    "...........",
+                    "..#######..",
+                    "..#,,,,,#..",
+                    "..#,,,,,#..",
+                    "..,,,,,,#..",
+                    "..#,,,,,#..",
+                    "..#,,,,,#..",
+                    "..#######..",
+                    "...........",
+                    "..........."]
+        
+        tileDict = {'.' : self.defaultFloorType,
+                    '#' : self.buildingWallType,
+                    ',' : self.buildingFloorType}
+        
+        entranceHeight = len(template)
+        entranceWidth = len(template[0])
+        
+        templateX = random.choice(range(1, self.width - entranceWidth - 1))
+        templateY = random.choice(range(1, self.height - entranceHeight - 1))
+        
+        print (templateX, templateY)
+        
+        entranceRoom = Room()
+        
+        for y in range(entranceHeight):
+            for x in range(entranceWidth):
+                tileX, tileY = x + templateX, y + templateY
+                symb = template[y][x]
+                tileType = tileDict[symb]
+                
+                newTile = tileType(tileX, tileY)
+                oldTile = self.getTile(tileX, tileY)
+                self.replaceTile(oldTile, newTile)
+                
+                # Is this tile in the entry room?
+                if tileType == self.buildingFloorType:
+                    entranceRoom.addTile(newTile)
+                
+        self.addRoom(entranceRoom)
         
 
 class ForestLevel(WildernessLevel):
