@@ -56,15 +56,34 @@ def getDirectionNameFromAngle(angle):
 
 def readTemplateFile(path): 
     
-    templateFile = open(path, 'r')   
-    lines = []
+    templateFile = open(path, 'r')
+    templates = []
+    temp = []
+    
+    def addTemplate(temp):
+        templates.append(temp)
+        templates.append(rotateCW(temp))
+        templates.append(rotateCCW(temp))
+        templates.append(rotateCCW(rotateCCW(temp)))
         
     for line in templateFile.readlines():
-        lines.append(line.rstrip())
+        line = line.strip()
+        
+        if line == '':
+            if temp:
+                # If we've reached the end of a template, add it and its rotations
+                addTemplate(temp)
+            temp = []
+        else:
+            temp.append(line)
         
     templateFile.close()
     
-    return lines
+    if temp:
+        # Add the last one if we haven't already
+        addTemplate(temp)
+    
+    return templates
 
 def readTemplateImage(path, colormap):
     img = PIL.Image.open(path)
@@ -106,10 +125,18 @@ def twoDArray(width, height, val=True):
     return arr
 
 def rotateCW(arr):
-    return zip(*arr[::-1])
+    rot = zip(*arr[::-1])
+    retArr = []
+    for row in rot:
+        retArr.append(''.join(row))
+    return retArr
 
 def rotateCCW(arr):
-    return zip(*arr)[::-1]
+    rot = zip(*arr)[::-1]
+    retArr = []
+    for row in rot:
+        retArr.append(''.join(row))
+    return retArr
     
 def printArray(arr):
     for row in arr:
