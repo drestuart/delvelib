@@ -31,16 +31,16 @@ class MapTile(TileBase):
         self.levels = []
         self.startingLevelIndex = kwargs.get('startingLevelIndex', 0)
         
-    id = Column(Integer, ForeignKey('tiles.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('tiles.id', use_alter = True, name="maptile_id_fk"), primary_key=True)
     name = Column(String)
     startingLevelIndex = Column(Integer)
     
-    levels = relationship("Level", backref=backref("maptile", uselist=False), 
+    levels = relationship("Level", backref=backref("maptile", uselist=False, cascade_backrefs=False), 
                           primaryjoin="MapTile.id==Level.mapTileId")
     
     regionId = Column(Integer, ForeignKey("regions.id"))
+    
     worldMapId = Column(Integer, ForeignKey("levels.id", use_alter = True, name="world_map_fk"))
-    name = Column(String)
     
     waterTile = False
     terrainType = L.WildernessLevel

@@ -60,8 +60,8 @@ class Creature(colors.withColor, Base):
     inventoryId = Column(Integer, ForeignKey("inventories.id"))
     inventory = relationship("Inventory", backref = backref("creature", uselist = False), uselist = False, primaryjoin = "Creature.inventoryId == Inventory.id")
     
-    levelId = Column(Integer, ForeignKey('levels.id'))
-    level = relationship("Level", backref=backref("creatures"), uselist = False, primaryjoin = "Creature.levelId == Level.id")
+    levelId = Column(Integer, ForeignKey('levels.id', use_alter = True, name = "creature_level_fk"))
+#     level = relationship("Level", backref=backref("creatures"), uselist = False, primaryjoin = "Creature.levelId == Level.id")
     
     visible = Column(Boolean)
     

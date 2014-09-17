@@ -41,8 +41,8 @@ class TileBase(colors.withBackgroundColor, Base):
     x = Column(Integer)
     y = Column(Integer)
     
-    creatureId = Column(Integer, ForeignKey('creatures.id'))
-    creature = relationship("Creature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.creatureId == Creature.id")
+    creatureId = Column(Integer, ForeignKey('creatures.id', use_alter = True, name = "creature_tile_fk"))
+    creature = relationship("Creature", backref=backref("tile", uselist=False, cascade_backrefs=False), uselist = False, primaryjoin = "Tile.creatureId == Creature.id")
     
     tileType = Column(String)
 

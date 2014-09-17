@@ -106,7 +106,9 @@ class Level(MapBase):
     mapTileId = Column(Integer, ForeignKey("map_tiles.id", use_alter = True, name = "maptile_fk"))
     
     tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
-    rooms = relationship("Room", backref = "level")
+    rooms = relationship("Room", backref=backref("level"))
+    creatures = relationship("Creature", primaryjoin = "Level.id==Creature.levelId")
+
     
     entryPointX = Column(Integer)
     entryPointY = Column(Integer)
