@@ -79,7 +79,7 @@ class Level(MapBase):
         super(Level, self).__init__(**kwargs)
         
         self.depth = kwargs.get('depth', 0)
-        self.area = kwargs['area']
+        self.maptile = kwargs['maptile']
                 
         self.tiles = []
         self.rooms = []
@@ -103,8 +103,7 @@ class Level(MapBase):
 
     depth = Column(Integer)
     
-    areaId = Column(Integer, ForeignKey("areas.id"))
-    startingLevelOfId = Column(Integer, ForeignKey("areas.id"))
+    mapTileId = Column(Integer, ForeignKey("map_tiles.id", use_alter = True, name = "maptile_fk"))
     
     tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
     rooms = relationship("Room", backref = "level")
@@ -249,11 +248,9 @@ class Level(MapBase):
                 
             
     def getRandomTileInRoom(self, room):
-#         return self.getRandomTileInArea(room.x1, room.x2, room.y1, room.y2)
         return random.choice(room.getTiles())
     
     def getRandomOpenTileInRoom(self, room):
-#         return self.getRandomOpenTileInArea(room.x1, room.x2, room.y1, room.y2)
         openTiles = []
         for tile in room.getTiles():
             if tile and not tile.blocksMove():
@@ -531,8 +528,8 @@ class Level(MapBase):
         
         return self.upStairs
     
-    def getArea(self):
-        return self.area
+    def getMapTile(self):
+        return self.maptile
     
     def findDownStairs(self):
         self.downStairs = []
@@ -580,7 +577,7 @@ class Level(MapBase):
         
     def bumpEdge(self, creature):
         if self.depth == 0:
-            return self.getArea().getMapTile()
+            return self.getMapTile()
         return False
     
     def findEntryPoint(self):

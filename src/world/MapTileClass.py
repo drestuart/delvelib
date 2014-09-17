@@ -12,7 +12,6 @@ import LevelClass as L
 from TileClass import TileBase
 from colors import blankBackground
 import database as db
-from AreaClass import Area
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -28,12 +27,16 @@ class MapTile(TileBase):
     def __init__(self, x, y, **kwargs):
         super(MapTile, self).__init__(x, y, **kwargs)
         
-        self.connectedArea = self.areaType()
         self.worldMap = kwargs.get('worldMap')
+        self.levels = []
+        self.startingLevelIndex = kwargs.get('startingLevelIndex', 0)
         
     id = Column(Integer, ForeignKey('tiles.id'), primary_key=True)
+    name = Column(String)
+    startingLevelIndex = Column(Integer)
     
-    connectedAreaId = Column(Integer, ForeignKey("areas.id"))
+    levels = relationship("Level", backref=backref("maptile", uselist=False), 
+                          primaryjoin="MapTile.id==Level.mapTileId")
     
     regionId = Column(Integer, ForeignKey("regions.id"))
     worldMapId = Column(Integer, ForeignKey("levels.id", use_alter = True, name="world_map_fk"))
@@ -41,7 +44,6 @@ class MapTile(TileBase):
     
     waterTile = False
     terrainType = L.WildernessLevel
-    areaType = Area
     
     tileType = Column(String)
     
@@ -97,19 +99,21 @@ class MapTile(TileBase):
     
     def getConnectedLevel(self):
         print "Deprecated getConnectedLevel()"
-        return self.getConnectedArea().getStartingLevel()
+        return self.getStartingLevel()
     
     def generateConnectedLevel(self):
         raise NotImplementedError("Deprecated generateConnectedLevel()")
         
-    def getConnectedArea(self):
-        return self.connectedArea
+    def getLevels(self):
+        return self.levels
     
-    def setConnectedArea(self, area):
-        self.connectedArea = area
+    def generateLevels(self, numLevels = 1):
+        raise NotImplementedError("generateLevels() not implemented, use a subclass")
     
     def getStartingLevel(self):
-        return self.getConnectedArea().getStartingLevel()
+        if not self.levels:
+            self.generateLevels()
+        return self.levels[self.startingLevelIndex]
         
     def getDescription(self):
         return self.description
