@@ -187,6 +187,8 @@ class Level(MapBase):
         self.tiles.remove(oldtile)
         self.tiles.append(newtile)
         
+        newtile.setLevel(self)
+        
         # TODO: Move any items from the old tile to the new tile
         
     def addRoom(self, room):

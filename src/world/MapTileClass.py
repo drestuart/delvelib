@@ -7,12 +7,16 @@ Created on Feb 25, 2014
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer
 from sqlalchemy.orm import relationship, backref
+from symbols import dungeonSymbol
+from AreaClass import DungeonStatus
 
 import LevelClass as L
 from TileClass import TileBase
-from colors import blankBackground
+from colors import blankBackground, colorClosedDungeon, colorOpenDungeon
 import database as db
 from AreaClass import Area
+from EriuAreas import MultiLevelArea, DungeonArea
+import database
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -28,8 +32,8 @@ class MapTile(TileBase):
     def __init__(self, x, y, **kwargs):
         super(MapTile, self).__init__(x, y, **kwargs)
         
-        self.connectedArea = self.areaType()
         self.worldMap = kwargs.get('worldMap')
+        self.generateArea()
         
     id = Column(Integer, ForeignKey('tiles.id'), primary_key=True)
     
@@ -79,20 +83,27 @@ class MapTile(TileBase):
         
         if self.creature and self.creature.isVisible():
             return self.creature.getColor()
+        
+        elif self.hasDungeon():
+            if self.hasOpenDungeon():
+                return colorOpenDungeon
+            else:
+                return colorClosedDungeon
 
         else:
             return super(MapTile, self).getColor()
     
     def getSymbol(self):
         # Determine which symbol to use to draw this tile
-        
         if self.creature and self.creature.isVisible():
             toReturn = self.creature.getSymbol()
+            
+        elif self.hasDungeon():
+            toReturn = dungeonSymbol
             
         else:
             toReturn = self.baseSymbol
         
-#        self.setLastSeenSymbol(toReturn)
         return toReturn
     
     def getConnectedLevel(self):
@@ -103,6 +114,8 @@ class MapTile(TileBase):
         raise NotImplementedError("Deprecated generateConnectedLevel()")
         
     def getConnectedArea(self):
+        if not self.connectedArea:
+            self.generateArea()
         return self.connectedArea
     
     def setConnectedArea(self, area):
@@ -116,3 +129,28 @@ class MapTile(TileBase):
     
     def getTerrainType(self):
         return self.terrainType
+    
+    def generateArea(self):
+        self.connectedArea = self.areaType()
+    
+    def hasDungeon(self):
+        return self.getConnectedArea().dungeonStatus() is not DungeonStatus.none
+    
+    def hasOpenDungeon(self):
+        return self.getConnectedArea().dungeonStatus() is DungeonStatus.open
+    
+    def addDungeon(self, areaType = DungeonArea):
+        if self.areaType is areaType:
+            return
+        
+        self.areaType = areaType
+        
+        if self.getConnectedArea() and self.getConnectedArea().startingLevel:
+            self.getConnectedArea().convertToMultilevelArea()
+        else:
+            newArea = areaType(name = self.name)
+            self.setConnectedArea(newArea)
+            newArea.setMapTile(self)
+            
+#         database.saveDB.save(self)
+        

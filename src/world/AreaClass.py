@@ -4,14 +4,12 @@ Created on Jan 28, 2014
 @author: dstuart
 '''
 
+from enum import Enum, unique
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer
-from sqlalchemy.orm import relationship, backref
 
 import database as db
-import LevelClass as L
-import Const as C
-
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -19,10 +17,10 @@ class Area(Base):
     
     __tablename__ = "areas"
     __table_args__ = {'extend_existing': True}
+    hasDungeon = False
 
     def __init__(self, **kwargs):
         self.name = kwargs.get('name', "")
-        self.withTown = kwargs.get("withTown", False)
         
         self.levels = []
     
@@ -47,20 +45,38 @@ class Area(Base):
     def getLevels(self):
         return self.levels
     
-    def generateLevels(self, numLevels = 1):
-        raise NotImplementedError("generateLevels() not implemented, use a subclass")
+    def buildStartingLevel(self):
+        raise NotImplementedError("buildStartingLevel() not implemented, use a subclass")
+    
+    def buildDungeon(self, numLevels):
+        raise NotImplementedError("buildDungeon() not implemented, use a subclass")
     
     def getStartingLevel(self):
         if not self.startingLevel:
-            self.generateLevels()
+            self.buildStartingLevel()
         return self.startingLevel
     
     def getMapTile(self):
         return self.mapTile
     
+    def setMapTile(self, mt):
+        self.mapTile = mt
+    
     def getTerrainType(self):
         return self.getMapTile().getTerrainType()
-        
     
+    def dungeonStatus(self):
+        if not self.hasDungeon:
+            return DungeonStatus.none
+        elif len(self.levels) > 1:  # We've added some levels other than the first
+            return DungeonStatus.open
+        else:
+            return DungeonStatus.closed
+    
+@unique
+class DungeonStatus(Enum):
+    none = 1
+    closed = 2
+    open = 3
     
     

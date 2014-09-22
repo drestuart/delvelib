@@ -69,3 +69,5 @@ upperOu = unichr(546)
 lowerOu = unichr(547)
 doubleWavy = u"\u2248" # Approx. equal symbol
 townShape = u"\u02ad"  # unichr(293)
+
+dungeonSymbol = '*'
