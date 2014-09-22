@@ -50,8 +50,8 @@ class MapTile(TileBase):
     __mapper_args__ = {'polymorphic_identity': 'maptile'}
     
     def remove(self):
-        self.worldMap = None
-        self.worldMapId = None
+#         self.worldMap = None
+#         self.worldMapId = None
         del self
         self = None
     

@@ -49,6 +49,8 @@ class MapBase(Base):
     width = Column(Integer)
     height = Column(Integer)
     levelType = Column(String)
+    creatures = relationship("Creature", primaryjoin = "MapBase.id==Creature.levelId")
+
     
     __mapper_args__ = {'polymorphic_on': levelType,
                        'polymorphic_identity': 'level'}
@@ -107,8 +109,6 @@ class Level(MapBase):
     
     tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
     rooms = relationship("Room", backref=backref("level"))
-    creatures = relationship("Creature", primaryjoin = "Level.id==Creature.levelId")
-
     
     entryPointX = Column(Integer)
     entryPointY = Column(Integer)
