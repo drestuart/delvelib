@@ -48,8 +48,8 @@ class Area(Base):
     def buildStartingLevel(self):
         raise NotImplementedError("buildStartingLevel() not implemented, use a subclass")
     
-    def buildDungeon(self, numLevels):
-        raise NotImplementedError("buildDungeon() not implemented, use a subclass")
+    def buildLowerLevels(self, numLevels):
+        raise NotImplementedError("buildLowerLevels() not implemented, use a subclass")
     
     def getStartingLevel(self):
         if not self.startingLevel:

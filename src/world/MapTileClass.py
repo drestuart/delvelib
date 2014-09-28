@@ -15,7 +15,7 @@ from TileClass import TileBase
 from colors import blankBackground, colorClosedDungeon, colorOpenDungeon
 import database as db
 from AreaClass import Area
-from EriuAreas import MultiLevelArea, DungeonArea
+from EriuAreas import MultiLevelArea
 import database
 
 Base = db.saveDB.getDeclarativeBase()
@@ -139,7 +139,7 @@ class MapTile(TileBase):
     def hasOpenDungeon(self):
         return self.getConnectedArea().dungeonStatus() is DungeonStatus.open
     
-    def addDungeon(self, areaType = DungeonArea):
+    def addDungeon(self, areaType = MultiLevelArea):
         if self.areaType is areaType:
             return
         
