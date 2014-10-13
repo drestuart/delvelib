@@ -184,12 +184,20 @@ class Level(MapBase):
     
     def replaceTile(self, oldtile, newtile):
         assert oldtile.getXY() == newtile.getXY()
+        
+        # Replace in tile list
         self.tiles.remove(oldtile)
         self.tiles.append(newtile)
+        
+        # Replace in tile array
+        if self.__dict__.get('tileArray'):
+            self.tileArray[oldtile.getX()][oldtile.getY()] = newtile
         
         newtile.setLevel(self)
         
         # TODO: Move any items from the old tile to the new tile
+        
+        del oldtile
         
     def addRoom(self, room):
         self.rooms.append(room)
@@ -364,6 +372,8 @@ class Level(MapBase):
         return tiles
     
     def computeFOVProperties(self, force = False):
+        
+        print "Setting up FOV"
         
         fovArray = []
         self.FOVMap = None
@@ -659,9 +669,6 @@ class DungeonLevel(Level):
         print "Saving open tiles"
         db.saveDB.save(self)
         
-        print "Setting up FOV"
-        self.computeFOVProperties()
-        
         print "Setting up pathing"
         self.setupPathing()
         
@@ -827,9 +834,6 @@ class CaveLevel(Level):
         print "Saving open tiles"
         db.saveDB.save(self)
         
-        print "Setting up FOV"
-        self.computeFOVProperties()
-        
         print "Finding the stairs"
         self.findUpStairs()
         self.findDownStairs()
@@ -932,9 +936,6 @@ class TownLevel(DungeonLevel):
         print "Saving open tiles"
         db.saveDB.save(self)
         
-        print "Setting up FOV"
-        self.computeFOVProperties()
-        
         print "Setting up pathing"
         self.setupPathing()
         
@@ -982,9 +983,6 @@ class WildernessLevel(Level):
         
         print "Saving open tiles"
         db.saveDB.save(self)
-        
-        print "Setting up FOV"
-        self.computeFOVProperties()
         
     def placeCreatureAtRandom(self, creature):
         tile = self.getRandomOpenTile()

@@ -451,6 +451,7 @@ class UI(object):
         toLevel.load()
         self.setCurrentLevel(toLevel)
         toLevel.placeCreature(self.player, tile)
+        toLevel.computeFOVProperties(True)
         
         return True
         
