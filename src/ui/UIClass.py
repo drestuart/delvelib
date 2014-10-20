@@ -27,7 +27,6 @@ fontpath = os.path.join("modules", "delvelib", "fonts", "FreeMono.ttf")
 class UI(object):
 
     def __init__(self, **kwargs):
-#        self.setCurrentLevel(kwargs.get('level', None))
         self.currentLevel = kwargs.get('level', None)
         self.player = kwargs.get('player', None)
         self.fullscreen = kwargs.get('fullscreen', False)
@@ -406,6 +405,12 @@ class UI(object):
         self.currentLevel = lvl
         self.mapPanel.setLevel(lvl)
         lvl.load()
+        
+    def getPlayer(self):
+        return self.player
+    
+    def setPlayer(self, c):
+        self.player = c
         
     def clearScreen(self):
         self.mapPanel.clear()
