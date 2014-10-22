@@ -129,6 +129,30 @@ class UI(object):
         self.window.update()
         self.window.blittowindow()
         
+    def clearWindow(self):
+        self.window.surface.fill((0,0,0))
+        self.drawWindow()
+        
+    def showCenteredText(self, lines, showtime):
+        swidth = C.SCREEN_WIDTH
+        clines = []
+        
+        for line in lines:
+            clines.append(line.center(swidth))
+        
+        startingy = (C.SCREEN_HEIGHT - len(lines))/2
+        y = startingy
+        
+        for line in clines:
+            print line
+            self.window.putchars(line, 0, y, colors.white, colors.blankBackground)
+            y += 1
+        
+        self.drawWindow()
+            
+        pygame.time.delay(showtime)
+        
+    
     def fadeInImage(self, imgpath, loadTime, alphaSteps):
         alphaMax = 255
         fadeInDelay = int(loadTime/alphaSteps)
