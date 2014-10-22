@@ -128,6 +128,36 @@ class UI(object):
     def drawWindow(self):
         self.window.update()
         self.window.blittowindow()
+        
+    def fadeInImage(self, imgpath, loadTime, alphaSteps):
+        alphaMax = 255
+        fadeInDelay = int(loadTime/alphaSteps)
+        
+        # Load and scale the logo image
+        image = pygame.image.load(imgpath).convert()
+        imageWidth, imageHeight = image.get_width(), image.get_height()
+        imageRatio = float(imageHeight)/imageWidth
+        
+        windowWidth, windowHeight = self.window.pixelsize
+        
+        newWidth = int(windowWidth*.9)
+        newHeight = int(newWidth*imageRatio)
+        
+        image = pygame.transform.scale(image, (newWidth, newHeight))
+        
+        # Logo postioning -- centered
+        logox, logoy = ((windowWidth - newWidth)/2, (windowHeight - newHeight)/2)
+        
+        # Fade in logo
+        for i in range(alphaSteps):
+            self.window.surface.fill((0,0,0))
+            
+            alpha = i*alphaMax/alphaSteps
+            image.set_alpha(alpha)
+            
+            self.window.surface.blit(image, (logox, logoy))
+            self.drawWindow()
+            pygame.time.delay(fadeInDelay)
     
     def singleChoiceMenu(self, title, options, width = C.MENU_WIDTH):
         
