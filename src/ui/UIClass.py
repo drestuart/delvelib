@@ -144,7 +144,6 @@ class UI(object):
         y = startingy
         
         for line in clines:
-            print line
             self.window.putchars(line, 0, y, colors.white, colors.blankBackground)
             y += 1
         

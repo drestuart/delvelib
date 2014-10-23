@@ -448,6 +448,150 @@ class MenuPanel(Panel):
         self.window.update()
         self.window.blittowindow()
         
+class GameMenuPanel(MenuPanel):
+    
+    def __init__(self, *args, **kwargs):
+        super(GameMenuPanel, self).__init__(*args, **kwargs)
+        
+        self.enabledFGColor = kwargs.get('enabledFGColor', C.MENU_TEXT_COLOR)
+        self.disabledFGColor = kwargs.get('disabledFGColor', C.MENU_DISABLED_TEXT_COLOR)
+        
+        self.selected = 0
+        
+    def setupOptions(self, options):
+        self.options = options
+        
+        # Set up word wrap
+        self.linesToDisplay = {}
+        optNum = 0
+        self.height = 2*(self.margin + 1)
+        
+        for opt in self.options:
+            # Data type check
+            if not isinstance(opt, dict):
+                raise ValueError("GameMenuPanel options must be dictionaries")
+            
+            text = opt.get('text')
+            enabled = opt.get('enabled')
+            function = opt.get('function')
+            
+            if text is None or not isinstance(text, basestring):
+                raise ValueError("GameMenuPanel options must have 'text' string parameter")
+            
+            if enabled is None or not isinstance(enabled, bool):
+                raise ValueError("GameMenuPanel options must have 'enabled' boolean parameter")
+
+            if enabled and (function is None or not hasattr(function, '__call__')): # Best method check I could come up with
+                raise ValueError("GameMenuPanel options must have 'function' method parameter")
+            
+            self.linesToDisplay[optNum] = []
+            wrappedLines = textwrap.wrap(text, self.width - 2*(self.margin + 1))
+            linesForOption = 0
+            
+            for wline in wrappedLines:
+                
+                if linesForOption > 0:
+                    wline = ' ' * self.multilineIndent + wline.ljust(self.width - 2*(self.margin + 1) - self.multilineIndent)
+                else:
+                    wline = wline.ljust(self.width - 2*(self.margin + 1))
+                    
+                self.linesToDisplay[optNum].append(wline)
+                self.height += 1
+                linesForOption += 1
+                
+            optNum += 1
+                
+        self.x = (C.SCREEN_WIDTH - self.width)/2
+        self.y = (C.SCREEN_HEIGHT - self.height)/2
+        
+        
+    def draw(self):
+    
+        # print top and bottom borders and title
+        self.putChars(self.titleLine, 0, 0, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+        self.putChars(self.tbBorder * self.width, 0, self.height - 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+        
+        # Draw margin lines
+        for i in range(self.margin):
+            
+            # Side borders
+            self.putChars(self.lrBorder + " " * self.margin, 0, i + 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+            self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, i + 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+            # Spaces
+            self.putChars(" " * (self.width - self.margin - 1), self.margin + 1, i + 1, fgcolor=colors.blankBackground, bgcolor=colors.blankBackground)
+            
+            self.putChars(self.lrBorder + " " * self.margin, 0, self.height - 2 - i, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+            self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, self.height - 2 - i, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+            self.putChars(" " * (self.width - self.margin - 1), self.margin + 1, self.height - 2 - i, fgcolor=colors.blankBackground, bgcolor=colors.blankBackground)
+        
+        # print options, finally
+        y = self.margin + 1
+        for key in sorted(self.linesToDisplay.keys()):
+            option = self.options[key]
+            
+            if key == self.selected:
+                bg = self.selectedBGColor
+            else:
+                bg = self.defaultBGColor
+            
+            if option['enabled']:
+                fg = self.enabledFGColor
+            else:
+                fg = self.disabledFGColor
+            
+            
+            lines = self.linesToDisplay[key]
+            for line in lines:
+
+                # print side borders
+                self.putChars(self.lrBorder + " " * self.margin, 0, y, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+                self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, y, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+                
+                # print text
+                self.putChars(line, self.margin + 1, y, fgcolor = fg, bgcolor = bg)
+                y += 1
+            
+        # Draw shadow
+        if self.shadow is not None:
+            self.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
+        
+        self.window.update()
+        self.window.blittowindow()
+        
+    def getSingleChoice(self):
+            
+        while True:
+            self.draw()
+            key, keyStr = keys.waitForInput()
+            
+            if key is None:
+                return
+         
+            if key in (K_KP2, K_DOWN, K_j):
+                while True:
+                    self.selected += 1
+                    if self.selected >= len(self.options):
+                        self.selected = 0
+                        
+                    newOption = self.options[self.selected]
+                    if newOption['enabled']: break
+                    
+                continue
+            
+            elif key in (K_KP8, K_UP, K_k):
+                while True:
+                    self.selected -= 1
+                    if self.selected < 0:
+                        self.selected = len(self.options) - 1
+                    
+                    newOption = self.options[self.selected]
+                    if newOption['enabled']: break
+                    
+                continue
+            
+            elif key in (K_RETURN, K_KP_ENTER, K_COMMA):
+                return self.options[self.selected]['function']
+
         
 def main():
     

@@ -45,6 +45,7 @@ MENU_Y = 10
 MENU_FPS = 20
 MENU_MARGIN = 1
 MENU_TEXT_COLOR = colors.white
+MENU_DISABLED_TEXT_COLOR = colors.grey
 MENU_SELECTED_COLOR = colors.goldenrod
 MENU_UNSELECTED_COLOR = colors.black
 
