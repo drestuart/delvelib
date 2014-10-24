@@ -85,9 +85,7 @@ class UI(object):
                 redrawScreen = False
                 
                 if event.type == QUIT:
-                    print "Got a QUIT event"
-                    pygame.quit()
-                    sys.exit()
+                    self.quit()
                 
 #                 elif event.type == MOUSEMOTION:
 #                     desc = self.getTileDescUnderMouse()
@@ -124,6 +122,11 @@ class UI(object):
                 
                 # Draw everything
                 self.drawWindow()
+    
+    def quit(self):
+        print "Got a QUIT event"
+        pygame.quit()
+        sys.exit()
     
     def drawWindow(self):
         self.window.update()
