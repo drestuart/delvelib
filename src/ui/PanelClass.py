@@ -409,16 +409,15 @@ class MenuPanel(Panel):
         
         # Draw margin lines
         for i in range(self.margin):
-            
             # Side borders
+            # Top left
             self.putChars(self.lrBorder + " " * self.margin, 0, i + 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+            # Top right
             self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, i + 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-            # Spaces
-            self.putChars(" " * (self.width - self.margin - 1), self.margin + 1, i + 1, fgcolor=colors.blankBackground, bgcolor=colors.blankBackground)
-            
+            # Bottom left
             self.putChars(self.lrBorder + " " * self.margin, 0, self.height - 2 - i, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+            # Bottom right
             self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, self.height - 2 - i, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-            self.putChars(" " * (self.width - self.margin - 1), self.margin + 1, self.height - 2 - i, fgcolor=colors.blankBackground, bgcolor=colors.blankBackground)
         
         # print options, finally
         y = self.margin + 1
@@ -513,16 +512,15 @@ class GameMenuPanel(MenuPanel):
         
         # Draw margin lines
         for i in range(self.margin):
-            
             # Side borders
+            # Top left
             self.putChars(self.lrBorder + " " * self.margin, 0, i + 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+            # Top right
             self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, i + 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-            # Spaces
-            self.putChars(" " * (self.width - self.margin - 1), self.margin + 1, i + 1, fgcolor=colors.blankBackground, bgcolor=colors.blankBackground)
-            
+            # Bottom left
             self.putChars(self.lrBorder + " " * self.margin, 0, self.height - 2 - i, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+            # Bottom right
             self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, self.height - 2 - i, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-            self.putChars(" " * (self.width - self.margin - 1), self.margin + 1, self.height - 2 - i, fgcolor=colors.blankBackground, bgcolor=colors.blankBackground)
         
         # print options, finally
         y = self.margin + 1
