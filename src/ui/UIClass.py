@@ -137,6 +137,7 @@ class UI(object):
         self.drawWindow()
         
     def showCenteredText(self, lines, showtime):
+        pygame.event.clear()
         swidth = C.SCREEN_WIDTH
         clines = []
         
@@ -151,11 +152,21 @@ class UI(object):
             y += 1
         
         self.drawWindow()
-            
-        pygame.time.delay(showtime)
+        
+        waited = 0
+        
+        while waited <= showtime:
+            waited += pygame.time.delay(20)
+            if pygame.event.peek([KEYDOWN, KEYUP]):
+                pygame.event.clear()
+                self.clearWindow()
+                return False
+        
+        return True
         
     
     def fadeInImage(self, imgpath, loadTime, alphaSteps):
+        pygame.event.clear()
         alphaMax = 255
         fadeInDelay = int(loadTime/alphaSteps)
         
@@ -176,6 +187,12 @@ class UI(object):
         
         # Fade in logo
         for i in range(alphaSteps):
+            # Check for key events and end if detected
+            if pygame.event.peek([KEYDOWN, KEYUP]):
+                pygame.event.clear()
+                self.clearWindow()
+                return False
+            
             self.window.surface.fill((0,0,0))
             
             alpha = i*alphaMax/alphaSteps
@@ -184,6 +201,8 @@ class UI(object):
             self.window.surface.blit(image, (logox, logoy))
             self.drawWindow()
             pygame.time.delay(fadeInDelay)
+        
+        return True
     
     def singleChoiceMenu(self, title, options, width = C.MENU_WIDTH):
         
