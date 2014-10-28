@@ -587,7 +587,7 @@ class GameMenuPanel(MenuPanel):
                     
                 continue
             
-            elif key in (K_RETURN, K_KP_ENTER, K_COMMA):
+            elif key in (K_RETURN, K_KP_ENTER, K_COMMA, K_SPACE):
                 return self.options[self.selected]['function']
 
         
