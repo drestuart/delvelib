@@ -76,3 +76,12 @@ PLAYER_VISION_RADIUS = 10
 
 HVCOST = 10
 DIAGONALCOST = 10
+
+########################
+#
+# Custom pygame events
+#
+########################
+
+CHECKTILEDESC = 25
+CHECKTILEDESCDELAY = 100 # ms

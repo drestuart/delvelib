@@ -30,7 +30,8 @@ class Panel(object):
         cellx = x + self.x
         celly = y + self.y
 #         chars = chars.encode(C.ENCODING, C.ENCODING_MODE)
-        self.window.putchars(chars, cellx, celly, fgcolor, bgcolor)
+#         self.window.putchars(chars, cellx, celly, fgcolor, bgcolor)
+        self.window.write(chars, cellx, celly, fgcolor, bgcolor)
         
     def putChar(self, char, x, y, fgcolor = None, bgcolor = None, indent = False):
         # Add offset for this window
@@ -154,12 +155,14 @@ class MessagePanel(Panel):
         clearst = ' ' * self.width
         self.putChars(clearst, 0, 0, colors.blankBackground, colors.blankBackground)
         
-        
-    def displayMessages(self):
-        # Show single-line message
+    def singleMessageShow(self):
+        # Show single-line message at the top of the panel
         self.putChars(self.singleMessage, 0, 0)
         
-        y = self.y + 1
+    def displayMessages(self):
+        self.singleMessageShow()
+                
+        y = 1
 
         # Only show the last (height) messages
         for line in self.messages[-self.messageWindowHeight:]:
@@ -183,7 +186,7 @@ class MessagePanel(Panel):
                         word = word + ' '
                         
                     # TODO convert to use putChars() so we don't have to handle the x-y offset twice
-                    self.window.write(word, y=y, fgcolor=fg, bgcolor=bg)
+                    self.putChars(word, 0, y, fgcolor=fg, bgcolor=bg)
                     charsPrinted += len(word)
                     wordsPrinted += 1
                     

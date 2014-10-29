@@ -5,6 +5,7 @@ Created on Mar 12, 2013
 '''
 
 import Const as C
+import delvelibConst as DC
 import colors
 import Game as G
 import keys
@@ -20,7 +21,6 @@ import os.path
 import TileClass as T
 import MapTileClass as MT
 
-# TODO Abstract out all pygcurse calls into an interface class
 
 fontpath = os.path.join("modules", "delvelib", "fonts", "FreeMono.ttf")
 
@@ -59,6 +59,7 @@ class UI(object):
         
         self.clock = pygame.time.Clock()
         
+        # Draw UI panels
         self.clearScreen()
         self.charPanel.draw(self.player.getX(), self.player.getY(), self.currentLevel.getDepth())
         self.messagePanel.displayMessages()
@@ -69,7 +70,10 @@ class UI(object):
         self.drawLevel()
         self.drawWindow()
         
-        pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
+        # Set up a DRAWSCREEN heartbeat
+        pygame.time.set_timer(DC.CHECKTILEDESC, DC.CHECKTILEDESCDELAY)
+        
+        pygame.event.set_blocked([MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION, KEYUP])
         
         while True:
             # Handle framerate
@@ -80,7 +84,7 @@ class UI(object):
 
 #            print "Loop"
 
-            for event in pygame.event.get():
+            for event in pygame.event.get(): #[QUIT, KEYDOWN, KEYUP, DC.DRAWSCREEN]
                 
                 redrawScreen = False
                 
@@ -110,9 +114,19 @@ class UI(object):
                         for cr in self.currentLevel.creatures:
                             if cr is not self.player:
                                 cr.takeTurn() 
-                
-                if redrawScreen:
+                                
+                elif event.type == DC.CHECKTILEDESC:
+                    redrawScreen = False
                     
+                # Check if there's a new tile description to show
+                desc = self.getTileDescUnderMouse()
+                
+                self.messagePanel.setSingleMessage(desc)
+                if self.messagePanel.messageChanged:
+                    self.messagePanel.singleMessageShow()
+
+                # Refresh window                
+                if redrawScreen:
                     self.clearScreen()
                     self.charPanel.draw(self.player.getX(), self.player.getY(), self.currentLevel.getDepth())
                     self.messagePanel.displayMessages()
@@ -506,6 +520,8 @@ class UI(object):
         # get cell coords
         (x, y) = self.window.getcoordinatesatpixel(mousex, mousey, onscreen=True)
      
+        if (x, y) == (None, None):
+            return ''
         
         # Check if the mouse is inside the map pane
         if self.mapPanel.containsPoint(x, y):
