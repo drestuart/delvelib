@@ -79,11 +79,6 @@ class UI(object):
             # Handle framerate
             self.clock.tick(C.LIMIT_FPS)
             
-            # get framerate with:
-                #self.clock.get_fps()
-
-#            print "Loop"
-
             for event in pygame.event.get(): #[QUIT, KEYDOWN, KEYUP, DC.DRAWSCREEN]
                 
                 redrawScreen = False
@@ -91,11 +86,6 @@ class UI(object):
                 if event.type == QUIT:
                     self.quit()
                 
-#                 elif event.type == MOUSEMOTION:
-#                     desc = self.getTileDescUnderMouse()
-#                     self.messagePanel.setSingleMessage(desc)
-#                     redrawScreen = self.messagePanel.messageChanged
-
                 elif event.type == KEYDOWN:
                     redrawScreen = True
                     
@@ -518,8 +508,10 @@ class UI(object):
         (mousex, mousey) = pygame.mouse.get_pos()
         
         # get cell coords
-        (x, y) = self.window.getcoordinatesatpixel(mousex, mousey, onscreen=True)
-     
+        (x, y) = self.window.getcoordinatesatpixel(mousex, mousey)
+        
+        print (x, y)
+        
         if (x, y) == (None, None):
             return ''
         
@@ -527,8 +519,12 @@ class UI(object):
         if self.mapPanel.containsPoint(x, y):
 #            print "Reading tile", (x, y)
 #            G.game.message( "Reading tile " + str(x) + ", " + str(y) )
+
+            # TODO: account for the offset in the map window. x and y are the coordinates relative to the panel
             tile = self.currentLevel.getTile(x, y)
-            if self.currentLevel.isInFOV(self.player.getX(), self.player.getY(), x, y):
+            if tile is None:
+                return ''
+            elif self.currentLevel.isInFOV(self.player.getX(), self.player.getY(), x, y):
                 return tile.getDescription()
             else:
                 return ''

@@ -71,6 +71,9 @@ class MapBase(Base):
     def distance(self, tilea, tileb):
         return U.ChebyshevDistance(tilea.getX(), tileb.getX(), tilea.getY(), tileb.getY())
 
+    # Default behavior for e.g. the world map
+    def isInFOV(self, fromx, fromy, tox, toy, radius = C.PLAYER_VISION_RADIUS):
+        return True
 
 class Level(MapBase):
     '''A class that models a map as an array of tiles.'''
