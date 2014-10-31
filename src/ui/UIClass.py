@@ -515,21 +515,7 @@ class UI(object):
         if (x, y) == (None, None):
             return ''
         
-        # Check if the mouse is inside the map pane
-        if self.mapPanel.containsPoint(x, y):
-#            print "Reading tile", (x, y)
-#            G.game.message( "Reading tile " + str(x) + ", " + str(y) )
-
-            # TODO: account for the offset in the map window. x and y are the coordinates relative to the panel
-            tile = self.currentLevel.getTile(x, y)
-            if tile is None:
-                return ''
-            elif self.currentLevel.isInFOV(self.player.getX(), self.player.getY(), x, y):
-                return tile.getDescription()
-            else:
-                return ''
-        else:
-            return ''
+        return self.mapPanel.getTileDescription(x, y)
     
     def enterNewLevel(self, creature, tile):
         clevel = self.currentLevel

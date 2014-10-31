@@ -11,6 +11,7 @@ from pygame.locals import *
 import re
 import textwrap
 from symbols import *
+import Game as G
 
 fgdefault = colors.colorMessagePanelFG
 bgdefault = colors.colorMessagePanelBG
@@ -305,6 +306,23 @@ class MapPanel(Panel):
         
         for (x, y, symbol, color, background) in tilesToDraw:
             self.putChar(symbol, x - self.camx, y - self.camy, color, background)
+            
+    def getTileDescription(self, x, y):
+        
+        if self.containsPoint(x, y):
+            mapx, mapy = x + self.camx, y + self.camy
+            
+            player = G.game.getPlayer()
+            
+            tile = self.level.getTile(mapx, mapy)
+            if tile is None:
+                return ''
+            elif self.level.isInFOV(player.getX(), player.getY(), x, y):
+                return tile.getDescription()
+            else:
+                return ''
+        else:
+            return ''
             
         
 class MenuPanel(Panel):
