@@ -30,15 +30,12 @@ class Panel(object):
         # Add offset for this window
         cellx = x + self.x
         celly = y + self.y
-#         chars = chars.encode(C.ENCODING, C.ENCODING_MODE)
-#         self.window.putchars(chars, cellx, celly, fgcolor, bgcolor)
-        self.window.write(chars, cellx, celly, fgcolor, bgcolor)
+        self.window.putchars(chars, cellx, celly, fgcolor, bgcolor)
         
     def putChar(self, char, x, y, fgcolor = None, bgcolor = None, indent = False):
         # Add offset for this window
         cellx = x + self.x
         celly = y + self.y
-#         char = char.encode(C.ENCODING, C.ENCODING_MODE)
         self.window.putchar(char, cellx, celly, fgcolor, bgcolor)
         
     def containsPoint(self, x, y):
@@ -146,7 +143,7 @@ class MessagePanel(Panel):
     
     def setSingleMessage(self, message=''):
         if message != self.singleMessage:
-#            self.singleMessageClear()
+            self.singleMessageClear()
             self.singleMessage = message.ljust(self.width)
             self.messageChanged = True
         else:
@@ -158,7 +155,7 @@ class MessagePanel(Panel):
         
     def singleMessageShow(self):
         # Show single-line message at the top of the panel
-        self.putChars(self.singleMessage, 0, 0)
+        self.putChars(self.singleMessage, 0, 0, colors.white)
         
     def displayMessages(self):
         self.singleMessageShow()

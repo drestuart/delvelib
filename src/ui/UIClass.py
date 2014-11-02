@@ -510,8 +510,6 @@ class UI(object):
         # get cell coords
         (x, y) = self.window.getcoordinatesatpixel(mousex, mousey)
         
-        print (x, y)
-        
         if (x, y) == (None, None):
             return ''
         
