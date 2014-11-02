@@ -155,7 +155,7 @@ class MessagePanel(Panel):
         
     def singleMessageShow(self):
         # Show single-line message at the top of the panel
-        self.putChars(self.singleMessage, 0, 0, colors.white)
+        self.putChars(self.singleMessage, 0, 0, colors.colorMapPanelFG, colors.colorMessagePanelBG)
         
     def displayMessages(self):
         self.singleMessageShow()
@@ -174,21 +174,19 @@ class MessagePanel(Panel):
                 words = text.split()
                 
                 # TODO Maybe don't need this if the word-wrap code in addMessage() is working?
+                # Probably do need it to deal with different-colored words though
                 for word in words:
                     if len(word) + charsPrinted > self.width:
-                        self.window.write("\n")
                         y += 1
                         charsPrinted = 0
                     
                     if wordsPrinted < wordsInLine - 1:
                         word = word + ' '
                         
-                    # TODO convert to use putChars() so we don't have to handle the x-y offset twice
-                    self.putChars(word, 0, y, fgcolor=fg, bgcolor=bg)
+                    self.putChars(word, charsPrinted, y, fgcolor=fg, bgcolor=bg)
                     charsPrinted += len(word)
                     wordsPrinted += 1
                     
-            self.window.write("\n")
             y += 1
         
 class CharacterPanel(Panel):
