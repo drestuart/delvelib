@@ -19,10 +19,11 @@ bgdefault = colors.colorMessagePanelBG
 __all__ = ["MessagePanel", "CharacterPanel", "MenuPanel", "MapPanel"]
 
 class Panel(object):
-    def __init__(self, dims, window, margin = 0):
+    def __init__(self, dims, window, parentUI, margin = 0):
         (self.x, self.y, self.width, self.height) = dims
         self.window = window
         self.margin = margin
+        self.ui = parentUI
         
         # TODO handle margin
         
@@ -60,6 +61,7 @@ class MessagePanel(Panel):
         self.singleMessage = ''
         self.messageWindowHeight = self.height - 2
         self.messageChanged = False
+        self.lastMessageShown = 0
     
     def addMessage(self, message):
 
@@ -157,37 +159,61 @@ class MessagePanel(Panel):
         # Show single-line message at the top of the panel
         self.putChars(self.singleMessage, 0, 0, colors.colorMapPanelFG, colors.colorMessagePanelBG)
         
+    def crapBomb(self):
+        for i in range(30):
+            self.addMessage("Crap " + str(i))
+        
     def displayMessages(self):
         self.singleMessageShow()
-                
-        y = 1
 
-        # Only show the last (height) messages
-        for line in self.messages[-self.messageWindowHeight:]:
-            charsPrinted = 0
-            wordsPrinted = 0
-            wordsInLine = 0
-            for (text, fg, bg) in line:
-                wordsInLine += len(text.split())
+        while True:
+            self.clear()
+            paging = False
+            numMessagesToShow = len(self.messages) - self.lastMessageShown - 1
             
-            for (text, fg, bg) in line:
-                words = text.split()
+            if numMessagesToShow > self.messageWindowHeight:
+                messagesToShow = self.messages[self.lastMessageShown:self.lastMessageShown + self.messageWindowHeight]
+                messagesToShow.append([("-- More --", fgdefault, bgdefault)]);
+                paging = True
+            else:
+                messagesToShow = self.messages[-self.messageWindowHeight:]
+                            
+            y = 1
+            for line in messagesToShow:
+                charsPrinted = 0
+                wordsPrinted = 0
+                wordsInLine = 0
+
+                for (text, fg, bg) in line:
+                    wordsInLine += len(text.split())
                 
-                # TODO Maybe don't need this if the word-wrap code in addMessage() is working?
-                # Probably do need it to deal with different-colored words though
-                for word in words:
-                    if len(word) + charsPrinted > self.width:
-                        y += 1
-                        charsPrinted = 0
+                for (text, fg, bg) in line:
+                    words = text.split()
                     
-                    if wordsPrinted < wordsInLine - 1:
-                        word = word + ' '
+                    # TODO Maybe don't need this if the word-wrap code in addMessage() is working?
+                    # Probably do need it to deal with different-colored words though
+                    for word in words:
+                        if len(word) + charsPrinted > self.width:
+                            y += 1
+                            charsPrinted = 0
                         
-                    self.putChars(word, charsPrinted, y, fgcolor=fg, bgcolor=bg)
-                    charsPrinted += len(word)
-                    wordsPrinted += 1
-                    
-            y += 1
+                        if wordsPrinted < wordsInLine - 1:
+                            word = word + ' '
+                            
+                        self.putChars(word, charsPrinted, y, fgcolor=fg, bgcolor=bg)
+                        charsPrinted += len(word)
+                        wordsPrinted += 1
+                        
+                y += 1
+            if paging:
+                self.lastMessageShown += self.messageWindowHeight - 1
+                self.ui.drawLevel()
+                self.ui.drawWindow()
+                keys.waitForInput()
+                continue
+            else:
+                self.lastMessageShown = len(self.messages)
+                break
         
 class CharacterPanel(Panel):
     def __init__(self, *args):

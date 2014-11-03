@@ -49,9 +49,9 @@ class UI(object):
         self.window.autodisplayupdate = False
         
         # Set up UI panels
-        self.mapPanel = MapPanel(self.currentLevel, C.MAP_PANEL_DIMS, self.window)
-        self.messagePanel = MessagePanel(C.MESSAGE_PANEL_DIMS, self.window)
-        self.charPanel = CharacterPanel(C.CHAR_PANEL_DIMS, self.window)
+        self.mapPanel = MapPanel(self.currentLevel, C.MAP_PANEL_DIMS, self.window, self)
+        self.messagePanel = MessagePanel(C.MESSAGE_PANEL_DIMS, self.window, self)
+        self.charPanel = CharacterPanel(C.CHAR_PANEL_DIMS, self.window, self)
 
         pygame.key.set_repeat(300, 150)
         
@@ -101,6 +101,9 @@ class UI(object):
                         sys.exit()
                     
                     elif player_action == 'took-turn':
+                        # MessagePanel paging test
+                        # self.messagePanel.crapBomb()
+
                         for cr in self.currentLevel.creatures:
                             if cr is not self.player:
                                 cr.takeTurn() 
