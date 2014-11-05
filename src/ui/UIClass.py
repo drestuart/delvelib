@@ -143,6 +143,19 @@ class UI(object):
         self.window.surface.fill((0,0,0))
         self.drawWindow()
         
+    def waitForInput(self):
+        clock = pygame.time.Clock()
+        while True:
+            clock.tick(C.MENU_FPS)
+            for event in pygame.event.get([KEYDOWN, QUIT]):  # TODO what do the event types do here?
+                if event.type == QUIT:
+                    return None, None
+                elif event.type == KEYDOWN:
+                    key = event.key
+                    keyStr = pygame.key.name(key)
+                    # key is the integer key code, keyStr is the string representation
+                    return key, keyStr
+        
     def showCenteredText(self, lines, showtime):
         pygame.event.clear()
         swidth = C.SCREEN_WIDTH
@@ -255,7 +268,7 @@ class UI(object):
         
         self.displayTextWindow(title, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, lines)
         
-        key, keyStr = keys.waitForInput()
+        key, keyStr = self.waitForInput()
         
         # Do nothing... yet
         return None
@@ -604,7 +617,7 @@ class UI(object):
         
         else:
             G.message("In which direction?")
-            key, keyStr = keys.waitForInput()
+            key, keyStr = self.waitForInput()
             direc = keys.getMovementDirection(key, keyStr)
             
             if direc:
@@ -643,7 +656,7 @@ class UI(object):
         
         else:
             G.message("In which direction?")
-            key, keyStr = keys.waitForInput()
+            key, keyStr = self.waitForInput()
             direc = keys.getMovementDirection(key, keyStr)
             
             if direc:

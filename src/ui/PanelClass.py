@@ -209,7 +209,7 @@ class MessagePanel(Panel):
                 self.lastMessageShown += self.messageWindowHeight - 1
                 self.ui.drawLevel()
                 self.ui.drawWindow()
-                keys.waitForInput()
+                self.ui.waitForInput()
                 continue
             else:
                 self.lastMessageShown = len(self.messages)
@@ -414,7 +414,7 @@ class MenuPanel(Panel):
         
         while True:
             self.draw()
-            key, keyStr = keys.waitForInput()
+            key, keyStr = self.ui.waitForInput()
             
             if key is None:
                 return
@@ -602,7 +602,7 @@ class GameMenuPanel(MenuPanel):
             
         while True:
             self.draw()
-            key, keyStr = keys.waitForInput()
+            key, keyStr = self.ui.waitForInput()
             
             if key is None:
                 return

@@ -5,21 +5,6 @@ Created on Mar 21, 2013
 '''
 
 from pygame.locals import *
-import pygame
-import Const as C
-
-def waitForInput():
-    clock = pygame.time.Clock()
-    while True:
-        clock.tick(C.MENU_FPS)
-        for event in pygame.event.get([KEYDOWN, QUIT]):  # TODO what do the event types do here?
-            if event.type == QUIT:
-                return None, None
-            elif event.type == KEYDOWN:
-                key = event.key
-                keyStr = pygame.key.name(key)
-                # key is the integer key code, keyStr is the string representation
-                return key, keyStr
 
 movementKeys = {
                 K_UP : (0, -1),
