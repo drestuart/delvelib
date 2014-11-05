@@ -19,9 +19,8 @@ bgdefault = colors.colorMessagePanelBG
 __all__ = ["MessagePanel", "CharacterPanel", "MenuPanel", "MapPanel"]
 
 class Panel(object):
-    def __init__(self, dims, window, parentUI, margin = 0):
+    def __init__(self, dims, parentUI, margin = 0):
         (self.x, self.y, self.width, self.height) = dims
-        self.window = window
         self.margin = margin
         self.ui = parentUI
         
@@ -31,13 +30,13 @@ class Panel(object):
         # Add offset for this window
         cellx = x + self.x
         celly = y + self.y
-        self.window.putchars(chars, cellx, celly, fgcolor, bgcolor)
+        self.ui.window.putchars(chars, cellx, celly, fgcolor, bgcolor)
         
     def putChar(self, char, x, y, fgcolor = None, bgcolor = None, indent = False):
         # Add offset for this window
         cellx = x + self.x
         celly = y + self.y
-        self.window.putchar(char, cellx, celly, fgcolor, bgcolor)
+        self.ui.window.putchar(char, cellx, celly, fgcolor, bgcolor)
         
     def containsPoint(self, x, y):
         return (x >= self.x) and (x < self.x + self.width) and \
@@ -45,7 +44,7 @@ class Panel(object):
     
     def clear(self):
         # Clear tint
-        self.window.settint(0, 0, 0, (self.x, self.y, self.width, self.height))
+        self.ui.window.settint(0, 0, 0, (self.x, self.y, self.width, self.height))
         
         # Clear characters
         for y in range(self.height):
@@ -240,7 +239,7 @@ class CharacterPanel(Panel):
             else:
                 bg = backColor
 
-#            self.window.putchar(' ', x, self.y + bary, fgcolor = colors.white, bgcolor = bg)
+#            self.ui.window.putchar(' ', x, self.y + bary, fgcolor = colors.white, bgcolor = bg)
             self.putChar(' ', x, bary, fgcolor = colors.white, bgcolor = bg)
             
         # Add text
@@ -484,10 +483,10 @@ class MenuPanel(Panel):
     
         # Draw shadow
         if self.shadow is not None:
-            self.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
+            self.ui.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
         
-        self.window.update()
-        self.window.blittowindow()
+        self.ui.window.update()
+        self.ui.window.blittowindow()
         
 class GameMenuPanel(MenuPanel):
     
@@ -593,10 +592,10 @@ class GameMenuPanel(MenuPanel):
             
         # Draw shadow
         if self.shadow is not None:
-            self.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
+            self.ui.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
         
-        self.window.update()
-        self.window.blittowindow()
+        self.ui.window.update()
+        self.ui.window.blittowindow()
         
     def getSingleChoice(self):
             

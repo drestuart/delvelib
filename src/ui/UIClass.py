@@ -49,9 +49,9 @@ class UI(object):
         self.window.autodisplayupdate = False
         
         # Set up UI panels
-        self.mapPanel = MapPanel(self.currentLevel, C.MAP_PANEL_DIMS, self.window, self)
-        self.messagePanel = MessagePanel(C.MESSAGE_PANEL_DIMS, self.window, self)
-        self.charPanel = CharacterPanel(C.CHAR_PANEL_DIMS, self.window, self)
+        self.mapPanel = MapPanel(self.currentLevel, C.MAP_PANEL_DIMS, self)
+        self.messagePanel = MessagePanel(C.MESSAGE_PANEL_DIMS, self)
+        self.charPanel = CharacterPanel(C.CHAR_PANEL_DIMS, self)
 
         pygame.key.set_repeat(300, 150)
         
@@ -226,7 +226,7 @@ class UI(object):
     
     def singleChoiceMenu(self, title, options, width = C.MENU_WIDTH):
         
-        menu = MenuPanel(self.window, options = options, width = width, title = title, shadow = pygcurse.SOUTHEAST)
+        menu = MenuPanel(self, options = options, width = width, title = title, shadow = pygcurse.SOUTHEAST)
         return menu.getSingleChoice()
         
     def displayTextWindow(self, title, x, y, width, lines):
