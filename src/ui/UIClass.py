@@ -117,25 +117,23 @@ class UI(object):
                 self.messagePanel.setSingleMessage(desc)
                 if self.messagePanel.messageChanged:
                     self.messagePanel.singleMessageShow()
-
-                # Refresh window                
-                if redrawScreen:
-                    self.clearScreen()
-                    self.charPanel.draw(self.player.getX(), self.player.getY(), self.currentLevel.getDepth())
-                    self.messagePanel.displayMessages()
-                    
-#                     self.currentLevel.computeFOV(self.player.getX(), self.player.getY())
-                    self.drawLevel()
                 
                 # Draw everything
-                self.drawWindow()
+                self.drawWindow(redrawScreen)
+                
     
     def quit(self):
         print "Got a QUIT event"
         pygame.quit()
         sys.exit()
     
-    def drawWindow(self):
+    def drawWindow(self, redraw = False):
+        if redraw:
+            self.clearScreen()
+            self.charPanel.draw(self.player.getX(), self.player.getY(), self.currentLevel.getDepth())
+            self.messagePanel.displayMessages()
+            self.drawLevel()
+        
         self.window.update()
         self.window.blittowindow()
         
@@ -514,12 +512,10 @@ class UI(object):
         
     def drawLevel(self):
         # Get all tiles to draw from level class
-        # TODO implement windowing for larger maps
         playerx, playery = self.player.getX(), self.player.getY()
         self.mapPanel.drawLevel(playerx, playery)
         
     def getTileDescUnderMouse(self):
-    
         #return a string with the tiles of all objects under the mouse
         (mousex, mousey) = pygame.mouse.get_pos()
         

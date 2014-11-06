@@ -485,8 +485,7 @@ class MenuPanel(Panel):
         if self.shadow is not None:
             self.ui.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
         
-        self.ui.window.update()
-        self.ui.window.blittowindow()
+        self.ui.drawWindow()
         
 class GameMenuPanel(MenuPanel):
     
@@ -594,8 +593,7 @@ class GameMenuPanel(MenuPanel):
         if self.shadow is not None:
             self.ui.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
         
-        self.ui.window.update()
-        self.ui.window.blittowindow()
+        self.ui.drawWindow()
         
     def getSingleChoice(self):
             
