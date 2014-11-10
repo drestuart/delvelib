@@ -61,7 +61,7 @@ class UI(object):
         
         # Draw UI panels
         self.clearScreen()
-        self.charPanel.draw(self.player.getX(), self.player.getY(), self.currentLevel.getDepth())
+        self.charPanel.draw()
         self.messagePanel.displayMessages()
         
         self.currentLevel.setupEventListeners()
@@ -104,7 +104,7 @@ class UI(object):
                         # MessagePanel paging test
                         # self.messagePanel.crapBomb()
 
-                        for cr in self.currentLevel.creatures:
+                        for cr in self.currentLevel.getLivingCreatures():
                             if cr is not self.player:
                                 cr.takeTurn() 
                                 
@@ -130,7 +130,7 @@ class UI(object):
     def drawWindow(self, redraw = False):
         if redraw:
             self.clearScreen()
-            self.charPanel.draw(self.player.getX(), self.player.getY(), self.currentLevel.getDepth())
+            self.charPanel.draw()
             self.messagePanel.displayMessages()
             self.drawLevel()
         

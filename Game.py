@@ -35,5 +35,8 @@ class Game(object):
     def getPlayer(self):
         return self.player
     
+    def quit(self):
+        self.ui.quit()
+    
 game = Game()
 

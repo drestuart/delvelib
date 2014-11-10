@@ -218,8 +218,14 @@ class CharacterPanel(Panel):
     def __init__(self, *args):
         super(CharacterPanel, self).__init__(*args)
         
-    def draw(self, playerx, playery, depth):
-        self.render_bar(1, 1, 18, "HP", 15, 20, colors.darkBlue, colors.darkRed)
+    def draw(self):
+        maxHP = self.ui.player.getMaxHP()
+        currentHP = self.ui.player.getHP()
+                
+        playerx, playery = self.ui.player.getXY()
+        depth = self.ui.currentLevel.getDepth()
+        
+        self.render_bar(1, 1, 18, "HP", currentHP, maxHP, colors.darkBlue, colors.darkRed)
         self.showCoords(1, 3, playerx, playery, depth)
         
     def showCoords(self, x, y, playerx, playery, depth):

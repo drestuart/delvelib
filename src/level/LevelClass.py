@@ -155,7 +155,19 @@ class Level(MapBase):
             pub.subscribe(self.handleDoorOpen, "event.doorOpen")
             pub.subscribe(self.handleDoorClose, "event.doorClose")
 
-    
+    def getLivingCreatures(self):
+        deadCreatures = []
+        
+        for cr in self.creatures:
+            if cr.isDead:
+                deadCreatures.append(cr)
+                
+        # Remove dead creatures
+        for cr in deadCreatures:
+            cr.getTile().removeCreature()
+            self.creatures.remove(cr)
+            
+        return self.creatures
     
     def buildTileArray(self):
         self.tileArray = []

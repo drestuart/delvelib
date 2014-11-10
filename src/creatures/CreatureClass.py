@@ -32,7 +32,9 @@ class Creature(colors.withColor, Base):
         self.name = kwargs['name']
         
         self.maxHP = kwargs['maxHP']
+        self.hp = kwargs['maxHP']
         self.damageTaken = kwargs.get('damageTaken', 0)
+        self.isDead = False
         
         self.visible = kwargs.get('visible', True)
         self.AIClass = kwargs['AIClass']
@@ -53,6 +55,7 @@ class Creature(colors.withColor, Base):
     
     maxHP = Column(Integer)
     damageTaken = Column(Integer)
+    isDead = Column(Boolean)
     
     goalEnemy = relationship("Creature", uselist=False)
     goalEnemyId = Column(Integer, ForeignKey('creatures.id'))
@@ -82,7 +85,8 @@ class Creature(colors.withColor, Base):
         return self.inventory
     
     def handleBump(self, bumper):
-        return False
+        # Decide whether to handle an attack, start a dialog, or whatever
+        return bumper.attack(self)
     
     def move(self, dx, dy):
         
@@ -133,10 +137,20 @@ class Creature(colors.withColor, Base):
         self.changeHP(-dam)
         
     def changeHP(self, amount):
-        self.damageTaken = min(self.damageTaken - amount, 0)
+        self.damageTaken = max(self.damageTaken - amount, 0)
         self.calcHP()
         if self.hp <= 0:
-            self.deathFunction(self)
+            self.die()
+            
+    def die(self):
+        message = self.The() + " dies!"
+        G.message(message)
+        print message
+        
+        self.isDead = True
+            
+    def getHP(self):
+        return self.hp
 
 
     def getName(self):
@@ -150,10 +164,8 @@ class Creature(colors.withColor, Base):
     def getSpecies(self):
         return self.species
 
-
     def getMaxHP(self):
         return self.maxHP
-
 
     def getDamageTaken(self):
         return self.damageTaken
@@ -244,8 +256,20 @@ class Creature(colors.withColor, Base):
         self.hateList = value
         
     def attack(self, enemy):
-        G.message(self.The() + " attacks " + enemy.the())
-        print self.The() + " attacks " + enemy.the()
+        damage = self.getAttackDamage()
+        
+        message = self.The() + " attacks " + enemy.the() + " for " + str(damage)
+        G.message(message)
+        print message
+        
+        enemy.takeDamage(damage)
+        
+        return True
+        
+    def getAttackDamage(self):
+        # A highly sophisticated algorithm, taking into account material properties,
+        # the creature's lever arm, and the local wind speed
+        return 2
         
     def the(self):
         return "the " + self.getName()
@@ -278,7 +302,7 @@ class Orc(Creature):
     description = 'a hideous orc'
     
     def __init__(self, **kwargs):
-        super(Orc, self).__init__(symbol = 'o', name = 'orc', maxHP = 10, AIClass = AI.AggressiveAI, **kwargs)
+        super(Orc, self).__init__(symbol = 'o', name = 'orc', maxHP = 4, AIClass = AI.AggressiveAI, **kwargs)
     
     __mapper_args__ = {'polymorphic_identity': 'orc'}
 

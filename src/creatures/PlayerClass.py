@@ -9,6 +9,7 @@ from sqlalchemy.types import Integer
 import AIClass as AI
 import CreatureClass as Cr
 import colors
+import Game as G
 
 class Player(Cr.Creature):
     
@@ -40,6 +41,13 @@ class Player(Cr.Creature):
             return newTile.bump(self)
         else:
             return level.bumpEdge(self)
+        
+    def die(self):
+        message = self.The() + " dies!"
+        G.message(message)
+        print message
+        
+        G.game.quit()
     
     def the(self):
         return self.getName()
