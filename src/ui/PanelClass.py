@@ -343,7 +343,7 @@ class MapPanel(Panel):
             tile = self.level.getTile(mapx, mapy)
             if tile is None:
                 return ''
-            elif self.level.isInFOV(player.getX(), player.getY(), x, y):
+            elif self.level.isInFOV(player.getX(), player.getY(), mapx, mapy):
                 return tile.getDescription()
             else:
                 return ''
