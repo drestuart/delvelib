@@ -476,13 +476,13 @@ class Level(MapBase):
     def handleDoorOpen(self, tile):
         x, y = tile.getXY()
         G.message("Door opened " + str(x) + ", " + str(y))
-        if self.__dict__.get('astar'): self.astar.setMovable(x, y, True)
+        if self.__dict__.get('astar'): self.astar.setMovable(x, y, tile.blocksPathing())
         self.computeFOVProperties(force = True)
     
     def handleDoorClose(self, tile):
         x, y = tile.getXY()
         G.message("Door closed " + str(x) + ", " + str(y))
-        if self.__dict__.get('astar'): self.astar.setMovable(x, y, False)
+        if self.__dict__.get('astar'): self.astar.setMovable(x, y, tile.blocksPathing())
         self.computeFOVProperties(force = True)
     
     

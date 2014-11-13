@@ -13,6 +13,7 @@ import colors
 import database as db
 import InventoryClass as Inv
 import random
+from DungeonFeatureClass import Door
 
 #from DungeonFeatureClass import *
 
@@ -223,6 +224,12 @@ class Tile(TileBase):
             blocks = blocks or self.feature.getBlockSight()
                 
         return blocks
+    
+    def blocksPathing(self):
+        return self.blocksMove() and not self.hasClosedDoor()
+    
+    def hasClosedDoor(self):
+        return self.feature is not None and isinstance(self.feature, Door) and self.feature.isClosed()
     
     def addObject(self, obj):
         if not self.inventory:
