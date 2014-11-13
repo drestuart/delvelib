@@ -458,7 +458,7 @@ class Level(MapBase):
                 mapdata.append(1)
         
         for tile in self.tiles:
-            if tile.blocksMove():
+            if tile.blocksPathing():
                 mapdata[tile.getX() + tile.getY() * width] = -1
         
         self.astar = AStar.setUpMap(mapdata, self.width, self.height)
@@ -466,12 +466,12 @@ class Level(MapBase):
     def handleRemovedCreature(self, tile, creature):
 #        print "Creature removed from tile", tile.getXY()
         x, y = tile.getXY()
-        if self.__dict__.get('astar'): self.astar.setMovable(x, y, True)
+        if self.__dict__.get('astar'): self.astar.setMovable(x, y, tile.blocksPathing())
         
     def handleAddedCreature(self, tile, creature):
 #        print "Creature added to tile", tile.getXY()
         x, y = tile.getXY()
-        if self.__dict__.get('astar'): self.astar.setMovable(x, y, False)
+        if self.__dict__.get('astar'): self.astar.setMovable(x, y, tile.blocksPathing())
         
     def handleDoorOpen(self, tile):
         x, y = tile.getXY()
