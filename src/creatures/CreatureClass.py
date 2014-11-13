@@ -93,10 +93,22 @@ class Creature(colors.withColor, Base):
         newX = self.getX() + dx
         newY = self.getY() + dy
         level = self.getLevel()
-        newTile = level.getTile(newX, newY)
+        nextTile = level.getTile(newX, newY)
         
-        return self.moveToTile(newTile)
+        if nextTile.hasClosedDoor():
+            return self.openDoor(nextTile)
+        else:
+            return self.moveToTile(nextTile)
         
+    def openDoor(self, tile):
+        # Probably redundant error checking
+        if not tile.hasClosedDoor():
+            raise Exception("Trying to open an open or non-existent door")
+        
+        tile.getFeature().open()
+        message = self.The() + " opens a door " . str(tile.getXY())
+        G.message(message)
+        return True
         
     def moveToTile(self, newTile):
         

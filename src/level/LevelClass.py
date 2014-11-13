@@ -194,7 +194,7 @@ class Level(MapBase):
         if x >= 0 and x < self.width and y >= 0 and y < self.height:
             return self.tileArray[x][y]
     
-        print "Bad coordinates: ", (x, y)
+#         print "Bad coordinates: ", (x, y)
         return None
     
     def replaceTile(self, oldtile, newtile):
