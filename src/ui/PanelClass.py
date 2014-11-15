@@ -337,8 +337,10 @@ class MapPanel(Panel):
         
         if self.containsPoint(x, y):
             mapx, mapy = x + self.camx, y + self.camy
-            
             player = G.game.getPlayer()
+            
+            if mapx < 0 or mapy < 0 or mapx >= self.level.getWidth() or mapy >= self.level.getHeight():
+                return ''
             
             tile = self.level.getTile(mapx, mapy)
             if tile is None:
