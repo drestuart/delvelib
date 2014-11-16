@@ -124,6 +124,9 @@ class AStar:
             self.mh.m[(y*self.mh.w)+x] = 1
         else:
             self.mh.m[(y*self.mh.w)+x] = -1
+            
+    def getMovable(self, x, y):
+        return self.mh.m[(y*self.mh.w)+x]
       
 class SQ_Location:
     """A simple Square Map Location implementation"""

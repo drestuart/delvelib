@@ -15,6 +15,10 @@ def getAIClassByName(name):
 
 class AI(object):
     
+    def __init__(self):
+        print "Initializing AI"
+        self.path = None
+    
     def setOwner(self, creature):
         self.owner = creature
         
@@ -32,6 +36,9 @@ class AI(object):
                 
             if self.owner.move(randX, randY):
                 break
+            
+    def getPath(self):
+        return self.path
 
 
 class PlayerAI(AI):
@@ -64,25 +71,8 @@ class PlayerAI(AI):
     
 class AggressiveAI(AI):
     
-    def findNewEnemy(self, visibleCreatures):
-#        print self.owner.The(), "is looking for an enemy"
-        nearestEnemy = None
-        nearestEnemyDistance = None
-        
-        for cr in visibleCreatures:
-            if cr.getCreatureType() in self.owner.getHateList():
-                dist = self.owner.distance(cr)
-                
-                if dist < nearestEnemyDistance or nearestEnemyDistance is None:
-                    nearestEnemyDistance = dist
-                    nearestEnemy = cr
-                    self.owner.setGoalEnemy(cr)
-                    self.owner.setGoalTile(cr.getTile())
-                    
-        return nearestEnemy, nearestEnemyDistance
-    
     def walkPath(self):
-        path = self.owner.getPath()
+        path = self.getPath()
         
         if path is None or len(path) == 0:
             self.wander()
@@ -112,66 +102,99 @@ class AggressiveAI(AI):
         return False
     
     def takeTurn(self):
-#        print self.owner.name, "moves"
+        print "\n\n"
+        print self.owner.The(), "moves"
 
-        if self.attackAdjacent():
+        if self.enemyIsVisible() and self.enemyIsInRange():
+            print self.owner.The(), "sees an enemy within range!"
+            self.attackEnemy()
+            return
+        elif self.enemyIsVisible():
+            print self.owner.The(), "can see an enemy!"
+            self.findPathToEnemy()
+            self.walkPath()
             return
         else:
+            print self.owner.The(), "is looking for an enemy"
             if self.findEnemy():
-                self.walkPath()
+                if self.enemyIsInRange():
+                    self.attackEnemy()
+                else:
+                    self.findPathToEnemy()
+                    self.walkPath()
                 return
-#            print self.owner.The(), "gives up and wanders around"
+            print self.owner.The(), "gives up and wanders around"
             self.wander()
             
-    def findEnemy(self):
         
-        visibleCreatures = self.getLevel().getVisibleCreaturesFromTile(self.getTile(), 0)
-        
-        path = self.owner.getPath()
+
+    def enemyIsVisible(self):
         enemy = self.owner.getGoalEnemy()
+        if enemy is None: return False
         
-        # Look around for a new enemy to attack
-        if not enemy:
-            enemy, distance = self.findNewEnemy(visibleCreatures)
-            if distance == 1:
-                self.owner.attack(enemy)
-                return True
-            if not enemy:
-                return False
+        return self.owner.canSeeCreature(enemy)
+                
+    def enemyIsInRange(self):
+        enemy = self.owner.getGoalEnemy()
+        if enemy is None: return False
         
+        if enemy and self.owner.distance(enemy) <= self.owner.getAttackRange():
+            return True
+        else:
+            return False
+    
+    def attackEnemy(self):
+        self.owner.attack(self.owner.getGoalEnemy())
+        
+    def findPathToEnemy(self):
         # See if we need to recalculate the path
-        if path and not len(path) > 0 and (enemy.getTile() is self.owner.getGoalTile()):
+        if self.path and not len(self.path) > 0 and (self.owner.getGoalEnemy().getTile() is self.owner.getGoalTile()):
 #            print self.owner.The(), "follows the path"
             return True
-            
+        
         # If we need to recalculate, set up the goal tile
-        if not (enemy.getTile() is self.owner.getGoalTile()):
-#            print self.owner.The(), "needs to recompute a path to the enemy"
-            self.owner.setGoalTile(enemy.getTile())
-            distance = self.owner.distance(enemy)
-            if distance == 1:
-                self.owner.attack(enemy)
-                return True
+        goalTile = self.owner.getGoalEnemy().getTile()
+        self.owner.setGoalTile(goalTile)
         
         # Calculate the new path
-#        print self.owner.The(), "is computing a path to the enemy"
-        goalTile = self.owner.getGoalTile()
+        print self.owner.The(), "is finding a path from", (self.getTile().getXY()), "to", (goalTile.getXY())
         if goalTile:
-            path = self.getLevel().getPathToTile(self.getTile(), goalTile)
-            
-#            if path and not libtcod.path_is_empty(path):
-            if path and len(path) > 0:
-                self.owner.setPath(path)
+            self.path = self.getLevel().getPathToTile(self.getTile(), goalTile)
+            if self.path and len(self.path) > 0:
+                print "Path:", self.path
                 return True
             else:
 #                print self.owner.The(), "can't find a path to the enemy"
                 return False
-    
         else:
 #            print self.owner.The(), "has no goal tile"
             return False
-                
+            
+    def findEnemy(self):
+        # Look around for a new enemy to attack
+        visibleCreatures = self.getLevel().getVisibleCreaturesFromTile(self.getTile())
+        
+        enemy = self.findNewEnemy(visibleCreatures)
+        if not enemy:
+            return False
 
+        return True
+    
+    def findNewEnemy(self, visibleCreatures):
+#        print self.owner.The(), "is looking for an enemy"
+        nearestEnemy = None
+        nearestEnemyDistance = None
+        
+        for cr in visibleCreatures:
+            if cr.getCreatureType() in self.owner.getHateList():
+                dist = self.owner.distance(cr)
+                
+                if dist < nearestEnemyDistance or nearestEnemyDistance is None:
+                    nearestEnemyDistance = dist
+                    nearestEnemy = cr
+                    self.owner.setGoalEnemy(cr)
+                    
+        return nearestEnemy
 
 class NeutralAI(AI):
     def takeTurn(self):

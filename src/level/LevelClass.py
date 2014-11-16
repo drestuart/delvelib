@@ -432,18 +432,20 @@ class Level(MapBase):
         if (radius == 0 or self.distance(fromTile, toTile) <= radius) and self.FOVMap.isVisible(tox, toy):
             return True
         return False
+    
+    def isTileInFOV(self, fromTile, toTile, radius = C.PLAYER_VISION_RADIUS):
+        return self.isInFOV(fromTile.getX(), fromTile.getY(), toTile.getX(), toTile.getY(), radius)
         
     def getVisibleCreaturesFromTile(self, fromTile, radius = C.PLAYER_VISION_RADIUS):
         
-        fromx, fromy = fromTile.getXY()
         thisCreature = fromTile.getCreature()
         retArray = []
         
         for creature in self.creatures:
             if creature is thisCreature: continue
             
-            creaturex, creaturey = creature.getTile().getXY()
-            if creature and creature.isVisible() and self.isInFOV(fromx, fromy, creaturex, creaturey):
+            creatureTile = creature.getTile()
+            if creature.isVisible() and self.isTileInFOV(fromTile, creatureTile, radius):
                 retArray.append(creature)
             
         return retArray

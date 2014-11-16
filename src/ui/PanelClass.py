@@ -346,7 +346,7 @@ class MapPanel(Panel):
             if tile is None:
                 return ''
             elif self.level.isInFOV(player.getX(), player.getY(), mapx, mapy):
-                return tile.getDescription()
+                return tile.getDescription() + " " + str((tile.getXY()))+ " " + str(self.level.astar.getMovable(*tile.getXY()))
             else:
                 return ''
         else:

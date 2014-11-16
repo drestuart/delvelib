@@ -39,7 +39,9 @@ class Creature(colors.withColor, Base):
         self.visible = kwargs.get('visible', True)
         self.AIClass = kwargs['AIClass']
         self.AIClassName = kwargs['AIClass'].__name__
-        self.AI = None
+        
+        self.AI = self.AIClass()
+        self.AI.setOwner(self)
 
         self.load()
         
@@ -74,13 +76,8 @@ class Creature(colors.withColor, Base):
                        'polymorphic_identity': 'creature'}
     
     def load(self):
-        self.AIClass = None
-        self.AI = None
-        self.path = None
         self.hateList = ['player']
         
-        self.initializeAI()
-    
     def getInventory(self):
         return self.inventory
     
@@ -210,18 +207,7 @@ class Creature(colors.withColor, Base):
     def setSymbol(self, value):
         self.symbol = value
         
-    def initializeAI(self):
-        if self.AIClassName and not self.__dict__.get('AIClass'):
-            self.AIClass = AI.getAIClassByName(self.AIClassName)
-        else:
-            self.AIClassName = self.AIClass.__name__
-        
-        self.AI = self.AIClass()
-        self.AI.setOwner(self)
-        
     def takeTurn(self):
-        if not self.__dict__.get('AI'):
-            self.initializeAI()
         self.AI.takeTurn()
         
     def getGoalTile(self):
@@ -253,19 +239,14 @@ class Creature(colors.withColor, Base):
     def setGoalEnemyId(self, value):
         self.goalEnemyId = value
 
-    def getPath(self):
-        if not self.__dict__.get('path'):
-            self.path = None
-        return self.path
-
-    def setPath(self, value):
-        self.path = value
-
     def getHateList(self):
         return self.hateList
 
     def setHateList(self, value):
         self.hateList = value
+        
+    def canSeeCreature(self, creature):
+        return self.level.isTileInFOV(self.getTile(), creature.getTile())
         
     def attack(self, enemy):
         damage = self.getAttackDamage()
@@ -282,6 +263,9 @@ class Creature(colors.withColor, Base):
         # A highly sophisticated algorithm, taking into account material properties,
         # the creature's lever arm, and the local wind speed
         return 2
+    
+    def getAttackRange(self):
+        return 1
         
     def the(self):
         return "the " + self.getName()
