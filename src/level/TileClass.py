@@ -91,24 +91,25 @@ class TileBase(colors.withBackgroundColor, Base):
         return self.x, self.y
     
     def placeCreature(self, creature):
-        if (not self.blocksMove()) and (not self.creature):
-            oldTile = creature.getTile()
-            if oldTile:
-                oldTile.removeCreature()
-                pub.sendMessage("event.removedCreature", tile = oldTile, creature = creature)
-            
-            self.creature = creature
-            self.creature.setTile(self)
-            pub.sendMessage("event.addedCreature", tile = self, creature = creature)
-            return True
-        
-        else:
+        if self.blocksMove():
             return False
+        
+        oldTile = creature.getTile()
+        if oldTile:
+            oldTile.removeCreature()
+        
+        self.creature = creature
+        self.creature.setTile(self)
+        pub.sendMessage("event.addedCreature", tile = self, creature = creature)
+        return True
+        
         
     def removeCreature(self):
         if self.creature:
-            self.creature.setTile(None)
+            creature = self.creature
+            creature.setTile(None)
             self.creature = None
+            pub.sendMessage("event.removedCreature", tile = self, creature = creature)
             return True
         
         else:
@@ -195,7 +196,7 @@ class Tile(TileBase):
         # Determine whether creatures can see through this square.
         
         if self.creature:
-            #Blocked by creature.  All creatures block movement
+            # Blocked by creature.  All creatures block movement
             return True 
         
         blocks = self.blockMove

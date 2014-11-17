@@ -84,7 +84,8 @@ class AggressiveAI(AI):
             dy = y - self.owner.getY()
             
             if not self.owner.move(dx, dy):
-                print self.owner.The(), "is stuck!"
+                pass
+#                 print self.owner.The(), "is stuck!"
     
     def getLevel(self):
         return self.owner.getLevel()
@@ -102,20 +103,20 @@ class AggressiveAI(AI):
         return False
     
     def takeTurn(self):
-        print "\n\n"
-        print self.owner.The(), "moves"
+#         print "\n\n"
+#         print self.owner.The(), "moves"
 
         if self.enemyIsVisible() and self.enemyIsInRange():
-            print self.owner.The(), "sees an enemy within range!"
+#             print self.owner.The(), "sees an enemy within range!"
             self.attackEnemy()
             return
         elif self.enemyIsVisible():
-            print self.owner.The(), "can see an enemy!"
+#             print self.owner.The(), "can see an enemy!"
             self.findPathToEnemy()
             self.walkPath()
             return
         else:
-            print self.owner.The(), "is looking for an enemy"
+#             print self.owner.The(), "is looking for an enemy"
             if self.findEnemy():
                 if self.enemyIsInRange():
                     self.attackEnemy()
@@ -149,7 +150,6 @@ class AggressiveAI(AI):
     def findPathToEnemy(self):
         # See if we need to recalculate the path
         if self.path and not len(self.path) > 0 and (self.owner.getGoalEnemy().getTile() is self.owner.getGoalTile()):
-#            print self.owner.The(), "follows the path"
             return True
         
         # If we need to recalculate, set up the goal tile
@@ -157,17 +157,15 @@ class AggressiveAI(AI):
         self.owner.setGoalTile(goalTile)
         
         # Calculate the new path
-        print self.owner.The(), "is finding a path from", (self.getTile().getXY()), "to", (goalTile.getXY())
+#         print self.owner.The(), "is finding a path from", (self.getTile().getXY()), "to", (goalTile.getXY())
         if goalTile:
             self.path = self.getLevel().getPathToTile(self.getTile(), goalTile)
             if self.path and len(self.path) > 0:
-                print "Path:", self.path
+#                 print "Path:", self.path
                 return True
             else:
-#                print self.owner.The(), "can't find a path to the enemy"
                 return False
         else:
-#            print self.owner.The(), "has no goal tile"
             return False
             
     def findEnemy(self):

@@ -102,8 +102,8 @@ class Creature(colors.withColor, Base):
         if not tile.hasClosedDoor():
             raise Exception("Trying to open an open or non-existent door")
         
-        tile.getFeature().open()
-        message = self.The() + " opens a door " . str(tile.getXY())
+        tile.getFeature().open_()
+        message = self.The() + " opens a door " + str(tile.getXY())
         G.message(message)
         return True
         
