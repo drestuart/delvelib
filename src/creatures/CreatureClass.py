@@ -218,8 +218,12 @@ class Creature(colors.withColor, Base):
 #        if oldGoal:
 #            oldGoal.setGoalTileOf(None)
         
-#        self.goalTile = newTile
-        newTile.setGoalTileOf(self)
+        self.goalTile = newTile
+        if newTile is not None:
+            newTile.setGoalTileOf(self)
+            print "Setting goal tile to", (newTile.getXY())
+        else:
+            print "Setting goal tile to None"
         
     def distance(self, other):
         return self.getTile().distance(other.getTile())
@@ -230,14 +234,8 @@ class Creature(colors.withColor, Base):
     def getGoalEnemy(self):
         return self.goalEnemy
 
-    def getGoalEnemyId(self):
-        return self.goalEnemyId
-
     def setGoalEnemy(self, value):
         self.goalEnemy = value
-
-    def setGoalEnemyId(self, value):
-        self.goalEnemyId = value
 
     def getHateList(self):
         return self.hateList
