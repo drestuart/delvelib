@@ -143,6 +143,11 @@ class MessagePanel(Panel):
     
     
     def setSingleMessage(self, message=''):
+        # Fix to keep long messages from spilling over
+        # TODO: something smarter
+        if len(message) > self.width:
+            message = message[:self.width]
+        
         if message != self.singleMessage:
             self.singleMessageClear()
             self.singleMessage = message.ljust(self.width)
@@ -346,7 +351,7 @@ class MapPanel(Panel):
             if tile is None:
                 return ''
             elif self.level.isInFOV(player.getX(), player.getY(), mapx, mapy):
-                return tile.getDescription() + " " + str((tile.getXY()))+ " " + str(self.level.astar.getMovable(*tile.getXY()))
+                return tile.getDescription()# + " " + str((tile.getXY()))+ " " + str(self.level.astar.getMovable(*tile.getXY()))
             else:
                 return ''
         else:
