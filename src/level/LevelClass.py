@@ -74,6 +74,23 @@ class MapBase(Base):
     # Default behavior for e.g. the world map
     def isInFOV(self, fromx, fromy, tox, toy, radius = C.PLAYER_VISION_RADIUS):
         return True
+    
+    def getLivingCreatures(self):
+        deadCreatures = []
+        
+        for cr in self.creatures:
+            if cr.isDead():
+                deadCreatures.append(cr)
+                
+        # Remove dead creatures
+        for cr in deadCreatures:
+            cr.getTile().removeCreature()
+            self.creatures.remove(cr)
+            
+        return self.creatures
+    
+    def computeFOVProperties(self, force = False):
+        pass
 
 class Level(MapBase):
     '''A class that models a map as an array of tiles.'''
@@ -155,20 +172,6 @@ class Level(MapBase):
             pub.subscribe(self.handleDoorOpen, "event.doorOpen")
             pub.subscribe(self.handleDoorClose, "event.doorClose")
 
-    def getLivingCreatures(self):
-        deadCreatures = []
-        
-        for cr in self.creatures:
-            if cr.isDead:
-                deadCreatures.append(cr)
-                
-        # Remove dead creatures
-        for cr in deadCreatures:
-            cr.getTile().removeCreature()
-            self.creatures.remove(cr)
-            
-        return self.creatures
-    
     def buildTileArray(self):
         self.tileArray = []
         

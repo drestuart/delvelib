@@ -34,7 +34,7 @@ class Creature(colors.withColor, Base):
         self.maxHP = kwargs['maxHP']
         self.hp = kwargs['maxHP']
         self.damageTaken = kwargs.get('damageTaken', 0)
-        self.isDead = False
+        self.dead = False
         
         self.visible = kwargs.get('visible', True)
         self.AIClass = kwargs['AIClass']
@@ -57,7 +57,7 @@ class Creature(colors.withColor, Base):
     
     maxHP = Column(Integer)
     damageTaken = Column(Integer)
-    isDead = Column(Boolean)
+    dead = Column(Boolean)
     
     goalEnemy = relationship("Creature", uselist=False)
     goalEnemyId = Column(Integer, ForeignKey('creatures.id'))
@@ -156,19 +156,16 @@ class Creature(colors.withColor, Base):
         G.message(message)
         print message
         
-        self.isDead = True
+        self.dead = True
             
     def getHP(self):
         return self.hp
 
-
     def getName(self):
         return self.name
 
-
     def getDescription(self):
         return self.description
-
 
     def getSpecies(self):
         return self.species
@@ -197,6 +194,9 @@ class Creature(colors.withColor, Base):
 
     def isVisible(self):
         return self.visible
+    
+    def isDead(self):
+        return self.dead
 
     def setVisible(self, value):
         self.visible = value
