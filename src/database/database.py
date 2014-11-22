@@ -17,7 +17,7 @@ __all__ = ["Database", "DATA_DIR", "static", "SAVE_DIR", "saveDB"]
 
 DATA_DIR = os.path.abspath("data")
 SAVE_DIR = os.path.abspath("save")
-DB_STR = 'sqlite:///'
+DB_STR = 'sqlite+pysqlite:///'
 
 class NotInitializedException(Exception):
     def __init__(self, value):
