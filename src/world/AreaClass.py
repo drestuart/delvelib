@@ -7,7 +7,7 @@ Created on Jan 28, 2014
 from enum import Enum, unique
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import String, Integer
+from sqlalchemy.types import Unicode, Integer
 
 import database as db
 
@@ -25,7 +25,7 @@ class Area(Base):
         self.levels = []
     
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(Unicode)
     
     levels = relationship("Level", backref=backref("area", uselist=False), 
                           primaryjoin="Area.id==Level.areaId")
@@ -37,7 +37,7 @@ class Area(Base):
                           primaryjoin="MapTile.connectedAreaId==Area.id")
     mapTileId = Column(Integer, ForeignKey("map_tiles.id", use_alter = True, name="map_tile_fk"))
     
-    areaType = Column(String)
+    areaType = Column(Unicode)
     
     __mapper_args__ = {'polymorphic_on': areaType,
                        'polymorphic_identity': 'area'}

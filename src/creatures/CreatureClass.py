@@ -6,7 +6,7 @@ Created on Mar 13, 2013
 
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
-from sqlalchemy.types import String, Integer, Boolean
+from sqlalchemy.types import Unicode, Integer, Boolean
 import AIClass as AI
 import colors
 import database as db
@@ -50,10 +50,10 @@ class Creature(colors.withColor, Base):
 
     id = Column(Integer, primary_key=True, unique=True)
     
-    symbol = Column(String(length=1, convert_unicode = True))
+    symbol = Column(Unicode(length=1))
     
-    name = Column(String)
-    creatureType = Column(String)
+    name = Column(Unicode)
+    creatureType = Column(Unicode)
     
     maxHP = Column(Integer)
     damageTaken = Column(Integer)
@@ -70,7 +70,7 @@ class Creature(colors.withColor, Base):
     
     visible = Column(Boolean)
     
-    AIClassName = Column(String)
+    AIClassName = Column(Unicode)
     
     __mapper_args__ = {'polymorphic_on': creatureType,
                        'polymorphic_identity': 'creature'}

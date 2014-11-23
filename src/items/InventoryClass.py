@@ -7,7 +7,7 @@ Created on May 17, 2012
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Integer, String
+from sqlalchemy.types import Integer, Unicode
 import ItemClass as I
 import colors
 import database as db
@@ -29,7 +29,7 @@ class Inventory(Base):
     
     id = Column(Integer, primary_key=True)
     items = relationship("Item", backref=backref("container", uselist=False), primaryjoin="Inventory.id == Item.containerId")
-    inventoryType = Column(String)
+    inventoryType = Column(Unicode)
     
     # If this inventory belongs to an item
     containingItemId = Column(Integer, ForeignKey("items.id", use_alter=True, name='containing_item_fk'))

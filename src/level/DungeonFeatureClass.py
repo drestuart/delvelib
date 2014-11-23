@@ -6,7 +6,7 @@ Created on Mar 12, 2013
 
 from pubsub import pub
 from sqlalchemy.schema import Column
-from sqlalchemy.types import String, Integer, Boolean
+from sqlalchemy.types import Unicode, Integer, Boolean
 
 import colors
 import database as db
@@ -33,12 +33,12 @@ class DungeonFeature(colors.withBackgroundColor, Base):
         
         
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-    symbol = Column(String(length=1, convert_unicode = True))
+    name = Column(Unicode)
+    symbol = Column(Unicode(length=1))
     
     tileId = Column(Integer)
     visible = Column(Boolean)
-    featureType = Column(String)
+    featureType = Column(Unicode)
     
     __mapper_args__ = {'polymorphic_on': featureType,
                        'polymorphic_identity': 'feature'}

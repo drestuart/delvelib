@@ -6,7 +6,7 @@ Created on Mar 10, 2013
 
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import String, Integer, Boolean
+from sqlalchemy.types import Unicode, Integer, Boolean
 import database as db
 import TileClass as T
 

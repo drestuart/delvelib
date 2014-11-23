@@ -9,7 +9,7 @@ import random
 from pubsub import pub
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import String, Integer
+from sqlalchemy.types import Unicode, Integer
 
 import AStar
 import Const as C
@@ -45,10 +45,10 @@ class MapBase(Base):
             raise ValueError("Map class constructor requires width and height values")
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String)
+    name = Column(Unicode)
     width = Column(Integer)
     height = Column(Integer)
-    levelType = Column(String)
+    levelType = Column(Unicode)
     
     __mapper_args__ = {'polymorphic_on': levelType,
                        'polymorphic_identity': 'level'}

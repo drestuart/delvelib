@@ -5,7 +5,7 @@ Created on Mar 10, 2013
 '''
 
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import String, Integer, Float
+from sqlalchemy.types import Unicode, Integer, Float
 import colors
 import database as db
 from randomChoice import weightedChoice
@@ -45,10 +45,10 @@ class Item(colors.withColor, Base):
 
     id = Column(Integer, primary_key=True)
     weight = Column(Float)
-    itemType = Column(String)
-    material = Column(String)
+    itemType = Column(Unicode)
+    material = Column(Unicode)
     
-    symbol = Column(String(length=1, convert_unicode = True))
+    symbol = Column(Unicode(length=1))
     
     quantity = Column(Integer)
 

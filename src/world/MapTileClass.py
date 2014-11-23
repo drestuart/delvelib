@@ -5,7 +5,7 @@ Created on Feb 25, 2014
 '''
 
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import String, Integer
+from sqlalchemy.types import Unicode, Integer
 from sqlalchemy.orm import relationship, backref
 from symbols import dungeonSymbol
 from AreaClass import DungeonStatus
@@ -41,13 +41,13 @@ class MapTile(TileBase):
     
     regionId = Column(Integer, ForeignKey("regions.id"))
     worldMapId = Column(Integer, ForeignKey("levels.id", use_alter = True, name="world_map_fk"))
-    name = Column(String)
+    name = Column(Unicode)
     
     waterTile = False
     terrainType = L.WildernessLevel
     areaType = Area
     
-    tileType = Column(String)
+    tileType = Column(Unicode)
     
     __mapper_args__ = {'polymorphic_identity': 'maptile'}
     

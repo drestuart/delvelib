@@ -7,7 +7,7 @@ Created on Mar 10, 2013
 from pubsub import pub
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import String, Integer, Boolean
+from sqlalchemy.types import Unicode, Integer, Boolean
 import Util as U
 import colors
 import database as db
@@ -45,14 +45,14 @@ class TileBase(colors.withBackgroundColor, Base):
     creatureId = Column(Integer, ForeignKey('creatures.id'))
     creature = relationship("Creature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.creatureId == Creature.id")
     
-    tileType = Column(String)
+    tileType = Column(Unicode)
 
     blockMove = Column(Boolean)
 
-    baseSymbol = Column(String(length=1, convert_unicode = True))
-    baseDescription = Column(String)
+    baseSymbol = Column(Unicode(length=1))
+    baseDescription = Column(Unicode)
 
-    tileType = Column(String)
+    tileType = Column(Unicode)
 
     __mapper_args__ = {'polymorphic_on': tileType,
                        'polymorphic_identity': 'tileBase'}
@@ -146,7 +146,7 @@ class Tile(TileBase):
     blockSight = Column(Boolean)
     explored = Column(Boolean)
     
-    lastSeenSymbol = Column(String(length=1, convert_unicode = True))
+    lastSeenSymbol = Column(Unicode(length=1))
     
 #    level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
     levelId = Column(Integer, ForeignKey("levels.id"))

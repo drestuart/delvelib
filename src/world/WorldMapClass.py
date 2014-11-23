@@ -6,7 +6,7 @@ Created on Feb 26, 2014
 
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import String, Integer
+from sqlalchemy.types import Unicode, Integer
 
 import LevelClass as L
 import Util as U
@@ -29,9 +29,9 @@ class Region(Base):
 
 #     worldMapId = Column(Integer, ForeignKey("world_map.id"))
     worldMapId = Column(Integer, ForeignKey("levels.id"))
-    name = Column(String)
+    name = Column(Unicode)
     mapTiles = relationship("MapTile", backref=backref("region", uselist=False), primaryjoin="Region.id==MapTile.regionId")
-    regionType = Column(String)
+    regionType = Column(Unicode)
     
     __mapper_args__ = {'polymorphic_on': regionType,
                        'polymorphic_identity': 'region'}
@@ -66,10 +66,10 @@ class WorldMap(L.MapBase):
         self.load()
     
 #     id = Column(Integer, ForeignKey('levels.id'), primary_key=True, autoincrement=True)
-#     name = Column(String)
+#     name = Column(Unicode)
 #     width = Column(Integer)
 #     height = Column(Integer)
-#     levelType = Column(String)
+#     levelType = Column(Unicode)
     
     __mapper_args__ = {#'polymorphic_on': levelType,
                       'polymorphic_identity':'world_map',
