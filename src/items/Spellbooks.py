@@ -15,7 +15,7 @@ def getRandomSpellbook():
 
 class ObligatoryFireballSpellbook(I.Spellbook):
     
-    __mapper_args__ = {'polymorphic_identity':'obligatory_fireball_spellbook'}
+    __mapper_args__ = {'polymorphic_identity':u'obligatory_fireball_spellbook'}
     color = colors.colorLeather
     description = "spellbook of Obligatory Fireball"
     

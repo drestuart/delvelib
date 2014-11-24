@@ -15,7 +15,7 @@ def getRandomWeapon():
 
 class Longsword(I.Weapon):
     
-    __mapper_args__ = {'polymorphic_identity':'longsword'}
+    __mapper_args__ = {'polymorphic_identity':u'longsword'}
     
     color = colors.colorSteel
     description = "longsword"

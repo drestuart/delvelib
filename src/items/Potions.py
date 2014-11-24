@@ -15,7 +15,7 @@ def getRandomPotion():
 
 class PettyHealingPotion(I.Potion):
     
-    __mapper_args__ = {'polymorphic_identity':'petty_healing_potion'}
+    __mapper_args__ = {'polymorphic_identity':u'petty_healing_potion'}
     color = colors.lightBlue
     description = "potion of petty healing"
     
@@ -25,7 +25,7 @@ class PettyHealingPotion(I.Potion):
         
 class ModerateHealingPotion(I.Potion):
     
-    __mapper_args__ = {'polymorphic_identity':'moderate_healing_potion'}
+    __mapper_args__ = {'polymorphic_identity':u'moderate_healing_potion'}
     color = colors.blue
     description = "potion of moderate healing"
     
@@ -35,7 +35,7 @@ class ModerateHealingPotion(I.Potion):
 
 class ColossalHealingPotion(I.Potion):
     
-    __mapper_args__ = {'polymorphic_identity':'colossal_healing_potion'}
+    __mapper_args__ = {'polymorphic_identity':u'colossal_healing_potion'}
     color = colors.darkBlue
     description = "potion of colossal healing"
     
@@ -45,7 +45,7 @@ class ColossalHealingPotion(I.Potion):
         
 class PoisonPotion(I.Potion):
     
-    __mapper_args__ = {'polymorphic_identity':'poison_potion'}
+    __mapper_args__ = {'polymorphic_identity':u'poison_potion'}
     color = colors.red
     description = "potion of poison"
     

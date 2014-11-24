@@ -38,7 +38,7 @@ class Creature(colors.withColor, Base):
         
         self.visible = kwargs.get('visible', True)
         self.AIClass = kwargs['AIClass']
-        self.AIClassName = kwargs['AIClass'].__name__
+        self.AIClassName = unicode(kwargs['AIClass'].__name__)
         
         self.AI = self.AIClass()
         self.AI.setOwner(self)
@@ -73,7 +73,7 @@ class Creature(colors.withColor, Base):
     AIClassName = Column(Unicode)
     
     __mapper_args__ = {'polymorphic_on': creatureType,
-                       'polymorphic_identity': 'creature'}
+                       'polymorphic_identity': u'creature'}
     
     def load(self):
         self.hateList = ['player']
@@ -296,9 +296,9 @@ class Orc(Creature):
     description = 'a hideous orc'
     
     def __init__(self, **kwargs):
-        super(Orc, self).__init__(symbol = 'o', name = 'orc', maxHP = 4, AIClass = AI.AggressiveAI, **kwargs)
+        super(Orc, self).__init__(symbol = u'o', name = u'orc', maxHP = 4, AIClass = AI.AggressiveAI, **kwargs)
     
-    __mapper_args__ = {'polymorphic_identity': 'orc'}
+    __mapper_args__ = {'polymorphic_identity': u'orc'}
 
 
     

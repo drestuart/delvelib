@@ -19,11 +19,11 @@ class Player(Cr.Creature):
     species = 'player'
 
     def __init__(self, **kwargs):
-        super(Player, self).__init__(symbol = '@', name="player",
+        super(Player, self).__init__(symbol = u'@', name=u"player",
                                      AIClass = AI.PlayerAI, maxHP=10, **kwargs)
         
         
-    __mapper_args__ = {'polymorphic_identity': 'player'}
+    __mapper_args__ = {'polymorphic_identity': u'player'}
     
     id = Column(Integer, ForeignKey('creatures.id'), primary_key=True)
     

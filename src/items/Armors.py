@@ -15,7 +15,7 @@ def getRandomArmor():
 
 class Breastplate(I.Armor):
     
-    __mapper_args__ = {'polymorphic_identity':'breastplate'}
+    __mapper_args__ = {'polymorphic_identity':u'breastplate'}
     color = colors.colorSteel
     description = "breastplate"
     

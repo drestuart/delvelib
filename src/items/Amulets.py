@@ -15,7 +15,7 @@ def getRandomAmulet():
 
 class LuckAmulet(I.Amulet):
     
-    __mapper_args__ = {'polymorphic_identity':'luck_amulet'}
+    __mapper_args__ = {'polymorphic_identity':u'luck_amulet'}
     color = colors.red
     description = "amulet of luck"
     

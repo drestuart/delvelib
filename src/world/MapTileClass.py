@@ -49,7 +49,7 @@ class MapTile(TileBase):
     
     tileType = Column(Unicode)
     
-    __mapper_args__ = {'polymorphic_identity': 'maptile'}
+    __mapper_args__ = {'polymorphic_identity': u'maptile'}
     
     def remove(self):
         self.worldMap = None

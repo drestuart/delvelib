@@ -36,7 +36,7 @@ class MapBase(Base):
     def __init__(self, **kwargs):
         self.creatures = []
 
-        self.name = kwargs.get('name', "")
+        self.name = kwargs.get('name', u"")
 
         self.width = kwargs.get('width')
         self.height = kwargs.get('height')
@@ -51,7 +51,7 @@ class MapBase(Base):
     levelType = Column(Unicode)
     
     __mapper_args__ = {'polymorphic_on': levelType,
-                       'polymorphic_identity': 'level'}
+                       'polymorphic_identity': u'map_base'}
     
     def getWidth(self):
         return self.width
@@ -132,7 +132,7 @@ class Level(MapBase):
     entryPointX = Column(Integer)
     entryPointY = Column(Integer)
     
-    __mapper_args__ = {'polymorphic_identity': 'level',
+    __mapper_args__ = {'polymorphic_identity': u'level',
                        'concrete':True}
 
     
@@ -654,7 +654,7 @@ def connectLevels(upper, lower):
 class DungeonLevel(Level):
     '''A Level subclass for modeling one dungeon level.  Includes functionality for passing time and level construction.'''
     
-    __mapper_args__ = {'polymorphic_identity': 'dungeon level'}
+    __mapper_args__ = {'polymorphic_identity': u'dungeon level'}
 
     defaultFloorType = T.StoneFloor
     defaultWallType = T.StoneWall
@@ -816,7 +816,7 @@ class DungeonLevel(Level):
 
 class CaveLevel(Level):
     
-    __mapper_args__ = {'polymorphic_identity': 'cave level'}
+    __mapper_args__ = {'polymorphic_identity': u'cave level'}
     
     defaultFloorType = T.RockTunnel
     defaultWallType = T.RockWall
@@ -916,7 +916,7 @@ class CaveLevel(Level):
 
 class TownLevel(DungeonLevel):
     
-    __mapper_args__ = {'polymorphic_identity': 'town level'}
+    __mapper_args__ = {'polymorphic_identity': u'town level'}
     
     def __init__(self, **kwargs):
         self.tilesWide = kwargs['tilesWide']
@@ -980,7 +980,7 @@ class TownLevel(DungeonLevel):
 
 
 class WildernessLevel(Level):
-    __mapper_args__ = {'polymorphic_identity': 'wilderness level'}
+    __mapper_args__ = {'polymorphic_identity': u'wilderness level'}
     
     defaultFloorType = T.GrassFloor
     buildingWallType = T.StoneWall

@@ -15,7 +15,7 @@ def getRandomWand():
 
 class LightningWand(I.Wand):
     
-    __mapper_args__ = {'polymorphic_identity':'lightning_wand'}
+    __mapper_args__ = {'polymorphic_identity':u'lightning_wand'}
     color = colors.colorSteel
     description = "wand of lightning"
     

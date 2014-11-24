@@ -38,7 +38,7 @@ class Inventory(Base):
     
     __mapper_args__ = {
         'polymorphic_on':inventoryType,
-        'polymorphic_identity':'inventory'
+        'polymorphic_identity':u'inventory'
     }
     
     

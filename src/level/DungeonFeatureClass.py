@@ -41,7 +41,7 @@ class DungeonFeature(colors.withBackgroundColor, Base):
     featureType = Column(Unicode)
     
     __mapper_args__ = {'polymorphic_on': featureType,
-                       'polymorphic_identity': 'feature'}
+                       'polymorphic_identity': u'feature'}
 
     def handleBump(self, creature):
         return False
@@ -111,7 +111,7 @@ class Door(DungeonFeature):
 
     closed = Column(Boolean)
     
-    __mapper_args__ = {'polymorphic_identity': 'door'}
+    __mapper_args__ = {'polymorphic_identity': u'door'}
 
 
     def open_(self):
@@ -171,7 +171,7 @@ class Stair(DungeonFeature):
         self.blockMove = False
         self.blockSight = False
     
-    __mapper_args__ = {'polymorphic_identity': 'Stair'}
+    __mapper_args__ = {'polymorphic_identity': u'Stair'}
     
     def getDestination(self):
         return self.destination
@@ -191,7 +191,7 @@ class upStair(Stair):
         
         self.destination = kwargs.get('destination', None)
         
-    __mapper_args__ = {'polymorphic_identity': 'upStair'}
+    __mapper_args__ = {'polymorphic_identity': u'upStair'}
  
     blockMove = False
     blockSight = False
@@ -213,7 +213,7 @@ class downStair(Stair):
         
         self.destination = kwargs.get('destination', None)
         
-    __mapper_args__ = {'polymorphic_identity': 'downStair'}
+    __mapper_args__ = {'polymorphic_identity': u'downStair'}
     
     blockMove = False
     blockSight = False
@@ -236,7 +236,7 @@ class Altar(DungeonFeature):
     blockMove = False
     blockSight = False
         
-    __mapper_args__ = {'polymorphic_identity': 'altar'}
+    __mapper_args__ = {'polymorphic_identity': u'altar'}
     
 class Statue(DungeonFeature):
     color = colors.colorStone
@@ -249,7 +249,7 @@ class Statue(DungeonFeature):
     blockMove = True
     blockSight = False
         
-    __mapper_args__ = {'polymorphic_identity': 'statue'}
+    __mapper_args__ = {'polymorphic_identity': u'statue'}
 
 
 class Tree(DungeonFeature):
@@ -263,4 +263,4 @@ class Tree(DungeonFeature):
     blockMove = True
     blockSight = True
         
-    __mapper_args__ = {'polymorphic_identity': 'tree'}
+    __mapper_args__ = {'polymorphic_identity': u'tree'}

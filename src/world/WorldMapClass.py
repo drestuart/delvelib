@@ -34,7 +34,7 @@ class Region(Base):
     regionType = Column(Unicode)
     
     __mapper_args__ = {'polymorphic_on': regionType,
-                       'polymorphic_identity': 'region'}
+                       'polymorphic_identity': u'region'}
     
     def addTile(self, tile):
         self.mapTiles.append(tile)
@@ -72,7 +72,7 @@ class WorldMap(L.MapBase):
 #     levelType = Column(Unicode)
     
     __mapper_args__ = {#'polymorphic_on': levelType,
-                      'polymorphic_identity':'world_map',
+                      'polymorphic_identity':u'world_map',
 #                       'concrete':True,
                       'with_polymorphic':'*'}
     

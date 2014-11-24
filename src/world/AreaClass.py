@@ -40,7 +40,7 @@ class Area(Base):
     areaType = Column(Unicode)
     
     __mapper_args__ = {'polymorphic_on': areaType,
-                       'polymorphic_identity': 'area'}
+                       'polymorphic_identity': u'area'}
     
     def getLevels(self):
         return self.levels
