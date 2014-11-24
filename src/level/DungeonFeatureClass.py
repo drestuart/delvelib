@@ -21,7 +21,7 @@ class DungeonFeature(colors.withBackgroundColor, Base):
     __tablename__ = "dungeon_features"
     __table_args__ = {'extend_existing': True}
     
-    description = "dungeon feature"
+    description = u"dungeon feature"
     
     def __init__(self, symbol, **kwargs):
         super(DungeonFeature, self).__init__(**kwargs)
@@ -103,10 +103,10 @@ class Door(DungeonFeature):
     
     color = colors.colorWood
     backgroundColor = colors.black
-    description = 'a door'
+    description = u'a door'
     
     def __init__(self, **kwargs):
-        super(Door, self).__init__(symbol = '+', **kwargs)
+        super(Door, self).__init__(symbol = u'+', **kwargs)
         self.closed = True
 
     closed = Column(Boolean)
@@ -144,15 +144,15 @@ class Door(DungeonFeature):
     def setClosed(self, value):
         self.closed = value
         if value:
-            self.symbol = "+"
+            self.symbol = u"+"
         else:
-            self.symbol = "'"
+            self.symbol = u"'"
 
     def getSymbol(self):
         if self.closed:
-            self.symbol = "+"
+            self.symbol = u"+"
         else:
-            self.symbol = "'"
+            self.symbol = u"'"
         return self.symbol
     
     def getBlockSight(self):
@@ -164,7 +164,7 @@ class Door(DungeonFeature):
     
 class Stair(DungeonFeature):
     
-    description = 'a stairway'
+    description = u'a stairway'
     
     def __init__(self, **kwargs):
         super(Stair, self).__init__(**kwargs)
@@ -183,11 +183,11 @@ class Stair(DungeonFeature):
 class upStair(Stair):
     color = colors.colorStone
     backgroundColor = colors.black
-    description = 'a stairway leading up'
+    description = u'a stairway leading up'
     
     def __init__(self, **kwargs):
         
-        super(upStair, self).__init__(symbol = '<', **kwargs)
+        super(upStair, self).__init__(symbol = u'<', **kwargs)
         
         self.destination = kwargs.get('destination', None)
         
@@ -206,10 +206,10 @@ class upStair(Stair):
 class downStair(Stair):
     color = colors.colorStone
     backgroundColor = colors.black
-    description = 'a stairway leading down'
+    description = u'a stairway leading down'
     
     def __init__(self, **kwargs):
-        super(downStair, self).__init__(symbol = '>', **kwargs)
+        super(downStair, self).__init__(symbol = u'>', **kwargs)
         
         self.destination = kwargs.get('destination', None)
         
@@ -228,10 +228,10 @@ class downStair(Stair):
 class Altar(DungeonFeature):
     color = colors.colorStone
     backgroundColor = colors.black
-    description = 'an altar'
+    description = u'an altar'
     
     def __init__(self, **kwargs):
-        super(Altar, self).__init__(symbol = '_', **kwargs)
+        super(Altar, self).__init__(symbol = u'_', **kwargs)
         
     blockMove = False
     blockSight = False
@@ -241,10 +241,10 @@ class Altar(DungeonFeature):
 class Statue(DungeonFeature):
     color = colors.colorStone
     backgroundColor = colors.black
-    description = 'an statue'
+    description = u'a statue'
     
     def __init__(self, **kwargs):
-        super(Statue, self).__init__(symbol = '&', **kwargs)
+        super(Statue, self).__init__(symbol = u'&', **kwargs)
         
     blockMove = True
     blockSight = False
@@ -255,10 +255,10 @@ class Statue(DungeonFeature):
 class Tree(DungeonFeature):
     color = colors.colorTree
     backgroundColor = colors.black
-    description = 'a tree'
+    description = u'a tree'
     
     def __init__(self, **kwargs):
-        super(Tree, self).__init__(symbol = random.choice([symbols.lowerTau, 'T']), **kwargs)
+        super(Tree, self).__init__(symbol = random.choice([symbols.lowerTau, u'T']), **kwargs)
         
     blockMove = True
     blockSight = True

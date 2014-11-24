@@ -20,7 +20,7 @@ class Area(Base):
     hasDungeon = False
 
     def __init__(self, **kwargs):
-        self.name = kwargs.get('name', "")
+        self.name = kwargs.get('name', u"")
         
         self.levels = []
     

@@ -70,7 +70,7 @@ class MName:
             else:
                 name = name + suffix
                 prefix = prefix[1:] + suffix
-        return name.capitalize()  
+        return unicode(name.capitalize())  
 
 # for i in range(100):
 #     print MName().New()
