@@ -15,8 +15,10 @@ Town symbols
 1769    ۩    \u06e9
 
 
-Si symbols
-1758    ۞    # DOOOOOOOOOOOOOOOOOOOOOOOD  # Or for ringfort?
+Si or ringfort symbols
+1758    ۞    # DOOOOOOOOOOOOOOOOOOOOOOOD
+U+2699    ⚙    Awesome gear!
+U+0298    ʘ
 
 
 '''
