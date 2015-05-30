@@ -194,7 +194,7 @@ class Amulet(Item):
     __mapper_args__ = {'polymorphic_identity':u'amulet'}
     
     def __init__(self, **kwargs):
-        super(Amulet, self).__init__(symbol = '"', **kwargs)
+        super(Amulet, self).__init__(symbol = u'"', **kwargs)
 
 class Armor(Item):
     wearable = True
@@ -202,7 +202,7 @@ class Armor(Item):
     __mapper_args__ = {'polymorphic_identity':u'armor'}
     
     def __init__(self, **kwargs):
-        super(Armor, self).__init__(symbol = '[', **kwargs)
+        super(Armor, self).__init__(symbol = u'[', **kwargs)
         
 class Coins(Item):
     stackable = True
@@ -212,7 +212,7 @@ class Coins(Item):
     description = "gold coin"
     
     def __init__(self, **kwargs):
-        super(Coins, self).__init__(symbol = '$', **kwargs)
+        super(Coins, self).__init__(symbol = u'$', **kwargs)
     
 
 class Food(Item):
@@ -221,14 +221,14 @@ class Food(Item):
     __mapper_args__ = {'polymorphic_identity':u'food'}
     
     def __init__(self, **kwargs):
-        super(Food, self).__init__(symbol = '%', **kwargs)
+        super(Food, self).__init__(symbol = u'%', **kwargs)
 
 class Gem(Item):
     
     __mapper_args__ = {'polymorphic_identity':u'gem'}
     
     def __init__(self, **kwargs):
-        super(Gem, self).__init__(symbol = '*', **kwargs)
+        super(Gem, self).__init__(symbol = u'*', **kwargs)
 
 class Potion(Item):
     drinkable = True
@@ -236,7 +236,7 @@ class Potion(Item):
     __mapper_args__ = {'polymorphic_identity':u'potion'}
     
     def __init__(self, **kwargs):
-        super(Potion, self).__init__(symbol = '!', **kwargs)
+        super(Potion, self).__init__(symbol = u'!', **kwargs)
 
 class Ring(Item):
     wearable = True
@@ -244,7 +244,7 @@ class Ring(Item):
     __mapper_args__ = {'polymorphic_identity':u'ring'}
     
     def __init__(self, **kwargs):
-        super(Ring, self).__init__(symbol = '=', **kwargs)
+        super(Ring, self).__init__(symbol = u'=', **kwargs)
 
 class Scroll(Item):
     readable = True
@@ -252,7 +252,7 @@ class Scroll(Item):
     __mapper_args__ = {'polymorphic_identity':u'scroll'}
     
     def __init__(self, **kwargs):
-        super(Scroll, self).__init__(symbol = '?', **kwargs)
+        super(Scroll, self).__init__(symbol = u'?', **kwargs)
         
 class Spellbook(Item):
     readable = True
@@ -260,7 +260,7 @@ class Spellbook(Item):
     __mapper_args__ = {'polymorphic_identity':u'spellbook'}
     
     def __init__(self, **kwargs):
-        super(Spellbook, self).__init__(symbol = '+', **kwargs)
+        super(Spellbook, self).__init__(symbol = u'+', **kwargs)
         
 class Wand(Item):
     zappable = True
@@ -268,7 +268,7 @@ class Wand(Item):
     __mapper_args__ = {'polymorphic_identity':u'wand'}
     
     def __init__(self, **kwargs):
-        super(Wand, self).__init__(symbol = '/', **kwargs)
+        super(Wand, self).__init__(symbol = u'/', **kwargs)
 
 class Weapon(Item):
     wieldable = True
@@ -276,7 +276,7 @@ class Weapon(Item):
     __mapper_args__ = {'polymorphic_identity':u'weapon'}
     
     def __init__(self, **kwargs):
-        super(Weapon, self).__init__(symbol = ')', **kwargs)
+        super(Weapon, self).__init__(symbol = u')', **kwargs)
 
 
 
@@ -322,8 +322,8 @@ def main():
 #    db.saveDB.start(True)
 #    
 #    
-#    item1 = Item(symbol = '!', color = colors.white)
-#    item2 = Item(symbol = '!', color = colors.red)
+#    item1 = Item(symbol = u'!', color = colors.white)
+#    item2 = Item(symbol = u'!', color = colors.red)
 #    
 #    db.saveDB.save(item1)
 #    db.saveDB.save(item2)
