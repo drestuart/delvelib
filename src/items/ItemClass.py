@@ -105,9 +105,10 @@ class Item(colors.withColor, Base):
             return str(self.quantity) + " " + self.getPluralDescription()
         
     def getPluralDescription(self):
-        if self.__class__.pluralDescription:
+        try:
             return self.__class__.pluralDescription
-        return self.description + "s"
+        except AttributeError:
+            return self.description + "s"
 
     def passTime(self, turns):
         pass

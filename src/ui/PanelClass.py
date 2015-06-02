@@ -456,7 +456,10 @@ class MenuPanel(Panel):
         # TODO
 
     def draw(self):
-        
+        # Start by filling in blank background
+        for y in range(self.height):
+            self.putChars(" " * self.width, 0, y, self.defaultFGColor, self.defaultBGColor)
+
         # print top and bottom borders and title
         self.putChars(self.titleLine, 0, 0, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
         self.putChars(self.tbBorder * self.width, 0, self.height - 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
@@ -492,8 +495,6 @@ class MenuPanel(Panel):
                 self.putChars(line, self.margin + 1, y, fgcolor = self.defaultFGColor, bgcolor=bg)
                 y += 1
             
-            
-    
         # Draw shadow
         if self.shadow is not None:
             self.ui.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
