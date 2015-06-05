@@ -20,6 +20,7 @@ import database as db
 import os.path
 import TileClass as T
 import MapTileClass as MT
+import Conversation as Con
 
 
 fontpath = os.path.join("modules", "delvelib", "fonts", "FreeMono.ttf")
@@ -403,6 +404,12 @@ class UI(object):
             return None
         
         return inventory.getItem(index)
+
+    def conversationMenu(self):
+        # Use the test conversation tree
+        tree = Con.testConversationTree
+        conPanel = ConversationPanel(tree)
+        conPanel.doConversation()
         
     def handleKeys(self, key, event, key_mods):
 
@@ -482,7 +489,12 @@ class UI(object):
             elif keyStr == 'i':
                 self.showPlayerInventory()
                 return 'didnt-take-turn'
-            
+
+            # TEST
+            elif keyStr == 't':
+                self.conversationMenu()
+                return 'didnt-take-turn'
+
         else:
             return 'didnt-take-turn'
     

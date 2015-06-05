@@ -384,8 +384,6 @@ class MenuPanel(Panel):
         
         self.titleLine = self.title.center(self.width, self.tbBorder)
         
-        
-        
     def setupOptions(self, options):
         self.options = options
         
@@ -422,6 +420,8 @@ class MenuPanel(Panel):
         self.x = (C.SCREEN_WIDTH - self.width)/2
         self.y = (C.SCREEN_HEIGHT - self.height)/2
         
+        return self.linesToDisplay
+        
     def getSingleChoice(self):
         
         while True:
@@ -456,6 +456,28 @@ class MenuPanel(Panel):
         # TODO
 
     def draw(self):
+        self.setUpWindow()
+
+        # print options
+        y = self.margin + 1
+        for key in sorted(self.linesToDisplay.keys()):
+            if key in self.selected:
+                bg = self.selectedBGColor
+            else:
+                bg = self.defaultBGColor
+            
+            lines = self.linesToDisplay[key]
+            for line in lines:
+                self.putLine(line, y, self.defaultFGColor, bg)
+                y += 1
+            
+        # Draw shadow
+        if self.shadow is not None:
+            self.ui.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
+        
+        self.ui.drawWindow()
+        
+    def setUpWindow(self):
         # Start by filling in blank background
         for y in range(self.height):
             self.putChars(" " * self.width, 0, y, self.defaultFGColor, self.defaultBGColor)
@@ -475,31 +497,19 @@ class MenuPanel(Panel):
             self.putChars(self.lrBorder + " " * self.margin, 0, self.height - 2 - i, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
             # Bottom right
             self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, self.height - 2 - i, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-        
-        # print options, finally
-        y = self.margin + 1
-        for key in sorted(self.linesToDisplay.keys()):
-            if key in self.selected:
-                bg = self.selectedBGColor
-            else:
-                bg = self.defaultBGColor
-            
-            lines = self.linesToDisplay[key]
-            for line in lines:
 
-                # print side borders
-                self.putChars(self.lrBorder + " " * self.margin, 0, y, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-                self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, y, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-                
-                # print text
-                self.putChars(line, self.margin + 1, y, fgcolor = self.defaultFGColor, bgcolor=bg)
-                y += 1
-            
         # Draw shadow
         if self.shadow is not None:
             self.ui.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
+
         
-        self.ui.drawWindow()
+    def putLine(self, line, y, fg, bg):
+        # print side borders
+        self.putChars(self.lrBorder + " " * self.margin, 0, y, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+        self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, y, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+        
+        # print text
+        self.putChars(line, self.margin + 1, y, fgcolor=fg, bgcolor=bg)
         
 class GameMenuPanel(MenuPanel):
     
@@ -559,48 +569,24 @@ class GameMenuPanel(MenuPanel):
         
         
     def draw(self):
-    
-        # print top and bottom borders and title
-        self.putChars(self.titleLine, 0, 0, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-        self.putChars(self.tbBorder * self.width, 0, self.height - 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
+        self.setUpWindow()
         
-        # Draw margin lines
-        for i in range(self.margin):
-            # Side borders
-            # Top left
-            self.putChars(self.lrBorder + " " * self.margin, 0, i + 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-            # Top right
-            self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, i + 1, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-            # Bottom left
-            self.putChars(self.lrBorder + " " * self.margin, 0, self.height - 2 - i, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-            # Bottom right
-            self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, self.height - 2 - i, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-        
-        # print options, finally
+        # print options
         y = self.margin + 1
         for key in sorted(self.linesToDisplay.keys()):
             option = self.options[key]
-            
+            fg = self.disabledFGColor
+            bg = self.defaultBGColor
+
             if key == self.selected:
                 bg = self.selectedBGColor
-            else:
-                bg = self.defaultBGColor
             
             if option['enabled']:
                 fg = self.enabledFGColor
-            else:
-                fg = self.disabledFGColor
-            
-            
+
             lines = self.linesToDisplay[key]
             for line in lines:
-
-                # print side borders
-                self.putChars(self.lrBorder + " " * self.margin, 0, y, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-                self.putChars(" " * self.margin + self.lrBorder, self.width - self.margin - 1, y, fgcolor = self.defaultFGColor, bgcolor = self.defaultBGColor)
-                
-                # print text
-                self.putChars(line, self.margin + 1, y, fgcolor = fg, bgcolor = bg)
+                self.putLine(line, y, fg, bg)
                 y += 1
             
         # Draw shadow
@@ -643,6 +629,50 @@ class GameMenuPanel(MenuPanel):
             elif key in (K_RETURN, K_KP_ENTER, K_COMMA, K_SPACE):
                 return self.options[self.selected]['function']
 
+class ConversationPanel(MenuPanel):
+    
+    def __init__(self, tree, *args, **kwargs):
+        super(ConversationPanel, self).__init__(*args, **kwargs)
+        self.selected = 0
+        self.conversationTree = tree
+        
+    def doConversation(self):
+        pass
+    
+    def draw(self, text, options):
+        # Word wrapping
+        self.setUpWordWrap(text, options)
+        
+        self.setUpWindow()
+        
+        # Draw conversation text for this node
+        y = self.margin + 1
+        for line in self.textLines:
+            self.putLine(line, y, self.defaultFGColor, self.defaultBGColor)
+            y += 1
+
+        y += 1
+
+        # Draw options for this node
+        for key in sorted(self.linesToDisplay.keys()):
+            if key in self.selected:
+                bg = self.selectedBGColor
+            else:
+                bg = self.defaultBGColor
+            
+            lines = self.linesToDisplay[key]
+            for line in lines:
+                self.putLine(line, y, self.defaultFGColor, bg)
+                y += 1
+        
+        self.ui.drawWindow()
+            
+    def setUpWordWrap(self, text, options):
+        # Set up the conversation text
+        self.textLines = textwrap.wrap(text, self.width - 2*(self.margin + 1))
+
+        # Set up the conversation options
+        self.optionLines = self.setupOptions(options)
         
 def main():
     

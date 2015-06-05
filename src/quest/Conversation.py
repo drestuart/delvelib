@@ -5,7 +5,7 @@ Created on Jun 4, 2015
 '''
 
 class ConversationTree(object):
-    def __init__(self, nodes):
+    def __init__(self, nodes = []):
         self.nodes = nodes
         
     def addNode(self, node):
@@ -44,4 +44,6 @@ class ConversationOption(object):
             self.callback()
         else:
             return self.nextNode
-        
+
+# Initialize test object
+testConversationTree = ConversationTree()
