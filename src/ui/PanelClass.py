@@ -16,7 +16,7 @@ import Game as G
 fgdefault = colors.colorMessagePanelFG
 bgdefault = colors.colorMessagePanelBG
 
-__all__ = ["MessagePanel", "CharacterPanel", "MenuPanel", "MapPanel"]
+__all__ = ["MessagePanel", "CharacterPanel", "MenuPanel", "MapPanel", "ConversationPanel"]
 
 class Panel(object):
     def __init__(self, dims, parentUI, margin = 0):
@@ -356,8 +356,7 @@ class MapPanel(Panel):
                 return ''
         else:
             return ''
-            
-        
+
 class MenuPanel(Panel):
     def __init__(self, *args, **kwargs):
         super(MenuPanel, self).__init__((0, 0, kwargs['width'], 0), *args)
@@ -380,7 +379,8 @@ class MenuPanel(Panel):
         self.shadowamount = kwargs.get('shadowamount', 51)
         self.shadowx, self.shadowy = kwargs.get('shadowx', 1), kwargs.get('shadowy', 1)
         
-        self.setupOptions(kwargs['options'])
+        if kwargs.get('options'):
+            self.setupOptions(kwargs['options'])
         
         self.titleLine = self.title.center(self.width, self.tbBorder)
         
@@ -631,48 +631,117 @@ class GameMenuPanel(MenuPanel):
 
 class ConversationPanel(MenuPanel):
     
-    def __init__(self, tree, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(ConversationPanel, self).__init__(*args, **kwargs)
         self.selected = 0
-        self.conversationTree = tree
+        self.conversationTree = kwargs['tree']
         
     def doConversation(self):
-        pass
+        # Start with the first node on the tree
+        self.currentNode = None
+        node = self.conversationTree.getFirstNode()
+        
+        while True:
+            self.draw(node)
+            key, keyStr = self.ui.waitForInput()
+            
+            if key is None:
+                return
+         
+            if key in (K_KP2, K_DOWN, K_j):
+                self.selected += 1
+                if self.selected >= len(node.options):
+                    self.selected = 0
+
+                continue
+            
+            elif key in (K_KP8, K_UP, K_k):
+                self.selected -= 1
+                if self.selected < 0:
+                    self.selected = len(node.options) - 1
+                continue
+            
+            elif key in (K_RETURN, K_KP_ENTER, K_SPACE):
+                selectedOption = node.options[self.selected]
+                if selectedOption.callback:
+                    selectedOption.callback()
+                if selectedOption.nextNode:
+                    node = selectedOption.nextNode
+                    self.selected = 0
+                    continue
+                else:
+                    break
     
-    def draw(self, text, options):
+    def draw(self, node):
         # Word wrapping
-        self.setUpWordWrap(text, options)
-        
+        self.setupPanel(node)
         self.setUpWindow()
-        
+                
         # Draw conversation text for this node
         y = self.margin + 1
         for line in self.textLines:
             self.putLine(line, y, self.defaultFGColor, self.defaultBGColor)
             y += 1
 
+        # Skip a line
+        self.putLine("", y, self.defaultFGColor, self.defaultBGColor)
         y += 1
 
         # Draw options for this node
-        for key in sorted(self.linesToDisplay.keys()):
-            if key in self.selected:
+        for key in sorted(self.optionLines.keys()):
+            if key == self.selected:
                 bg = self.selectedBGColor
             else:
                 bg = self.defaultBGColor
             
-            lines = self.linesToDisplay[key]
+            lines = self.optionLines[key]
             for line in lines:
                 self.putLine(line, y, self.defaultFGColor, bg)
                 y += 1
         
         self.ui.drawWindow()
             
-    def setUpWordWrap(self, text, options):
+    def setupPanel(self, node):
+        # Skip this if we've already set up this node
+        if self.currentNode is node:
+            return
+        
+        self.height = 2*self.margin + 2 + 1 # 2 for the border, 1 for the space between text and opts
+        text, options = node.getTextAndOptions()
+        
         # Set up the conversation text
         self.textLines = textwrap.wrap(text, self.width - 2*(self.margin + 1))
+        self.height += len(self.textLines)
 
-        # Set up the conversation options
-        self.optionLines = self.setupOptions(options)
+        # Set up word wrap for conversation options
+        self.optionLines = {}
+        optNum = 0
+        
+        for opt in options:
+            # Add letters
+            line = '(' + chr(ord('a') + optNum) + ') ' + opt
+            
+            self.optionLines[optNum] = []
+            wrappedLines = textwrap.wrap(line, self.width - 2*(self.margin + 1))
+            linesForOption = 0
+            
+            for wline in wrappedLines:
+                
+                if linesForOption > 0:
+                    wline = ' ' * self.multilineIndent + wline.ljust(self.width - 2*(self.margin + 1) - self.multilineIndent)
+                else:
+                    wline = wline.ljust(self.width - 2*(self.margin + 1))
+                    
+                self.optionLines[optNum].append(wline)
+                self.height += 1
+                linesForOption += 1
+                
+            optNum += 1
+                
+        self.x = (C.SCREEN_WIDTH - self.width)/2
+        self.y = (C.SCREEN_HEIGHT - self.height)/2
+        
+        self.currentNode = node
         
 def main():
     

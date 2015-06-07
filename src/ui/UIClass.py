@@ -20,7 +20,7 @@ import database as db
 import os.path
 import TileClass as T
 import MapTileClass as MT
-import Conversation as Con
+import ConversationClass as Con
 
 
 fontpath = os.path.join("modules", "delvelib", "fonts", "FreeMono.ttf")
@@ -408,7 +408,7 @@ class UI(object):
     def conversationMenu(self):
         # Use the test conversation tree
         tree = Con.testConversationTree
-        conPanel = ConversationPanel(tree)
+        conPanel = ConversationPanel(self, tree=tree, width=C.MENU_WIDTH, title='')
         conPanel.doConversation()
         
     def handleKeys(self, key, event, key_mods):
