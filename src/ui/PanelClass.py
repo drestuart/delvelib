@@ -17,7 +17,7 @@ import pygame
 fgdefault = colors.colorMessagePanelFG
 bgdefault = colors.colorMessagePanelBG
 
-__all__ = ["MessagePanel", "CharacterPanel", "MenuPanel", "MapPanel", "ConversationPanel"]
+__all__ = ["MessagePanel", "CharacterPanel", "MenuWindow", "MapPanel", "ConversationWindow"]
 
 class Panel(object):
     def __init__(self, dims, parentUI, margin = 0):
@@ -358,9 +358,9 @@ class MapPanel(Panel):
         else:
             return ''
 
-class MenuPanel(Panel):
+class MenuWindow(Panel):
     def __init__(self, *args, **kwargs):
-        super(MenuPanel, self).__init__((0, 0, kwargs['width'], 0), *args)
+        super(MenuWindow, self).__init__((0, 0, kwargs['width'], 0), *args)
         
         self.selected = [0]
         
@@ -422,38 +422,54 @@ class MenuPanel(Panel):
         self.y = (C.SCREEN_HEIGHT - self.height)/2
         
         return self.linesToDisplay
+    
+    def getUserInput(self):
+        key, keyStr = self.ui.waitForInput()
         
+        if key is None:
+            return None
+     
+        elif key in (K_KP2, K_DOWN, K_j):
+            return 'down'
+        
+        elif key in (K_KP8, K_UP, K_k):
+            return 'up'
+        
+        elif key in (K_RETURN, K_KP_ENTER, K_COMMA, K_SPACE):
+            return 'select'
+        
+        else:
+            pygame.event.clear()
+            return None
+
     def getSingleChoice(self):
         
         while True:
             self.draw()
-            key, keyStr = self.ui.waitForInput()
+            uinput = self.getUserInput()
             
-            if key is None:
-                return
+            if uinput is None:
+                continue
          
-            if key in (K_KP2, K_DOWN, K_j):
+            elif uinput == 'down':
                 self.selected[0] += 1
                 if self.selected[0] >= len(self.options):
                     self.selected[0] = 0
                 continue
             
-            elif key in (K_KP8, K_UP, K_k):
+            elif uinput == 'up':
                 self.selected[0] -= 1
                 if self.selected[0] < 0:
                     self.selected[0] = len(self.options) - 1
                 continue
             
-            elif key in (K_RETURN, K_KP_ENTER, K_COMMA):
+            elif uinput == 'select':
                 return self.selected[0]
+            
+            # TODO: Add support for selection by key letter
 
             else:
-                pygame.event.clear()
-
-            #convert the ASCII code to an index; if it corresponds to an option, return it
-            index = key - ord('a')
-            if index >= 0 and index < len(self.options): 
-                return index
+                continue
             
     def getMultiChoice(self):
         pass
@@ -515,10 +531,10 @@ class MenuPanel(Panel):
         # print text
         self.putChars(line, self.margin + 1, y, fgcolor=fg, bgcolor=bg)
         
-class GameMenuPanel(MenuPanel):
+class GameMenuWindow(MenuWindow):
     
     def __init__(self, *args, **kwargs):
-        super(GameMenuPanel, self).__init__(*args, **kwargs)
+        super(GameMenuWindow, self).__init__(*args, **kwargs)
         
         self.enabledFGColor = kwargs.get('enabledFGColor', C.MENU_TEXT_COLOR)
         self.disabledFGColor = kwargs.get('disabledFGColor', C.MENU_DISABLED_TEXT_COLOR)
@@ -536,20 +552,20 @@ class GameMenuPanel(MenuPanel):
         for opt in self.options:
             # Data type check
             if not isinstance(opt, dict):
-                raise ValueError("GameMenuPanel options must be dictionaries")
+                raise ValueError("GameMenuWindow options must be dictionaries")
             
             text = opt.get('text')
             enabled = opt.get('enabled')
             function = opt.get('function')
             
             if text is None or not isinstance(text, basestring):
-                raise ValueError("GameMenuPanel options must have 'text' string parameter")
+                raise ValueError("GameMenuWindow options must have 'text' string parameter")
             
             if enabled is None or not isinstance(enabled, bool):
-                raise ValueError("GameMenuPanel options must have 'enabled' boolean parameter")
+                raise ValueError("GameMenuWindow options must have 'enabled' boolean parameter")
 
             if enabled and (function is None or not hasattr(function, '__call__')): # Best method check I could come up with
-                raise ValueError("GameMenuPanel options must have 'function' method parameter")
+                raise ValueError("GameMenuWindow options must have 'function' method parameter")
             
             self.linesToDisplay[optNum] = []
             wrappedLines = textwrap.wrap(text, self.width - 2*(self.margin + 1))
@@ -603,12 +619,12 @@ class GameMenuPanel(MenuPanel):
             
         while True:
             self.draw()
-            key, keyStr = self.ui.waitForInput()
+            uinput = self.getUserInput()
             
-            if key is None:
-                return
+            if uinput is None:
+                continue
          
-            if key in (K_KP2, K_DOWN, K_j):
+            elif uinput == 'down':
                 while True:
                     self.selected += 1
                     if self.selected >= len(self.options):
@@ -619,7 +635,7 @@ class GameMenuPanel(MenuPanel):
                     
                 continue
             
-            elif key in (K_KP8, K_UP, K_k):
+            elif uinput == 'up':
                 while True:
                     self.selected -= 1
                     if self.selected < 0:
@@ -630,16 +646,17 @@ class GameMenuPanel(MenuPanel):
                     
                 continue
             
-            elif key in (K_RETURN, K_KP_ENTER, K_COMMA, K_SPACE):
+            elif uinput == 'select':
                 return self.options[self.selected]['function']
-
+            
             else:
-                pygame.event.clear()
+                continue
+            
 
-class ConversationPanel(MenuPanel):
+class ConversationWindow(MenuWindow):
     
     def __init__(self, *args, **kwargs):
-        super(ConversationPanel, self).__init__(*args, **kwargs)
+        super(ConversationWindow, self).__init__(*args, **kwargs)
         self.selected = 0
         self.conversationTree = kwargs['tree']
         
@@ -650,36 +667,37 @@ class ConversationPanel(MenuPanel):
         
         while True:
             self.draw(node)
-            key, keyStr = self.ui.waitForInput()
+            uinput = self.getUserInput()
             
-            if key is None:
-                return
+            if uinput is None:
+                continue
          
-            if key in (K_KP2, K_DOWN, K_j):
+            elif uinput == 'down':
                 self.selected += 1
                 if self.selected >= len(node.options):
                     self.selected = 0
-
                 continue
             
-            elif key in (K_KP8, K_UP, K_k):
+            elif uinput == 'up':
                 self.selected -= 1
                 if self.selected < 0:
                     self.selected = len(node.options) - 1
                 continue
             
-            elif key in (K_RETURN, K_KP_ENTER, K_SPACE):
+            elif uinput == 'select':
                 selectedOption = node.options[self.selected]
                 if selectedOption.callback:
                     selectedOption.callback()
+
                 if selectedOption.nextNode:
                     node = selectedOption.nextNode
                     self.selected = 0
                     continue
                 else:
                     break
+            
             else:
-                pygame.event.clear()
+                continue
 
     def draw(self, node):
         # Word wrapping
@@ -761,7 +779,7 @@ def main():
     options = ['bread', 'butter', 'eggs', 'an option which is significantly longer and will test my wordwrapping code to its very uttermost', 'milk', 'pickles']
     
     window = pygcurse.PygcurseWindow(C.SCREEN_WIDTH, C.SCREEN_HEIGHT)
-    panel = MenuPanel(window, options = options, width = 25, title = "Groceries")
+    panel = MenuWindow(window, options = options, width = 25, title = "Groceries")
     print panel.getSingleChoice()
         
     pygame.quit()

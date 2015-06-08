@@ -225,7 +225,7 @@ class UI(object):
     
     def singleChoiceMenu(self, title, options, width = C.MENU_WIDTH):
         
-        menu = MenuPanel(self, options = options, width = width, title = title, shadow = pygcurse.SOUTHEAST)
+        menu = MenuWindow(self, options = options, width = width, title = title, shadow = pygcurse.SOUTHEAST)
         return menu.getSingleChoice()
         
     def displayTextWindow(self, title, x, y, width, lines):
@@ -408,8 +408,8 @@ class UI(object):
     def conversationMenu(self):
         # Use the test conversation tree
         tree = Con.testConversationTree
-        conPanel = ConversationPanel(self, tree=tree, width=C.MENU_WIDTH, title='')
-        conPanel.doConversation()
+        conWindow = ConversationWindow(self, tree=tree, width=C.MENU_WIDTH, title='')
+        conWindow.doConversation()
         
     def handleKeys(self, key, event, key_mods):
 
