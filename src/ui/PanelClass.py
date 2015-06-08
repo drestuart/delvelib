@@ -12,6 +12,7 @@ import re
 import textwrap
 from symbols import *
 import Game as G
+import pygame
 
 fgdefault = colors.colorMessagePanelFG
 bgdefault = colors.colorMessagePanelBG
@@ -445,7 +446,10 @@ class MenuPanel(Panel):
             
             elif key in (K_RETURN, K_KP_ENTER, K_COMMA):
                 return self.selected[0]
-            
+
+            else:
+                pygame.event.clear()
+
             #convert the ASCII code to an index; if it corresponds to an option, return it
             index = key - ord('a')
             if index >= 0 and index < len(self.options): 
@@ -629,6 +633,9 @@ class GameMenuPanel(MenuPanel):
             elif key in (K_RETURN, K_KP_ENTER, K_COMMA, K_SPACE):
                 return self.options[self.selected]['function']
 
+            else:
+                pygame.event.clear()
+
 class ConversationPanel(MenuPanel):
     
     def __init__(self, *args, **kwargs):
@@ -671,7 +678,9 @@ class ConversationPanel(MenuPanel):
                     continue
                 else:
                     break
-    
+            else:
+                pygame.event.clear()
+
     def draw(self, node):
         # Word wrapping
         self.setupPanel(node)
