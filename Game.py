@@ -11,6 +11,9 @@ defaultNames = 0
 def message(msg):
     game.message(msg)
     
+def startConversation(conv):
+    game.startConversation(conv)
+
 class Game(object):
     
     fontsize = None
@@ -29,6 +32,9 @@ class Game(object):
         if self.debug: print msg
         self.ui.message(msg)
         
+    def startConversation(self, conv):
+        self.ui.conversationMenu(conv)
+
     def waitForInput(self):
         return self.ui.waitForInput()
         

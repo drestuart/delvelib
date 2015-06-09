@@ -405,10 +405,9 @@ class UI(object):
         
         return inventory.getItem(index)
 
-    def conversationMenu(self):
+    def conversationMenu(self, conv):
         # Use the test conversation tree
-        tree = Con.testConversationTree
-        conWindow = ConversationWindow(self, tree=tree, width=C.MENU_WIDTH, title='')
+        conWindow = ConversationWindow(self, tree=conv, width=C.MENU_WIDTH, title='')
         conWindow.doConversation()
         
     def handleKeys(self, key, event, key_mods):
