@@ -25,6 +25,7 @@ import ca_cave
 import colors
 import database as db
 from randomChoice import weightedChoice
+import NPCClass
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -534,8 +535,8 @@ class Level(MapBase):
             self.creatures.append(creature)
         return success
     
-    def placeCreatureAtRandom(self, creature):
-        raise NotImplementedError("placeStairs() not implemented, use a subclass")
+    def placeCreatureAtRandom(self, creature, dummy=True):
+        raise NotImplementedError("placeCreatureAtRandom() not implemented, use a subclass")
         
     def buildLevel(self):
         raise NotImplementedError("buildLevel() not implemented, use a subclass")
@@ -907,7 +908,7 @@ class CaveLevel(Level):
             
         return downTile
 
-    def placeCreatureAtRandom(self, creature):
+    def placeCreatureAtRandom(self, creature, dummy=True):
         tile = self.getRandomOpenTile()
         self.placeCreature(creature, tile)
         
@@ -951,10 +952,12 @@ class TownLevel(DungeonLevel):
         tmap = self.MapBuilderType(self.tilesWide, self.tilesHigh)
         self.addTiles(tmap)
 
-        # Place items
         print "Placing items"
         self.placeItems()
-        
+
+        print "Placing NPCs"
+        self.placeNPCs()
+
         print "Finding entry point"
         self.findEntryPoint()
         
@@ -968,16 +971,17 @@ class TownLevel(DungeonLevel):
         self.findUpStairs()
         self.findDownStairs()
 
-    def placeCreatureAtRandom(self, creature):
-        # Very random
-        # TODO: make more random
-        tile = self.getTile(1, 1)
-        self.placeCreature(creature, tile)
-        
     def placeCreatureAtEntrance(self, creature):
         tile = self.getTile(self.entryPointX, self.entryPointY)
         self.placeCreature(creature, tile)
 
+    def placeNPCs(self):
+        for room in self.rooms:
+            # Just place one NPC per room for now
+            tile = self.getRandomOpenTileInRoom(room)
+            if tile:
+                npc = NPCClass.NPC()
+                self.placeCreature(npc, tile)
 
 class WildernessLevel(Level):
     __mapper_args__ = {'polymorphic_identity': u'wilderness level'}
@@ -1009,7 +1013,7 @@ class WildernessLevel(Level):
         print "Saving open tiles"
         db.saveDB.save(self)
         
-    def placeCreatureAtRandom(self, creature):
+    def placeCreatureAtRandom(self, creature, dummy=True):
         tile = self.getRandomOpenTile()
         self.placeCreature(creature, tile)
         

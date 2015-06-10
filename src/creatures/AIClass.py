@@ -16,7 +16,6 @@ def getAIClassByName(name):
 class AI(object):
     
     def __init__(self):
-        print "Initializing AI"
         self.path = None
     
     def setOwner(self, creature):
