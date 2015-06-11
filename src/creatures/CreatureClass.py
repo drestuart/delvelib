@@ -29,7 +29,7 @@ class Creature(colors.withColor, Base):
         
         self.symbol = kwargs['symbol']
         
-        self.name = kwargs['name']
+        self.name = kwargs.get('name', None)
         
         self.maxHP = kwargs['maxHP']
         self.hp = kwargs['maxHP']
@@ -165,7 +165,7 @@ class Creature(colors.withColor, Base):
         return self.name
 
     def getDescription(self):
-        return self.description
+        return self.name or self.description
 
     def getSpecies(self):
         return self.species

@@ -326,13 +326,13 @@ class Tile(TileBase):
     def getDescription(self):
         # Determine which description to use to draw this tile
         if self.creature and self.creature.isVisible():
-            return self.creature.description
+            return self.creature.getDescription()
         
         elif self.inventory and self.inventory.length() > 0:
             return self.inventory.getItem(0).getDescription()
         
         elif self.feature and self.feature.isVisible():
-            return self.feature.description
+            return self.feature.getDescription()
         
         else:
             return self.baseDescription 

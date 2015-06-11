@@ -18,10 +18,8 @@ class NPC(Cr.Creature):
     species = 'player'
     
     def __init__(self, **kwargs):
-        super(NPC, self).__init__(symbol = u'@', name=u"NPC",
-                                     AIClass = AI.SedentaryAI, maxHP=10, **kwargs)
+        super(NPC, self).__init__(symbol = u'@', AIClass = AI.SedentaryAI, maxHP=10, **kwargs)
         self.conversationTree = ConversationClass.testConversationTree
-    
     
     __mapper_args__ = {'polymorphic_identity': u'NPC'}
     
