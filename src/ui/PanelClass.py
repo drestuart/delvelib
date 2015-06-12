@@ -429,15 +429,18 @@ class MenuWindow(Panel):
         if key is None:
             return None
      
-        elif key in (K_KP2, K_DOWN, K_j):
+        elif key in [K_KP2, K_DOWN, K_j]:
             return 'down'
         
-        elif key in (K_KP8, K_UP, K_k):
+        elif key in [K_KP8, K_UP, K_k]:
             return 'up'
         
-        elif key in (K_RETURN, K_KP_ENTER, K_COMMA, K_SPACE):
+        elif key in [K_RETURN, K_KP_ENTER, K_COMMA, K_SPACE]:
             return 'select'
-        
+
+        elif key in [K_ESCAPE]:
+            return 'escape'
+
         else:
             pygame.event.clear()
             return None
@@ -466,6 +469,9 @@ class MenuWindow(Panel):
             elif uinput == 'select':
                 return self.selected[0]
             
+            elif uinput == 'escape':
+                return None
+
             # TODO: Add support for selection by key letter
 
             else:

@@ -247,9 +247,6 @@ class UI(object):
                                        wrap=True, margin=C.MENU_MARGIN, caption=title, shadow = pygcurse.SOUTHEAST)   
         
         box.text = "\n".join(linesToDisplay)
-        
-        for line in box.text.split("\n"):
-            print "| " + line + " |"
         box.update()
         self.drawWindow()        
     
