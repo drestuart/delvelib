@@ -72,6 +72,48 @@ class Area(Base):
             return DungeonStatus.open
         else:
             return DungeonStatus.closed
+
+class SingleLevelArea(Area):
+    __mapper_args__ = {'polymorphic_identity': u'single_level_area'}
+    defaultWidth = 100
+    defaultHeight = 80
+    
+    def buildStartingLevel(self):
+        terrainType = self.getTerrainType()
+        newLevel = terrainType(area = self, depth = 0, width = self.defaultWidth, height = self.defaultHeight)
+        self.startingLevel = newLevel
+        newLevel.buildLevel()
+        db.saveDB.save(self)
+
+    def convertToMultilevelArea(self):
+        newArea = MultiLevelArea(name=self.name)
+        mt = self.getMapTile()
+        
+        self.levels[0].placeDungeonEntrance()
+        newArea.levels = self.levels
+        self.levels = []
+        
+        mt.setConnectedArea(newArea)
+        del self
+        db.saveDB.save(newArea)
+        
+        return newArea
+    
+class MultiLevelArea(Area):
+    __mapper_args__ = {'polymorphic_identity': u'multi_level_area'}
+    defaultWidth = 100
+    defaultHeight = 80
+    hasDungeon = True
+    
+    def buildStartingLevel(self):
+        newDepth = 0
+        
+        terrainType = self.getTerrainType()
+        newLevel = terrainType(area = self, depth = newDepth, width = self.defaultWidth, height = self.defaultHeight)
+        self.startingLevel = newLevel
+        
+        newLevel.buildLevel()
+        newLevel.placeDungeonEntrance()
     
 @unique
 class DungeonStatus(Enum):

@@ -6,7 +6,6 @@ Created on Feb 25, 2014
 
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import Unicode, Integer
-from sqlalchemy.orm import relationship, backref
 from symbols import dungeonSymbol
 from AreaClass import DungeonStatus
 
@@ -14,9 +13,7 @@ import LevelClass as L
 from TileClass import TileBase
 from colors import blankBackground, colorClosedDungeon, colorOpenDungeon
 import database as db
-from AreaClass import Area
-from EriuAreas import MultiLevelArea
-import database
+from AreaClass import Area, MultiLevelArea
 
 Base = db.saveDB.getDeclarativeBase()
 
