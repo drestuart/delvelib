@@ -176,9 +176,14 @@ class Creature(colors.withColor, Base):
     def getDamageTaken(self):
         return self.damageTaken
 
-
     def getAIClass(self):
         return self.AIClass
+    
+    def getAI(self):
+        if self.__dict__.get("AI"):
+            return self.AI
+        self.AI = self.AIClass()
+        return self.AI
 
     def setName(self, value):
         self.name = value
@@ -208,16 +213,12 @@ class Creature(colors.withColor, Base):
         self.symbol = value
         
     def takeTurn(self):
-        self.AI.takeTurn()
+        self.getAI().takeTurn()
         
     def getGoalTile(self):
         return self.goalTile
     
     def setGoalTile(self, newTile):
-#        oldGoal = self.getGoalTile()
-#        if oldGoal:
-#            oldGoal.setGoalTileOf(None)
-        
         self.goalTile = newTile
         if newTile is not None:
             newTile.setGoalTileOf(self)
