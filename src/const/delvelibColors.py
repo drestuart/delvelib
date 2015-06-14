@@ -58,6 +58,10 @@ orange = (255, 165, 0)
 
 yellow = (255, 255, 0)
 
+mediumPurple = (147,112,219)
+violet = (238,130,238)
+blueViolet = (138,43,226)
+
 # UI Colors
 blankBackground = black
 
