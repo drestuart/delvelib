@@ -169,9 +169,11 @@ class Level(MapBase):
             if not pub.isSubscribed(self.handleDoorOpen, "event.doorOpen"):
                 pub.subscribe(self.handleDoorOpen, "event.doorOpen")
                 pub.subscribe(self.handleDoorClose, "event.doorClose")
+                pub.subscribe(self.handleDoorBlocked, "event.doorBlocked")
         except:
             pub.subscribe(self.handleDoorOpen, "event.doorOpen")
             pub.subscribe(self.handleDoorClose, "event.doorClose")
+            pub.subscribe(self.handleDoorBlocked, "event.doorBlocked")
 
     def buildTileArray(self):
         self.tileArray = []
@@ -491,6 +493,9 @@ class Level(MapBase):
         if self.__dict__.get('astar'): self.astar.setMovable(x, y, not tile.blocksPathing())
         self.computeFOVProperties(force = True)
     
+    def handleDoorBlocked(self, tile):
+        x, y = tile.getXY()
+        G.message("Door blocked from closing " + str(x) + ", " + str(y))
     
     def getPathToTile(self, fromTile, toTile):
         

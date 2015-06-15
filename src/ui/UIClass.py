@@ -654,9 +654,12 @@ class UI(object):
         
         elif len(doors) == 1:
             door = doors[0]
-            door.close()
-            G.message("You close the door")
-            return True
+            if door.close():
+                G.message("You close the door")
+                return True
+            G.message("The door is blocked")
+            # TODO: Should trying to close a blocked door take a turn?
+            return False
         
         else:
             G.message("In which direction?")

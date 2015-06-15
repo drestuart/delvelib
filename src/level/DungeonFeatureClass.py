@@ -126,6 +126,11 @@ class Door(DungeonFeature):
         if self.isClosed():
             return False
         else:
+            # Fail to close if parent tile is blocked by e.g. a creature
+            if self.tile.blocksMove():
+                pub.sendMessage("event.doorBlocked", tile = self.tile)
+                return False
+
             self.setClosed(True)
             pub.sendMessage("event.doorClose", tile = self.tile)
             return True
