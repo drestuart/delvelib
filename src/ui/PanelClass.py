@@ -393,21 +393,22 @@ class MenuWindow(Panel):
         optNum = 0
         self.height = 2*(self.margin + 1)
         letter_index = ord('a')
+        textWidth = self.width - 2*(self.margin + 1)
         
         for line in self.options:
             # Add letters
             line = '(' + chr(letter_index) + ') ' + line
             
             self.linesToDisplay[optNum] = []
-            wrappedLines = textwrap.wrap(line, self.width - 2*(self.margin + 1))
+            wrappedLines = textwrap.wrap(line, textWidth)
             linesForOption = 0
             
             for wline in wrappedLines:
                 
                 if linesForOption > 0:
-                    wline = ' ' * self.multilineIndent + wline.ljust(self.width - 2*(self.margin + 1) - self.multilineIndent)
+                    wline = ' ' * self.multilineIndent + wline.ljust(textWidth - self.multilineIndent)
                 else:
-                    wline = wline.ljust(self.width - 2*(self.margin + 1))
+                    wline = wline.ljust(textWidth)
                     
                 self.linesToDisplay[optNum].append(wline)
                 self.height += 1
@@ -434,6 +435,12 @@ class MenuWindow(Panel):
         
         elif key in [K_KP8, K_UP, K_k]:
             return 'up'
+        
+        elif key in [K_KP4, K_LEFT, K_h]:
+            return 'left'
+        
+        elif key in [K_KP6, K_RIGHT, K_l]:
+            return 'right'
         
         elif key in [K_RETURN, K_KP_ENTER, K_COMMA, K_SPACE]:
             return 'select'
@@ -554,6 +561,7 @@ class GameMenuWindow(MenuWindow):
         self.linesToDisplay = {}
         optNum = 0
         self.height = 2*(self.margin + 1)
+        textWidth = self.width - 2*(self.margin + 1)
         
         for opt in self.options:
             # Data type check
@@ -574,15 +582,15 @@ class GameMenuWindow(MenuWindow):
                 raise ValueError("GameMenuWindow options must have 'function' method parameter")
             
             self.linesToDisplay[optNum] = []
-            wrappedLines = textwrap.wrap(text, self.width - 2*(self.margin + 1))
+            wrappedLines = textwrap.wrap(text, textWidth)
             linesForOption = 0
             
             for wline in wrappedLines:
                 
                 if linesForOption > 0:
-                    wline = ' ' * self.multilineIndent + wline.ljust(self.width - 2*(self.margin + 1) - self.multilineIndent)
+                    wline = ' ' * self.multilineIndent + wline.ljust(textWidth - self.multilineIndent)
                 else:
-                    wline = wline.ljust(self.width - 2*(self.margin + 1))
+                    wline = wline.ljust(textWidth)
                     
                 self.linesToDisplay[optNum].append(wline)
                 self.height += 1
@@ -775,22 +783,151 @@ class ConversationWindow(MenuWindow):
         self.y = (C.SCREEN_HEIGHT - self.height)/2
         
         self.currentNode = node
+
+class OptionWindow(MenuWindow):
+    
+    # For toggle and integer, deal with string TODO
+    maxOptionWidth = 3
+    
+    def __init__(self, *args, **kwargs):
+        super(OptionWindow, self).__init__(*args, **kwargs)
+        self.selected = 0
         
-def main():
-    
-    import pygcurse
-    import pygame
-    import sys
-    
-    options = ['bread', 'butter', 'eggs', 'an option which is significantly longer and will test my wordwrapping code to its very uttermost', 'milk', 'pickles']
-    
-    window = pygcurse.PygcurseWindow(C.SCREEN_WIDTH, C.SCREEN_HEIGHT)
-    panel = MenuWindow(window, options = options, width = 25, title = "Groceries")
-    print panel.getSingleChoice()
+    def doMenuStuff(self):
+        while True:
+            currentOption = self.options[self.selected]
+            self.draw()
+            uinput = self.getUserInput()
+            
+            if uinput is None:
+                continue
+         
+            elif uinput == 'down':
+                while True:
+                    self.selected += 1
+                    if self.selected >= len(self.options):
+                        self.selected = 0
+                        
+                    newOption = self.options[self.selected]
+                    if newOption['enabled']: break
+                    
+                continue
+            
+            elif uinput == 'up':
+                while True:
+                    self.selected -= 1
+                    if self.selected < 0:
+                        self.selected = len(self.options) - 1
+                    
+                    newOption = self.options[self.selected]
+                    if newOption['enabled']: break
+                    
+                continue
+            
+            elif currentOption['type'] == "toggle":
+                if uinput in ('left', 'right'):
+                    currentOption['value'] = not currentOption['value']
+                    continue
+            
+            elif currentOption['type'] == "integer":
+                val = currentOption['value']
+                if uinput == 'left':
+                    currentOption['value'] = max(val - 1, currentOption['min'])
+                elif uinput == 'right':
+                    currentOption['value'] = min(val + 1, currentOption['max'])
+                continue
+            
+            elif currentOption['type'] == "string":
+                # TODO
+                pass
+            
+            elif uinput == 'select':
+                # TODO
+                pass
+            
+            elif uinput == 'escape':
+                return self.options
+            
+            else:
+                continue
+
+    def draw(self):
+        self.setUpWindow()
+
+        y = self.margin + 1
+        for key in sorted(self.linesToDisplay.keys()):
+            option = self.options[key]
+            fg = self.defaultFGColor
+            bg = self.defaultBGColor
+
+            if key == self.selected:
+                bg = self.selectedBGColor
+            
+            lines = self.linesToDisplay[key]
+            for line in lines:
+                if line is lines[0]:
+                    line += self.getOptionString(option)
+                self.putLine(line, y, fg, bg)
+                y += 1
+                
+        # Draw shadow
+        if self.shadow is not None:
+            self.ui.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
         
-    pygame.quit()
-    sys.exit()
+        self.ui.drawWindow()
+        
+    def getOptionString(self, option):
+        if option['type'] == "toggle":
+            if option["value"]:
+                val = "On"
+            else:
+                val = "Off"
+        
+        elif option['type'] == "integer":
+            val = str(option['value'])
+        
+        elif option['type'] == "string":
+            # TODO
+            val = option["value"]
+        
+        return val.rjust(self.maxOptionWidth)
+        
+    def setupOptions(self, options):
+        # Options should be a list of dictionaries with keys as follows:
+        #     Text: The option text
+        #     Type: The option type. Toggle, integer, string
+        #     Value: The starting value
+        #     Min, max: for integer only
+        self.options = options
+        
+        # Fill in current state of the options
+        self.state = {}
+        for opt in self.options:
+            self.state[opt["text"]] = opt["value"]
+            
+        # Format the options text for display
+        self.linesToDisplay = {}
+        optNum = 0
+        self.height = 2*(self.margin + 1)
+        textWidth = self.width - 2*(self.margin + 1)
+        
+        for opt in self.options:
+            self.linesToDisplay[optNum] = []
+            text = opt["text"]
+            
+            wrappedLines = textwrap.wrap(text, textWidth - self.maxOptionWidth)
+            
+            for wline in wrappedLines:
+                wline = wline.ljust(textWidth - self.maxOptionWidth)
+                    
+                self.linesToDisplay[optNum].append(wline)
+                self.height += 1
+                
+            optNum += 1
+
+        self.x = (C.SCREEN_WIDTH - self.width)/2
+        self.y = (C.SCREEN_HEIGHT - self.height)/2
+        
+        return self.linesToDisplay
 
 
-if __name__ == '__main__':
-    main()
