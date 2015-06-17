@@ -17,7 +17,7 @@ import pygame
 fgdefault = colors.colorMessagePanelFG
 bgdefault = colors.colorMessagePanelBG
 
-__all__ = ["MessagePanel", "CharacterPanel", "MenuWindow", "MapPanel", "ConversationWindow"]
+__all__ = ["MessagePanel", "CharacterPanel", "MenuWindow", "MapPanel", "ConversationWindow", "OptionWindow"]
 
 class Panel(object):
     def __init__(self, dims, parentUI, margin = 0):
@@ -445,7 +445,7 @@ class MenuWindow(Panel):
         elif key in [K_RETURN, K_KP_ENTER, K_COMMA, K_SPACE]:
             return 'select'
 
-        elif key in [K_ESCAPE]:
+        elif key == K_ESCAPE:
             return 'escape'
 
         else:
@@ -803,32 +803,33 @@ class OptionWindow(MenuWindow):
                 continue
          
             elif uinput == 'down':
-                while True:
-                    self.selected += 1
-                    if self.selected >= len(self.options):
-                        self.selected = 0
-                        
-                    newOption = self.options[self.selected]
-                    if newOption['enabled']: break
-                    
+                self.selected += 1
+                if self.selected >= len(self.options):
+                    self.selected = 0
                 continue
-            
+
             elif uinput == 'up':
-                while True:
-                    self.selected -= 1
-                    if self.selected < 0:
-                        self.selected = len(self.options) - 1
-                    
-                    newOption = self.options[self.selected]
-                    if newOption['enabled']: break
-                    
+                self.selected -= 1
+                if self.selected < 0:
+                    self.selected = len(self.options) - 1
                 continue
-            
+
+            elif currentOption['type'] == "string":
+                # TODO
+                pass
+
+            elif uinput == 'select':
+                # TODO
+                pass
+
+            elif uinput == 'escape':
+                return self.options
+
             elif currentOption['type'] == "toggle":
                 if uinput in ('left', 'right'):
                     currentOption['value'] = not currentOption['value']
                     continue
-            
+
             elif currentOption['type'] == "integer":
                 val = currentOption['value']
                 if uinput == 'left':
@@ -836,18 +837,7 @@ class OptionWindow(MenuWindow):
                 elif uinput == 'right':
                     currentOption['value'] = min(val + 1, currentOption['max'])
                 continue
-            
-            elif currentOption['type'] == "string":
-                # TODO
-                pass
-            
-            elif uinput == 'select':
-                # TODO
-                pass
-            
-            elif uinput == 'escape':
-                return self.options
-            
+
             else:
                 continue
 

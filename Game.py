@@ -14,6 +14,15 @@ def message(msg):
 def startConversation(conv):
     game.startConversation(conv)
 
+def getDebug():
+    return game.debug
+
+def getDebugOptions():
+    return game.getDebugOptions()
+
+def setDebugOptions(options):
+    game.setDebugOptions(options)
+
 class Game(object):
     
     fontsize = None
@@ -41,6 +50,14 @@ class Game(object):
     def getPlayer(self):
         return self.player
     
+    def getDebugOptions(self):
+        return self.debugOptions
+
+    def setDebugOptions(self, options):
+        self.debugOptions = options
+        print "New debug options"
+        print options
+
     def quit(self):
         self.ui.quit()
     

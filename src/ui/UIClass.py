@@ -407,6 +407,14 @@ class UI(object):
         conWindow = ConversationWindow(self, tree=conv, width=C.MENU_WIDTH, title='')
         conWindow.doConversation()
         
+    def debugMenu(self):
+        debugOptions = G.getDebugOptions()
+
+        debugMenu = OptionWindow(self, options=debugOptions, width=C.MENU_WIDTH, title='')
+        menuResult = debugMenu.doMenuStuff()
+
+        G.setDebugOptions(menuResult)
+
     def handleKeys(self, key, event, key_mods):
 
         if key == K_ESCAPE:
@@ -489,6 +497,11 @@ class UI(object):
             # TEST
             elif keyStr == 't':
                 self.conversationMenu()
+                return 'didnt-take-turn'
+
+            # Debug menu
+            elif keyStr == '`' and G.getDebug():
+                self.debugMenu()
                 return 'didnt-take-turn'
 
         else:
