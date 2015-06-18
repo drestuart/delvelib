@@ -787,7 +787,7 @@ class ConversationWindow(MenuWindow):
 class OptionWindow(MenuWindow):
     
     # For toggle and integer, deal with string TODO
-    maxOptionWidth = 3
+    maxOptionWidth = 5
     
     def __init__(self, *args, **kwargs):
         super(OptionWindow, self).__init__(*args, **kwargs)
@@ -874,7 +874,15 @@ class OptionWindow(MenuWindow):
                 val = "Off"
         
         elif option['type'] == "integer":
-            val = str(option['value'])
+            val = str(option['value']).rjust(self.maxOptionWidth - 2)
+            # Add left/right arrows if appropriate
+            if option['value'] > option['min']:
+                val = leftArrow + val
+
+            if option['value'] < option["max"]:
+                val += rightArrow
+            else:
+                val += " "
         
         elif option['type'] == "string":
             # TODO

@@ -150,9 +150,11 @@ class UI(object):
                 if event.type == QUIT:
                     return None, None
                 elif event.type == KEYDOWN:
+                    # key is the integer key code, keyStr is the string representation
                     key = event.key
                     keyStr = pygame.key.name(key)
-                    # key is the integer key code, keyStr is the string representation
+
+                    pygame.event.clear()
                     return key, keyStr
         
     def showCenteredText(self, lines, showtime):
@@ -410,7 +412,7 @@ class UI(object):
     def debugMenu(self):
         debugOptions = G.getDebugOptions()
 
-        debugMenu = OptionWindow(self, options=debugOptions, width=C.MENU_WIDTH, title='')
+        debugMenu = OptionWindow(self, options=debugOptions, width=C.MENU_WIDTH, title='Debug')
         menuResult = debugMenu.doMenuStuff()
 
         G.setDebugOptions(menuResult)

@@ -55,8 +55,6 @@ class Game(object):
 
     def setDebugOptions(self, options):
         self.debugOptions = options
-        print "New debug options"
-        print options
 
     def quit(self):
         self.ui.quit()
