@@ -12,6 +12,7 @@ import re
 import textwrap
 from symbols import *
 import Game as G
+from OptionClass import OptionType, Option
 import pygame
 
 fgdefault = colors.colorMessagePanelFG
@@ -785,7 +786,6 @@ class ConversationWindow(MenuWindow):
         self.currentNode = node
 
 class OptionWindow(MenuWindow):
-    
     # For toggle and integer, deal with string TODO
     maxOptionWidth = 5
     
@@ -814,10 +814,6 @@ class OptionWindow(MenuWindow):
                     self.selected = len(self.options) - 1
                 continue
 
-            elif currentOption['type'] == "string":
-                # TODO
-                pass
-
             elif uinput == 'select':
                 # TODO
                 pass
@@ -825,17 +821,21 @@ class OptionWindow(MenuWindow):
             elif uinput == 'escape':
                 return self.options
 
-            elif currentOption['type'] == "toggle":
+            elif currentOption.optionType == OptionType.STRING:
+                # TODO
+                pass
+
+            elif currentOption.optionType == OptionType.TOGGLE:
                 if uinput in ('left', 'right'):
-                    currentOption['value'] = not currentOption['value']
+                    currentOption.setValue(not currentOption.value)
                     continue
 
-            elif currentOption['type'] == "integer":
-                val = currentOption['value']
+            elif currentOption.optionType == OptionType.INTEGER:
+                val = currentOption.value
                 if uinput == 'left':
-                    currentOption['value'] = max(val - 1, currentOption['min'])
+                    currentOption.setValue(val - 1) # Bounds checking happens in setValue()
                 elif uinput == 'right':
-                    currentOption['value'] = min(val + 1, currentOption['max'])
+                    currentOption.setValue(val + 1)
                 continue
 
             else:
@@ -867,26 +867,26 @@ class OptionWindow(MenuWindow):
         self.ui.drawWindow()
         
     def getOptionString(self, option):
-        if option['type'] == "toggle":
-            if option["value"]:
-                val = "On"
+        if option.optionType == OptionType.TOGGLE:
+            if option.value:
+                val = option.trueText
             else:
-                val = "Off"
+                val = option.falseText
         
-        elif option['type'] == "integer":
-            val = str(option['value']).rjust(self.maxOptionWidth - 2)
+        elif option.optionType == OptionType.INTEGER:
+            val = str(option.value).rjust(self.maxOptionWidth - 2)
             # Add left/right arrows if appropriate
-            if option['value'] > option['min']:
+            if option.value > option.min:
                 val = leftArrow + val
 
-            if option['value'] < option["max"]:
+            if option.value < option.max:
                 val += rightArrow
             else:
                 val += " "
         
-        elif option['type'] == "string":
+        elif option.optionType == OptionType.STRING:
             # TODO
-            val = option["value"]
+            val = option.value
         
         return val.rjust(self.maxOptionWidth)
         
@@ -901,7 +901,7 @@ class OptionWindow(MenuWindow):
         # Fill in current state of the options
         self.state = {}
         for opt in self.options:
-            self.state[opt["text"]] = opt["value"]
+            self.state[opt.name] = opt.value
             
         # Format the options text for display
         self.linesToDisplay = {}
@@ -911,7 +911,7 @@ class OptionWindow(MenuWindow):
         
         for opt in self.options:
             self.linesToDisplay[optNum] = []
-            text = opt["text"]
+            text = opt.text
             
             wrappedLines = textwrap.wrap(text, textWidth - self.maxOptionWidth)
             
