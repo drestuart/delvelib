@@ -76,3 +76,5 @@ colorMessagePanelBG = black
 
 colorCharPanelFG = white
 colorCharPanelBG = black
+
+colorDebugPath = green

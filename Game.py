@@ -23,6 +23,9 @@ def getDebugOptions():
 def setDebugOptions(options):
     game.setDebugOptions(options)
 
+def getDebugValue(name):
+    return game.getDebugValue(name)
+
 class Game(object):
     
     fontsize = None
@@ -55,6 +58,12 @@ class Game(object):
 
     def setDebugOptions(self, options):
         self.debugOptions = options
+
+    def getDebugValue(self, name):
+        for opt in self.debugOptions:
+            if opt.name == name:
+                return opt.value
+        return None
 
     def quit(self):
         self.ui.quit()

@@ -265,7 +265,10 @@ class Creature(colors.withColor, Base):
     
     def getAttackRange(self):
         return 1
-        
+
+    def getPath(self):
+        return self.getAI().path
+
     def the(self):
         return "the " + self.getName()
     

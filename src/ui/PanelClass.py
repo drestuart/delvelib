@@ -5,7 +5,7 @@ Created on Jan 18, 2014
 '''
 
 import Const as C
-import colors
+import delvelibColors as colors
 import keys
 from pygame.locals import *
 import re
@@ -330,6 +330,7 @@ class MapPanel(Panel):
             
     
     def drawLevel(self, playerx, playery):
+        debug = G.getDebugValue("showPaths")
         
         # Set camera position
         self.positionCamera(playerx, playery)
@@ -337,7 +338,19 @@ class MapPanel(Panel):
         # Get tiles
         tilesToDraw = self.level.getTilesToDraw(playerx, playery, self.cameraDims())
         
+        # Draw monster paths
+        if debug:
+            creaturePathTiles = []
+            for cr in self.level.getLivingCreatures():
+                path = cr.getPath()
+                if path:
+                    creaturePathTiles += path
+
+
         for (x, y, symbol, color, background) in tilesToDraw:
+            if debug:
+                if (x, y) in creaturePathTiles:
+                    color = colors.colorDebugPath
             self.putChar(symbol, x - self.camx, y - self.camy, color, background)
             
     def getTileDescription(self, x, y):

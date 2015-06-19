@@ -320,7 +320,6 @@ class Level(MapBase):
                         
                     
                     else:
-                        
                         if tile.getExplored():
                             symbol = tile.getLastSeenSymbol()
                             color = colors.colorNotInFOV
