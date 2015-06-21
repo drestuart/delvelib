@@ -97,9 +97,7 @@ class UI(object):
                     player_action = self.handleKeys(key, event, key_mods)
                     
                     if player_action == 'exit':
-                        print "Got a QUIT command"
-                        pygame.quit()
-                        sys.exit()
+                        self.quit()
                     
                     elif player_action == 'took-turn':
                         # MessagePanel paging test
@@ -420,9 +418,9 @@ class UI(object):
     def handleKeys(self, key, event, key_mods):
 
         if key == K_ESCAPE:
-            return "exit"
+            self.gameMenu()
+            return 'didnt-take-turn'
             
-#        elif event.type == KEYUP:
         elif event.type == KEYDOWN:
             
             keyStr = pygame.key.name(key)

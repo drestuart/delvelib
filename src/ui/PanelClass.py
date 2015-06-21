@@ -6,19 +6,16 @@ Created on Jan 18, 2014
 
 import Const as C
 import delvelibColors as colors
-import keys
 from pygame.locals import *
 import re
 import textwrap
 from symbols import *
 import Game as G
-from OptionClass import OptionType, Option
+from OptionClass import OptionType
 import pygame
 
 fgdefault = colors.colorMessagePanelFG
 bgdefault = colors.colorMessagePanelBG
-
-__all__ = ["MessagePanel", "CharacterPanel", "MenuWindow", "MapPanel", "ConversationWindow", "OptionWindow"]
 
 class Panel(object):
     def __init__(self, dims, parentUI, margin = 0):
@@ -644,7 +641,6 @@ class GameMenuWindow(MenuWindow):
         self.ui.drawWindow()
         
     def getSingleChoice(self):
-            
         while True:
             self.draw()
             uinput = self.getUserInput()
@@ -680,6 +676,45 @@ class GameMenuWindow(MenuWindow):
             else:
                 continue
             
+class EscapeMenuWindow(GameMenuWindow):
+    def getSingleChoice(self):
+        while True:
+            self.draw()
+            uinput = self.getUserInput()
+
+            if uinput is None:
+                continue
+
+            elif uinput == 'down':
+                while True:
+                    self.selected += 1
+                    if self.selected >= len(self.options):
+                        self.selected = 0
+
+                    newOption = self.options[self.selected]
+                    if newOption['enabled']: break
+
+                continue
+
+            elif uinput == 'up':
+                while True:
+                    self.selected -= 1
+                    if self.selected < 0:
+                        self.selected = len(self.options) - 1
+
+                    newOption = self.options[self.selected]
+                    if newOption['enabled']: break
+
+                continue
+
+            elif uinput == 'select':
+                return self.options[self.selected]['function']
+
+            elif uinput == 'escape':
+                return None
+
+            else:
+                continue
 
 class ConversationWindow(MenuWindow):
     
