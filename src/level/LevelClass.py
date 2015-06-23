@@ -110,7 +110,6 @@ class Level(MapBase):
         self.upStairs = []
         self.downStairs = []
         self.tileArray = []
-#         self.load()
         
 ##########################################################################
 #

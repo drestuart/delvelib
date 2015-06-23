@@ -5,7 +5,7 @@ Created on Mar 13, 2013
 '''
 
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
+from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import Unicode, Integer, Boolean
 import AIClass as AI
 import colors
@@ -67,6 +67,8 @@ class Creature(colors.withColor, Base):
     
     levelId = Column(Integer, ForeignKey('levels.id'))
     level = relationship("Level", backref=backref("creatures"), uselist = False, primaryjoin = "Creature.levelId == Level.id")
+    
+    givingQuestId = Column(Integer, ForeignKey("quests.id"))
     
     visible = Column(Boolean)
     

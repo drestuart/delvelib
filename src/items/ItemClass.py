@@ -54,6 +54,8 @@ class Item(colors.withColor, Base):
 
     containerId = Column(Integer, ForeignKey("inventories.id"))
     
+    questId = Column(Integer, ForeignKey("quests.id"))
+    
     # For items that have an inventory of their own
     myInventoryId = Column(Integer, ForeignKey("inventories.id", use_alter=True, name='my_inventory_fk'))
 #    inventory = relationship("Inventory", uselist=False, backref=backref("containingItem", uselist=False), primaryjoin="Inventory.id==Item.inventoryId")
