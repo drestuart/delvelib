@@ -7,8 +7,12 @@ Created on Jun 23, 2015
 from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
 from sqlalchemy.types import Integer, Boolean, Unicode
 from sqlalchemy.orm import relationship, backref
+import database as db
+from pubsub import pub
 
-class Quest(object):
+Base = db.saveDB.getDeclarativeBase()
+
+class Quest(Base):
     __tablename__ = "quests"
     __table_args__ = {'extend_existing': True}
     
@@ -18,18 +22,58 @@ class Quest(object):
     id = Column(Integer, primary_key=True, unique=True)
     questType = Column(Unicode)
     
-    fetchItems = relationship("Item", backref=backref("quest", uselist = False), primaryjoin="Quest.id==Item.questId")
     questGivers = relationship("Creature", backref=backref("quest", uselist = False), primaryjoin="Quest.id==Creature.givingQuestId")
-    
-    # Might not be necessary to do it this way. Maybe subscribe to a creature kill event?
-#     questTargets = relationship("Creature", backref=backref("quest", uselist = False), primaryjoin="Quest.id==Creature.targetOfQuestId")
+    questRequirements = relationship("QuestRequirement", backref=backref("quest", uselist = False), primaryjoin="Quest.id==QuestRequirement.questId")
     
     __mapper_args__ = {'polymorphic_on': questType,
                        'polymorphic_identity': u'quest'}
     
+    def buildRequirements(self):
+        raise NotImplementedError("buildRequirements()")
+
     def startQuest(self):
+        for req in self.questRequirements:
+            req.subscribe()
+
+        pub.subscribe(self.questProgress, QuestRequirement.updatedEventName)
+        pub.subscribe(self.handleRequirementCompletion, QuestRequirement.satisfiedEventName)
+
+    def questProgress(self, req):
         pass
+
+    def handleRequirementCompletion(self, req):
+        pass
+
+class QuestRequirement(Base):
+    __tablename__ = "quest_requirements"
+    __table_args__ = {'extend_existing': True}
+
+    eventPrefix = 'event.quest.'
+    updatedEventName = eventPrefix + 'requirement.updated'
+    satisfiedEventName = eventPrefix + 'requirement.satisfied'
+
+    def __init__(self, eventName, eventsRemaining, quest):
+        self.eventName = eventName
+        self.eventsRemaining = eventsRemaining
+        self.quest = quest
+
+    id = Column(Integer, primary_key=True, unique=True)
+    questId = Column(Integer, ForeignKey("quests.id"))
+    eventName = Column(Unicode)
+    eventsRemaining = Column(Integer)
+
+    def subscribe(self):
+        pub.subscribe(self.handleEvent, self.eventPrefix + self.eventName)
+
+    def handleEvent(self):
+        self.eventsRemaining -= 1
+        pub.sendMessage(self.updatedEventName, req = self)
+        if self.completed():
+            pub.sendMessage(self.satisfiedEventName, req = self)
     
+    def completed(self):
+        return self.eventsRemaining <= 0
+
 class FetchQuest(Quest):
     pass
 
