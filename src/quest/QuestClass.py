@@ -12,10 +12,14 @@ from pubsub import pub
 
 Base = db.saveDB.getDeclarativeBase()
 
+questEventPrefix = 'event.quest.'
+
 class Quest(Base):
     __tablename__ = "quests"
     __table_args__ = {'extend_existing': True}
     
+    questCompleteEventName = questEventPrefix + 'complete'
+
     def __init__(self, **kwargs):
         pass
     
@@ -42,15 +46,14 @@ class Quest(Base):
         pass
 
     def handleRequirementCompletion(self, req):
-        pass
+        pub.sendMessage(self.questCompleteEventName, self)
 
 class QuestRequirement(Base):
     __tablename__ = "quest_requirements"
     __table_args__ = {'extend_existing': True}
 
-    eventPrefix = 'event.quest.'
-    updatedEventName = eventPrefix + 'requirement.updated'
-    satisfiedEventName = eventPrefix + 'requirement.satisfied'
+    updatedEventName = questEventPrefix + 'requirement.updated'
+    satisfiedEventName = questEventPrefix + 'requirement.satisfied'
 
     def __init__(self, eventName, eventsRemaining, quest):
         self.eventName = eventName
@@ -63,7 +66,7 @@ class QuestRequirement(Base):
     eventsRemaining = Column(Integer)
 
     def subscribe(self):
-        pub.subscribe(self.handleEvent, self.eventPrefix + self.eventName)
+        pub.subscribe(self.handleEvent, self.questEventPrefix + self.eventName)
 
     def handleEvent(self):
         self.eventsRemaining -= 1
