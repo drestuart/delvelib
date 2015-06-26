@@ -47,6 +47,16 @@ class Quest(Base):
 
     def handleRequirementCompletion(self, req):
         pub.sendMessage(self.questCompleteEventName, self)
+        
+    def placeQuestItems(self):
+        pass
+    
+    def placeQuestCreatures(self):
+        pass
+    
+    def attachToQuestgiver(self):
+        pass
+    
 
 class QuestRequirement(Base):
     __tablename__ = "quest_requirements"
@@ -77,8 +87,3 @@ class QuestRequirement(Base):
     def completed(self):
         return self.eventsRemaining <= 0
 
-class FetchQuest(Quest):
-    pass
-
-class AssassinationQuest(Quest):
-    pass

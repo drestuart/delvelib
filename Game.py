@@ -26,6 +26,15 @@ def setDebugOptions(options):
 def getDebugValue(name):
     return game.getDebugValue(name)
 
+def getCurrentLevel():
+    return game.ui.getCurrentLevel()
+
+def getCurrentMapTile():
+    pass
+
+def getWorldMap():
+    return game.worldMap
+
 class Game(object):
     
     fontsize = None

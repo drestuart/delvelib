@@ -383,7 +383,9 @@ class UI(object):
         if index is None or inventory.length() == 0:
             return None
         
-        return inventory.pop(index)
+        item = inventory.pop(index)
+        item.pickupEvent()
+        return item
     
     def selectItemMenu(self, inventory):
         #show a singleChoiceMenu with each item of the inventory as an option

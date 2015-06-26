@@ -290,6 +290,9 @@ class Level(MapBase):
                 openTiles.append(tile)
                 
         return random.choice(openTiles)
+    
+    def getRandomRoom(self):
+        return random.choice(self.rooms)
         
     def getTilesToDraw(self, playerx, playery, cameradims, visibility = True):
         retArray = []
@@ -753,6 +756,12 @@ class DungeonLevel(Level):
             
             self.addRoom(newRoom)
             
+    def placeItemAtRandom(self, item):
+        room = self.getRandomRoom()
+        tile = self.getRandomOpenTileInRoom(room)
+        if tile:
+            tile.addObject(item)
+        
     def placeItems(self):
         
         for room in self.rooms:

@@ -5,12 +5,19 @@ Created on Mar 10, 2013
 '''
 
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Unicode, Integer, Float
+from sqlalchemy.types import Unicode, Integer, Float, Boolean
 import colors
 import database as db
 from randomChoice import weightedChoice
+from pubsub import pub
 
 Base = db.saveDB.getDeclarativeBase()
+
+pickupEventPrefix = "event.item.pickup."
+dropEventPrefix = "event.item.drop."
+
+questPickupEventPrefix = "event.quest.item.pickup."
+questDropEventPrefix = "event.quest.item.drop."
 
 class Item(colors.withColor, Base):
     '''
@@ -40,21 +47,19 @@ class Item(colors.withColor, Base):
         self.symbol = kwargs['symbol']
         
         self.quantity = kwargs.get('quantity', 1)
-
         
+        self.questItem = kwargs.get('questItem', False)
+
 
     id = Column(Integer, primary_key=True)
     weight = Column(Float)
     itemType = Column(Unicode)
     material = Column(Unicode)
-    
+    questItem = Column(Boolean)
     symbol = Column(Unicode(length=1))
-    
     quantity = Column(Integer)
 
     containerId = Column(Integer, ForeignKey("inventories.id"))
-    
-    questId = Column(Integer, ForeignKey("quests.id"))
     
     # For items that have an inventory of their own
     myInventoryId = Column(Integer, ForeignKey("inventories.id", use_alter=True, name='my_inventory_fk'))
@@ -66,14 +71,27 @@ class Item(colors.withColor, Base):
         'polymorphic_identity':u'item'
     }
     
-    
-    def drop(self):
-        # TODO: Handle universal dropping logic
-        self.onDrop()
+    def pickupEvent(self):
+        pub.sendMessage(self.getpickupEvent(), self)
+        if self.isQuestItem():
+            pub.sendMessage(self.getQuestPickupEvent(), self)
         
-    def pickup(self):
-        # TODO: Handle universal pickup logic
-        self.onPickup()
+    def getPickupEvent(self):
+        return pickupEventPrefix + self.itemType
+    
+    def getQuestPickupEvent(self):
+        return questPickupEventPrefix + self.itemType
+    
+    def dropEvent(self):
+        pub.sendMessage(self.getDropEvent(), self)
+        if self.isQuestItem():
+            pub.sendMessage(self.getQuestDropEvent(), self)
+    
+    def getDropEvent(self):
+        return dropEventPrefix + self.itemType
+    
+    def getQuestDropEvent(self):
+        return questDropEventPrefix + self.itemType
         
     def use(self):
         self.onUse()
@@ -81,18 +99,14 @@ class Item(colors.withColor, Base):
     def getWeight(self):
         return self.weight
 
-
     def getMaterial(self):
         return self.material
-
 
     def getSymbol(self):
         return self.symbol
 
-
     def setWeight(self, value):
         self.weight = value
-
 
     def setMaterial(self, value):
         self.material = value
@@ -189,6 +203,9 @@ class Item(colors.withColor, Base):
     @classmethod
     def getZappable(cls):
         return cls.zappable
+    
+    def isQuestItem(self):
+        return self.questItem
 
 
 class Amulet(Item):
@@ -281,9 +298,14 @@ class Weapon(Item):
     def __init__(self, **kwargs):
         super(Weapon, self).__init__(symbol = u')', **kwargs)
 
-
-
-
+class MacGuffin(Item):
+    __mapper_args__ = {'polymorphic_identity':u'weapon'}
+    
+    color = colors.colorSteel
+    description = "Mystic MacGuffin"
+    
+    def __init__(self, **kwargs):
+        super(Weapon, self).__init__(symbol = u'^', **kwargs)
 
 def getRandomItem():
     
