@@ -102,12 +102,12 @@ class QuestItemRequirement(QuestRequirement):
         pub.subscribe(self.handlePickupEvent, self.getItemType().getQuestPickupEvent())
         pub.subscribe(self.handleDropEvent, self.getItemType().getQuestDropEvent())
         
-    def handlePickupEvent(self):
+    def handlePickupEvent(self, item):
         print "Picked up item!"
         self.eventsRemaining -= 1
         self.updateEvents()
         
-    def handleDropEvent(self):
+    def handleDropEvent(self, item):
         print "Dropped item!"
         self.eventsRemaining += 1
         self.updateEvents()
