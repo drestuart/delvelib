@@ -64,7 +64,6 @@ class Item(colors.withColor, Base):
     # For items that have an inventory of their own
     myInventoryId = Column(Integer, ForeignKey("inventories.id", use_alter=True, name='my_inventory_fk'))
 #    inventory = relationship("Inventory", uselist=False, backref=backref("containingItem", uselist=False), primaryjoin="Inventory.id==Item.inventoryId")
-
     
     __mapper_args__ = {
         'polymorphic_on':itemType,
@@ -72,26 +71,34 @@ class Item(colors.withColor, Base):
     }
     
     def pickupEvent(self):
-        pub.sendMessage(self.getpickupEvent(), self)
+        pub.sendMessage(self.getPickupEvent(), item=self)
         if self.isQuestItem():
-            pub.sendMessage(self.getQuestPickupEvent(), self)
-        
-    def getPickupEvent(self):
-        return pickupEventPrefix + self.itemType
+            pub.sendMessage(self.getQuestPickupEvent(), item=self)
     
-    def getQuestPickupEvent(self):
-        return questPickupEventPrefix + self.itemType
+    @classmethod
+    def getPickupEvent(cls):
+        return pickupEventPrefix + cls.__mapper_args__['polymorphic_identity']
+#         return pickupEventPrefix + cls.itemType
+    
+    @classmethod
+    def getQuestPickupEvent(cls):
+        return questPickupEventPrefix + cls.__mapper_args__['polymorphic_identity']
+#         return questPickupEventPrefix + cls.itemType
     
     def dropEvent(self):
-        pub.sendMessage(self.getDropEvent(), self)
+        pub.sendMessage(self.getDropEvent(), item=self)
         if self.isQuestItem():
-            pub.sendMessage(self.getQuestDropEvent(), self)
+            pub.sendMessage(self.getQuestDropEvent(), item=self)
     
-    def getDropEvent(self):
-        return dropEventPrefix + self.itemType
+    @classmethod
+    def getDropEvent(cls):
+        return dropEventPrefix + cls.__mapper_args__['polymorphic_identity']
+#         return dropEventPrefix + cls.itemType
     
-    def getQuestDropEvent(self):
-        return questDropEventPrefix + self.itemType
+    @classmethod
+    def getQuestDropEvent(cls):
+        return questDropEventPrefix + cls.__mapper_args__['polymorphic_identity']
+#         return questDropEventPrefix + cls.itemType
         
     def use(self):
         self.onUse()
@@ -299,13 +306,13 @@ class Weapon(Item):
         super(Weapon, self).__init__(symbol = u')', **kwargs)
 
 class MacGuffin(Item):
-    __mapper_args__ = {'polymorphic_identity':u'weapon'}
+    __mapper_args__ = {'polymorphic_identity':u'macguffin'}
     
     color = colors.colorSteel
     description = "Mystic MacGuffin"
     
     def __init__(self, **kwargs):
-        super(Weapon, self).__init__(symbol = u'^', **kwargs)
+        super(MacGuffin, self).__init__(symbol = u'^', **kwargs)
 
 def getRandomItem():
     

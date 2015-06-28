@@ -9,6 +9,7 @@ from sqlalchemy.types import Integer, Boolean, Unicode
 from sqlalchemy.orm import relationship, backref
 import database as db
 from pubsub import pub
+import ItemClass
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -41,12 +42,16 @@ class Quest(Base):
 
         pub.subscribe(self.questProgress, QuestRequirement.updatedEventName)
         pub.subscribe(self.handleRequirementCompletion, QuestRequirement.satisfiedEventName)
+        
+    def addRequirement(self, req):
+        self.questRequirements.append(req)
 
     def questProgress(self, req):
-        pass
+        print "Quest progress!"
 
     def handleRequirementCompletion(self, req):
-        pub.sendMessage(self.questCompleteEventName, self)
+        print "Quest complete!"
+        pub.sendMessage(self.questCompleteEventName, quest=self)
         
     def placeQuestItems(self):
         pass
@@ -56,7 +61,7 @@ class Quest(Base):
     
     def attachToQuestgiver(self):
         pass
-    
+
 
 class QuestRequirement(Base):
     __tablename__ = "quest_requirements"
@@ -65,25 +70,58 @@ class QuestRequirement(Base):
     updatedEventName = questEventPrefix + 'requirement.updated'
     satisfiedEventName = questEventPrefix + 'requirement.satisfied'
 
-    def __init__(self, eventName, eventsRemaining, quest):
-        self.eventName = eventName
+    def __init__(self, eventsRemaining, quest):
         self.eventsRemaining = eventsRemaining
         self.quest = quest
 
     id = Column(Integer, primary_key=True, unique=True)
     questId = Column(Integer, ForeignKey("quests.id"))
-    eventName = Column(Unicode)
     eventsRemaining = Column(Integer)
-
-    def subscribe(self):
-        pub.subscribe(self.handleEvent, self.questEventPrefix + self.eventName)
-
-    def handleEvent(self):
-        self.eventsRemaining -= 1
-        pub.sendMessage(self.updatedEventName, req = self)
-        if self.completed():
-            pub.sendMessage(self.satisfiedEventName, req = self)
+    requirementType = Column(Unicode)
+    
+    __mapper_args__ = {
+        'polymorphic_on':requirementType,
+        'polymorphic_identity':u'quest_requirement'
+    }
     
     def completed(self):
         return self.eventsRemaining <= 0
+
+class QuestItemRequirement(QuestRequirement):
+    
+    def __init__(self, itemType, eventsRemaining, quest):
+        super(QuestItemRequirement, self).__init__(eventsRemaining, quest)
+        self.itemType = itemType
+        self.itemTypeStr = itemType.__name__
+    
+    itemTypeStr = Column(Unicode)
+    
+    __mapper_args__ = {'polymorphic_identity':u'quest_item_requirement'}
+        
+    def subscribe(self):
+        pub.subscribe(self.handlePickupEvent, self.getItemType().getQuestPickupEvent())
+        pub.subscribe(self.handleDropEvent, self.getItemType().getQuestDropEvent())
+        
+    def handlePickupEvent(self):
+        print "Picked up item!"
+        self.eventsRemaining -= 1
+        self.updateEvents()
+        
+    def handleDropEvent(self):
+        print "Dropped item!"
+        self.eventsRemaining += 1
+        self.updateEvents()
+    
+    def updateEvents(self):
+        print "Events remaining:", self.eventsRemaining
+        pub.sendMessage(self.updatedEventName, req = self)
+        if self.completed():
+            pub.sendMessage(self.satisfiedEventName, req = self)
+            
+    def getItemType(self):
+        if self.__dict__.get("itemType"):
+            return self.itemType
+        
+        self.itemType = ItemClass.__dict__.get(self.itemTypeStr)
+        return self.itemType
 
