@@ -50,6 +50,7 @@ MENU_SELECTED_COLOR = colors.goldenrod
 MENU_UNSELECTED_COLOR = colors.black
 
 PICK_UP_ITEM_MENU_HEADER = "Pick up what?"
+DROP_ITEM_MENU_HEADER = "Drop what?"
 PLAYER_INVENTORY_HEADER = "Inventory"
 WEAR_MENU_HEADER = "Wear what?"
 WIELD_MENU_HEADER = "Wield what?"

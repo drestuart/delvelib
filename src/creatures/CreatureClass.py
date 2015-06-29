@@ -290,10 +290,12 @@ class Creature(colors.withColor, Base):
             return "A " + self.getName()
         
     def pickUpItem(self, item):
-        
         G.message(self.The() + " picks up " + item.a_an())
         self.getInventory().addItem(item)
     
+    def dropItem(self, item):
+        G.message(self.The() + " drops " + item.a_an())
+#         self.getInventory().removeItem(item)
     
 
 class Orc(Creature):

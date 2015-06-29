@@ -380,13 +380,32 @@ class UI(object):
         index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
      
         #if an item was chosen, return it
-        if index is None or inventory.length() == 0:
+        if index is None:
             return None
         
         item = inventory.pop(index)
         item.pickupEvent()
         return item
     
+    def dropItemMenu(self):
+        inventory = self.player.getInventory()
+
+        if inventory.length() == 0:
+            return None
+        else:
+            items = inventory.getItems()
+            lines = [item.getDescription() for item in items]
+
+        header = C.DROP_ITEM_MENU_HEADER
+        index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
+
+        if index is None:
+            return None
+
+        item = inventory.pop(index)
+        item.dropEvent()
+        return item
+
     def selectItemMenu(self, inventory):
         #show a singleChoiceMenu with each item of the inventory as an option
         if inventory.length() == 0:
@@ -465,11 +484,20 @@ class UI(object):
                     if inv:
                         item = self.pickUpItemMenu(inv)
                         if item:
-    #                        inv.removeItem(item)
                             self.player.pickUpItem(item)
-                        
+                            return 'took-turn'
+                        return 'didnt-take-turn'
+
+            elif keyStr == 'd':
+                inv = self.player.getTile().getInventory()
+                if inv:
+                    item = self.dropItemMenu()
+                    if item:
+                        self.player.dropItem(item)
+                        inv.addItem(item)
                         return 'took-turn'
-                
+                    return 'didnt-take-turn'
+
             elif keyStr == 'c': # Close a door
                 if self.closeAdjacentDoor(self.player):
                     return 'took-turn'

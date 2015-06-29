@@ -375,6 +375,7 @@ class Tile(TileBase):
         self.creature = value
         
     def getInventory(self):
+        self.initializeInventory()
         return self.inventory
 
 # Some classes representing different kinds of tiles
