@@ -61,6 +61,9 @@ class Quest(Base):
     
     def attachToQuestgiver(self):
         pass
+    
+    def getConversation(self):
+        pass
 
 
 class QuestRequirement(Base):

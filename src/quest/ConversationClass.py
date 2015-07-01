@@ -24,6 +24,9 @@ class ConversationNode(object):
     def addOption(self, option):
         self.options.append(option)
         
+    def createOption(self, text, nextNode=None, callback=None):
+        ConversationOption(self, text, nextNode)
+        
     def setText(self, text):
         self.text = text
         
