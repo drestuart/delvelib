@@ -309,7 +309,7 @@ class MacGuffin(Item):
     __mapper_args__ = {'polymorphic_identity':u'macguffin'}
     
     color = colors.colorSteel
-    description = "Mystic MacGuffin"
+    description = u"Mystic MacGuffin"
     
     def __init__(self, **kwargs):
         super(MacGuffin, self).__init__(symbol = u'^', **kwargs)

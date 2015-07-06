@@ -59,8 +59,9 @@ class Quest(Base):
     def placeQuestCreatures(self):
         pass
     
-    def attachToQuestgiver(self):
-        pass
+    def addQuestGiver(self, cr):
+        self.questGivers.append(cr)
+        cr.quest = self
     
     def getConversation(self):
         pass
@@ -95,7 +96,7 @@ class QuestItemRequirement(QuestRequirement):
     def __init__(self, itemType, eventsRemaining, quest):
         super(QuestItemRequirement, self).__init__(eventsRemaining, quest)
         self.itemType = itemType
-        self.itemTypeStr = itemType.__name__
+        self.itemTypeStr = unicode(itemType.__name__)
     
     itemTypeStr = Column(Unicode)
     
@@ -106,12 +107,12 @@ class QuestItemRequirement(QuestRequirement):
         pub.subscribe(self.handleDropEvent, self.getItemType().getQuestDropEvent())
         
     def handlePickupEvent(self, item):
-        print "Picked up item!"
+        print "Picked up quest item"
         self.eventsRemaining -= 1
         self.updateEvents()
         
     def handleDropEvent(self, item):
-        print "Dropped item!"
+        print "Dropped quest item"
         self.eventsRemaining += 1
         self.updateEvents()
     

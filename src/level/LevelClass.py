@@ -87,8 +87,19 @@ class MapBase(Base):
         for cr in deadCreatures:
             cr.getTile().removeCreature()
             self.creatures.remove(cr)
-            
+
         return self.creatures
+    
+    def getRandomNPC(self):
+        npcs = []
+        for cr in self.getLivingCreatures():
+            if isinstance(cr, NPCClass.NPC):
+                npcs.append(cr)
+        
+        if len(npcs) == 0:
+            return None
+        
+        return random.choice(npcs)
     
     def computeFOVProperties(self, force = False):
         pass
@@ -395,8 +406,6 @@ class Level(MapBase):
     
     def computeFOVProperties(self, force = False):
         
-        print "Setting up FOV"
-        
         fovArray = []
         self.FOVMap = None
         
@@ -484,19 +493,19 @@ class Level(MapBase):
         
     def handleDoorOpen(self, tile):
         x, y = tile.getXY()
-        G.message("Door opened " + str(x) + ", " + str(y))
+#         G.message("Door opened " + str(x) + ", " + str(y))
         if self.__dict__.get('astar'): self.astar.setMovable(x, y, not tile.blocksPathing())
         self.computeFOVProperties(force = True)
     
     def handleDoorClose(self, tile):
         x, y = tile.getXY()
-        G.message("Door closed " + str(x) + ", " + str(y))
+#         G.message("Door closed " + str(x) + ", " + str(y))
         if self.__dict__.get('astar'): self.astar.setMovable(x, y, not tile.blocksPathing())
         self.computeFOVProperties(force = True)
     
     def handleDoorBlocked(self, tile):
         x, y = tile.getXY()
-        G.message("Door blocked from closing " + str(x) + ", " + str(y))
+#         G.message("Door blocked from closing " + str(x) + ", " + str(y))
     
     def getPathToTile(self, fromTile, toTile):
         

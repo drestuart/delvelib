@@ -122,7 +122,6 @@ class UI(object):
                 
     
     def quit(self):
-        print "Got a QUIT event"
         pygame.quit()
         sys.exit()
     

@@ -25,6 +25,12 @@ class NPC(Cr.Creature):
     
     def handleBump(self, bumper):
         # Start a conversation
-        Game.startConversation(self.conversationTree)
+        if self.quest:
+            conv = self.quest.getConversation()
+            if conv:
+                Game.startConversation(conv)
+        else:
+            Game.startConversation(self.conversationTree)
+
         return False
     
