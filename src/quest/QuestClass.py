@@ -10,22 +10,39 @@ from sqlalchemy.orm import relationship, backref
 import database as db
 from pubsub import pub
 import ItemClass
+from enum import Enum, unique
 
 Base = db.saveDB.getDeclarativeBase()
 
 questEventPrefix = 'event.quest.'
 
+# TODO
+# @unique
+# class QuestStatus(Enum):
+#     NOT_STARTED = 1
+#     STARTED = 2
+#     COMPLETED = 3
+
+NOT_STARTED = 1
+STARTED = 2
+COMPLETED = 3
+
 class Quest(Base):
     __tablename__ = "quests"
     __table_args__ = {'extend_existing': True}
     
+    questRequirementCompleteEventName = questEventPrefix + 'requirement.complete'
     questCompleteEventName = questEventPrefix + 'complete'
 
     def __init__(self, **kwargs):
-        pass
+        self.questStatus = NOT_STARTED
+        self.startConversation = None
+        self.progressConversation = None
+        self.completedConversation = None
     
     id = Column(Integer, primary_key=True, unique=True)
     questType = Column(Unicode)
+    questStatus = Column(Integer)
     
     questGivers = relationship("Creature", backref=backref("quest", uselist = False), primaryjoin="Quest.id==Creature.givingQuestId")
     questRequirements = relationship("QuestRequirement", backref=backref("quest", uselist = False), primaryjoin="Quest.id==QuestRequirement.questId")
@@ -40,32 +57,71 @@ class Quest(Base):
         for req in self.questRequirements:
             req.subscribe()
 
-        pub.subscribe(self.questProgress, QuestRequirement.updatedEventName)
+        pub.subscribe(self.handleQuestProgress, QuestRequirement.updatedEventName)
         pub.subscribe(self.handleRequirementCompletion, QuestRequirement.satisfiedEventName)
         
+        self.questStatus = STARTED
+
     def addRequirement(self, req):
         self.questRequirements.append(req)
 
-    def questProgress(self, req):
+    def handleQuestProgress(self, req):
         print "Quest progress!"
+        self.checkQuestRequirements()
+
+    def checkQuestRequirements(self):
+        for req in self.questRequirements:
+            if not req.completed():
+                self.setUncompleted()
+                return False
+
+        self.setCompleted()
+        return True
+
+    def setUncompleted(self):
+        if self.questStatus != NOT_STARTED:
+            self.questStatus = STARTED
+
+        print "Status:", self.questStatus
+
+    def setCompleted(self):
+        if self.questStatus != NOT_STARTED:
+            print "Quest complete!"
+            self.questStatus = COMPLETED
+            pub.sendMessage(self.questCompleteEventName, quest=self)
+
+        print "Status:", self.questStatus
 
     def handleRequirementCompletion(self, req):
-        print "Quest complete!"
-        pub.sendMessage(self.questCompleteEventName, quest=self)
-        
+        print "Quest requirement complete!"
+        pub.sendMessage(self.questRequirementCompleteEventName, quest=self)
+
     def placeQuestItems(self):
         pass
-    
+
     def placeQuestCreatures(self):
         pass
-    
+
     def addQuestGiver(self, cr):
         self.questGivers.append(cr)
         cr.quest = self
-    
+
     def getConversation(self):
+        if self.questStatus == NOT_STARTED:
+            return self.getStartConversation()
+        elif self.questStatus == STARTED:
+            return self.getProgressConversation()
+        elif self.questStatus == COMPLETED:
+            return self.getCompletedConversation()
+
+    def getStartConversation(self):
         pass
 
+    def getProgressConversation(self):
+        pass
+
+    def getCompletedConversation(self):
+        pass
 
 class QuestRequirement(Base):
     __tablename__ = "quest_requirements"
