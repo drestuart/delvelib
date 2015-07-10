@@ -26,6 +26,7 @@ questEventPrefix = 'event.quest.'
 NOT_STARTED = 1
 STARTED = 2
 COMPLETED = 3
+RETURNED = 4
 
 class Quest(Base):
     __tablename__ = "quests"
@@ -33,6 +34,7 @@ class Quest(Base):
     
     questRequirementCompleteEventName = questEventPrefix + 'requirement.complete'
     questCompleteEventName = questEventPrefix + 'complete'
+    questReturnedEventName = questEventPrefix + 'returned'
 
     def __init__(self, **kwargs):
         self.questStatus = NOT_STARTED
@@ -91,6 +93,17 @@ class Quest(Base):
             pub.sendMessage(self.questCompleteEventName, quest=self)
 
         print "Status:", self.questStatus
+        
+    def setReturned(self):
+        if self.questStatus != NOT_STARTED:
+            print "Quest returned!"
+            self.questStatus = RETURNED
+            pub.sendMessage(self.questReturnedEventName, quest=self)
+
+        print "Status:", self.questStatus
+        
+    def isReturned(self):
+        return self.questStatus == RETURNED
 
     def handleRequirementCompletion(self, req):
         print "Quest requirement complete!"
