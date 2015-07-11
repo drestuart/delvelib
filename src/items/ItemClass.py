@@ -167,13 +167,10 @@ class Item(colors.withColor, Base):
         self.quantity = value
         
     def canStackWith(self, other):
-#        print "Determining stacking for " + self.getDescription() + " and " + other.getDescription()
         if not (self.stackable and other.stackable):
-#            print "Not stackable!"
             return False
         
         elif self.__class__ != other.__class__:
-#            print "Items incompatible!"
             return False
         
         return True

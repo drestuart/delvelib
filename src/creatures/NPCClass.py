@@ -15,7 +15,7 @@ class NPC(Cr.Creature):
     blockSight = False
     description = "NPC"
     color = colors.white
-    species = 'player'
+    species = 'NPC'
     
     def __init__(self, **kwargs):
         super(NPC, self).__init__(symbol = u'@', AIClass = AI.SedentaryAI, maxHP=10, **kwargs)

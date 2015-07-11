@@ -54,6 +54,11 @@ class Player(Cr.Creature):
     def The(self):
         return self.getName()
     
+    def giveItemToCreature(self, item, creature):
+        self.getInventory().removeItem(item)
+        creature.getInventory().addItem(item)
         
+    def getQuestItemOfType(self, itemType):
+        return self.getInventory().getQuestItemOfType(itemType)
     
     

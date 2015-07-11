@@ -68,7 +68,6 @@ class Quest(Base):
         self.questRequirements.append(req)
 
     def handleQuestProgress(self, req):
-        print "Quest progress!"
         self.checkQuestRequirements()
 
     def checkQuestRequirements(self):
@@ -84,29 +83,20 @@ class Quest(Base):
         if self.questStatus != NOT_STARTED:
             self.questStatus = STARTED
 
-        print "Status:", self.questStatus
-
     def setCompleted(self):
         if self.questStatus != NOT_STARTED:
-            print "Quest complete!"
             self.questStatus = COMPLETED
             pub.sendMessage(self.questCompleteEventName, quest=self)
-
-        print "Status:", self.questStatus
         
     def setReturned(self):
         if self.questStatus != NOT_STARTED:
-            print "Quest returned!"
             self.questStatus = RETURNED
             pub.sendMessage(self.questReturnedEventName, quest=self)
-
-        print "Status:", self.questStatus
         
     def isReturned(self):
         return self.questStatus == RETURNED
 
     def handleRequirementCompletion(self, req):
-        print "Quest requirement complete!"
         pub.sendMessage(self.questRequirementCompleteEventName, quest=self)
 
     def placeQuestItems(self):
@@ -143,12 +133,14 @@ class QuestRequirement(Base):
     updatedEventName = questEventPrefix + 'requirement.updated'
     satisfiedEventName = questEventPrefix + 'requirement.satisfied'
 
-    def __init__(self, eventsRemaining, quest):
-        self.eventsRemaining = eventsRemaining
+    def __init__(self, eventsRequired, quest):
+        self.eventsRequired = eventsRequired
+        self.eventsRemaining = eventsRequired
         self.quest = quest
 
     id = Column(Integer, primary_key=True, unique=True)
     questId = Column(Integer, ForeignKey("quests.id"))
+    eventsRequired = Column(Integer)
     eventsRemaining = Column(Integer)
     requirementType = Column(Unicode)
     
@@ -159,6 +151,16 @@ class QuestRequirement(Base):
     
     def completed(self):
         return self.eventsRemaining <= 0
+
+    # For subclasses to override
+    def getItemType(self):
+        return None
+
+    def getEventsRequired(self):
+        return self.eventsRequired
+
+    def getEventsRemaining(self):
+        return self.eventsRemaining
 
 class QuestItemRequirement(QuestRequirement):
     
@@ -176,17 +178,14 @@ class QuestItemRequirement(QuestRequirement):
         pub.subscribe(self.handleDropEvent, self.getItemType().getQuestDropEvent())
         
     def handlePickupEvent(self, item):
-        print "Picked up quest item"
         self.eventsRemaining -= 1
         self.updateEvents()
         
     def handleDropEvent(self, item):
-        print "Dropped quest item"
         self.eventsRemaining += 1
         self.updateEvents()
     
     def updateEvents(self):
-        print "Events remaining:", self.eventsRemaining
         pub.sendMessage(self.updatedEventName, req = self)
         if self.completed():
             pub.sendMessage(self.satisfiedEventName, req = self)
@@ -197,4 +196,4 @@ class QuestItemRequirement(QuestRequirement):
         
         self.itemType = ItemClass.__dict__.get(self.itemTypeStr)
         return self.itemType
-
+    

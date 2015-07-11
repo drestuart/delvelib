@@ -79,7 +79,6 @@ class Inventory(Base):
     def removeItem(self, itemIn):
         if itemIn in self.items:
             self.items.remove(itemIn)
-#            itemIn.setContainer(None)
             return itemIn
         
         raise ValueError(itemIn + " does not exist in container " + self)
@@ -96,21 +95,33 @@ class Inventory(Base):
     def getItems(self):
         return self.items
 
+    def getItemOfType(self, itemType, questItem = False):
+        for item in self.items:
+            if isinstance(item, itemType):
+                # If it's a quest item, don't bother checking questItem requirement
+                if item.isQuestItem():
+                    return item
+                # If it's not, check the requirement
+                if not questItem:
+                    return item
+
+        return None
+
+    def getQuestItemOfType(self, itemType):
+        return self.getItemOfType(itemType, True)
 
     def getContainingItem(self):
         return self.containingItem
 
-
     def setItems(self, value):
         self.items = value
-
 
     def setContainingItem(self, value):
         self.containingItem = value
 
     def length(self):
         return len(self.items)
-    
+
 
 
 def main():
