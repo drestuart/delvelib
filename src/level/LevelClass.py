@@ -13,7 +13,7 @@ from sqlalchemy.types import Unicode, Integer
 
 import AStar
 import Const as C
-from DungeonFeatureClass import upStair, downStair
+from DungeonFeatureClass import upStair, downStair, Door
 import DungeonFeatureClass as F
 import FOVMap as fov
 import Game as G
@@ -297,13 +297,20 @@ class Level(MapBase):
 #         return self.getRandomOpenTileInArea(room.x1, room.x2, room.y1, room.y2)
         openTiles = []
         for tile in room.getTiles():
-            if tile and not tile.blocksMove():
+            if tile and not tile.blocksMove() and not self.adjacentToDoor(tile):
                 openTiles.append(tile)
                 
         return random.choice(openTiles)
     
     def getRandomRoom(self):
         return random.choice(self.rooms)
+
+    def adjacentToDoor(self, tile):
+        adjTiles = self.getAdjacentTiles(tile)
+        for tile in adjTiles:
+            if isinstance(tile.getFeature(), Door):
+                return True
+        return False
         
     def getTilesToDraw(self, playerx, playery, cameradims, visibility = True):
         retArray = []
@@ -394,7 +401,6 @@ class Level(MapBase):
         return tiles
     
     def getAdjacentTiles(self, fromTile):
-#         return self.getTilesAtRadius(1, fromTile.getX(), fromTile.getY())
         tiles = []
         x, y = fromTile.getXY()
         for i in (-1, 0, 1):
