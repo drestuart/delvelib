@@ -31,6 +31,7 @@ class UI(object):
         self.currentLevel = kwargs.get('level', None)
         self.player = kwargs.get('player', None)
         self.fullscreen = kwargs.get('fullscreen', False)
+        self.conversationCreature = None
 
         self.window = pygcurse.PygcurseWindow(C.SCREEN_WIDTH, C.SCREEN_HEIGHT, C.TITLE, #font = self.font,
                                               fgcolor = colors.colorDefaultFG, bgcolor = colors.colorDefaultBG,
@@ -422,11 +423,14 @@ class UI(object):
         
         return inventory.getItem(index)
 
-    def conversationMenu(self, conv):
-        # Use the test conversation tree
+    def conversationMenu(self, cr, conv):
+        self.conversationCreature = cr
         conWindow = ConversationWindow(self, tree=conv, width=C.MENU_WIDTH, title='')
         conWindow.doConversation()
         
+    def getConversationCreature(self):
+        return self.conversationCreature
+
     def debugMenu(self):
         debugOptions = G.getDebugOptions()
 
@@ -521,11 +525,6 @@ class UI(object):
                             
             elif keyStr == 'i':
                 self.showPlayerInventory()
-                return 'didnt-take-turn'
-
-            # TEST
-            elif keyStr == 't':
-                self.conversationMenu()
                 return 'didnt-take-turn'
 
             # Debug menu

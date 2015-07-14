@@ -11,8 +11,8 @@ defaultNames = 0
 def message(msg):
     game.message(msg)
     
-def startConversation(conv):
-    game.startConversation(conv)
+def startConversation(cr, conv):
+    game.startConversation(cr, conv)
 
 def getDebug():
     return game.debug
@@ -53,8 +53,8 @@ class Game(object):
         if self.debug: print msg
         self.ui.message(msg)
         
-    def startConversation(self, conv):
-        self.ui.conversationMenu(conv)
+    def startConversation(self, cr, conv):
+        self.ui.conversationMenu(cr, conv)
 
     def waitForInput(self):
         return self.ui.waitForInput()

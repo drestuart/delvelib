@@ -29,9 +29,9 @@ class NPC(Cr.Creature):
         if self.quest and not self.quest.isReturned():
             conv = self.quest.getConversation()
             if conv:
-                Game.startConversation(conv)
+                Game.startConversation(self, conv)
         else:
-            Game.startConversation(self.conversationTree)
+            Game.startConversation(self, self.conversationTree)
 
         return False
     
