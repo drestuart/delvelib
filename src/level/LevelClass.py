@@ -304,14 +304,24 @@ class Level(MapBase):
     
     def getRandomRoom(self):
         return random.choice(self.rooms)
-
-    def adjacentToDoor(self, tile):
+    
+    def adjacentToBlocked(self, tile):
         adjTiles = self.getAdjacentTiles(tile)
-        for tile in adjTiles:
-            if isinstance(tile.getFeature(), Door):
+        for t in adjTiles:
+            if t.blocksMove():
                 return True
         return False
-        
+    
+    def adjacentToFeature(self, tile, featureType):
+        adjTiles = self.getAdjacentTiles(tile)
+        for t in adjTiles:
+            if isinstance(t.getFeature(), featureType):
+                return True
+        return False
+
+    def adjacentToDoor(self, tile):
+        return self.adjacentToFeature(tile, Door)
+    
     def getTilesToDraw(self, playerx, playery, cameradims, visibility = True):
         retArray = []
         
