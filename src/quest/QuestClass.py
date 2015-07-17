@@ -11,6 +11,7 @@ import database as db
 from pubsub import pub
 import ItemClass
 from enum import Enum, unique
+import Game
 
 Base = db.saveDB.getDeclarativeBase()
 
@@ -125,6 +126,42 @@ class Quest(Base):
 
     def getCompletedConversation(self):
         pass
+
+class ItemQuest(Quest):
+
+    def __init__(self, itemTypes):
+        super(ItemQuest, self).__init__()
+        self.itemTypes = itemTypes
+
+    def buildRequirements(self):
+        for (type_, quantity) in self.itemTypes:
+            QuestItemRequirement(type_, quantity, self)
+
+    def placeQuestItems(self):
+        pass
+
+    def startQuest(self):
+        self.placeQuestItems()
+        super(ItemQuest, self).startQuest()
+
+    def setReturned(self):
+        player = Game.getPlayer()
+
+        # Move item from player's inventory to quest giver's
+        for req in self.questRequirements:
+            itemType = req.getItemType()
+            if itemType:
+                for dummy in range(req.getEventsRequired()):
+                    item = player.getQuestItemOfType(itemType)
+                    if item:
+                        questGiver = self.questGivers[0]            # TODO!!!!!!
+                        player.giveItemToCreature(item, questGiver) # TODO!!!!!!
+                    else:
+                        print "Couldn't find a", req.itemTypeStr, "for some reason"
+
+        super(ItemQuest, self).setReturned()
+
+    __mapper_args__ = {'polymorphic_identity': u'item_quest'}
 
 class QuestRequirement(Base):
     __tablename__ = "quest_requirements"

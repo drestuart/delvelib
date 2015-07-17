@@ -35,6 +35,9 @@ def getCurrentMapTile():
 def getWorldMap():
     return game.worldMap
 
+def getPlayer():
+    return game.getPlayer()
+
 class Game(object):
     
     fontsize = None
