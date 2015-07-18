@@ -10,6 +10,7 @@ from pygame.locals import *
 import re
 import textwrap
 from symbols import *
+import pygcurse
 import Game as G
 from OptionClass import OptionType
 import pygame
@@ -562,6 +563,7 @@ class GameMenuWindow(MenuWindow):
         
         self.enabledFGColor = kwargs.get('enabledFGColor', C.MENU_TEXT_COLOR)
         self.disabledFGColor = kwargs.get('disabledFGColor', C.MENU_DISABLED_TEXT_COLOR)
+        self.shadow = None
         
         self.selected = 0
         
@@ -677,6 +679,11 @@ class GameMenuWindow(MenuWindow):
                 continue
             
 class EscapeMenuWindow(GameMenuWindow):
+
+    def __init__(self, *args, **kwargs):
+        super(EscapeMenuWindow, self).__init__(*args, **kwargs)
+        self.shadow = kwargs.get('shadow', pygcurse.SOUTHEAST)
+
     def getSingleChoice(self):
         while True:
             self.draw()
@@ -722,6 +729,7 @@ class ConversationWindow(MenuWindow):
         super(ConversationWindow, self).__init__(*args, **kwargs)
         self.selected = 0
         self.conversationTree = kwargs['tree']
+        self.shadow = kwargs.get('shadow', pygcurse.SOUTHEAST)
         
     def doConversation(self):
         # Start with the first node on the tree
@@ -839,6 +847,7 @@ class OptionWindow(MenuWindow):
     
     def __init__(self, *args, **kwargs):
         super(OptionWindow, self).__init__(*args, **kwargs)
+        self.shadow = kwargs.get('shadow', pygcurse.SOUTHEAST)
         self.selected = 0
         
     def doMenuStuff(self):

@@ -281,7 +281,6 @@ class UI(object):
                 text = item.getDescription()
                 lines.append(text)
         
-#        self.displayTextWindow(header, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, height, lines)
         index = self.singleChoiceMenu(header, lines, C.MENU_WIDTH)
         
         # Do nothing... yet
