@@ -644,7 +644,9 @@ class Level(MapBase):
         
     def bumpEdge(self, creature):
         if self.depth == 0:
-            return self.getArea().getMapTile()
+            area = self.getArea()
+            if area:
+                return area.getMapTile()
         return False
     
     def findEntryPoint(self):

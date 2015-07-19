@@ -231,7 +231,8 @@ class CharacterPanel(Panel):
         depth = self.ui.currentLevel.getDepth()
         
         self.render_bar(1, 1, 18, "HP", currentHP, maxHP, colors.darkBlue, colors.darkRed)
-        self.showCoords(1, 3, playerx, playery, depth)
+        if (G.getDebugValue("showCoords")):
+            self.showCoords(1, 3, playerx, playery, depth)
         
     def showCoords(self, x, y, playerx, playery, depth):
         
