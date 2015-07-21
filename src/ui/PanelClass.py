@@ -281,8 +281,6 @@ class MapPanel(Panel):
         self.xoffset += dx
         self.yoffset += dy
         
-#        print self.camx + self.xoffset, self.camy + self.yoffset
-        
     def resetCameraOffset(self):
         self.xoffset = 0
         self.yoffset = 0
@@ -557,6 +555,64 @@ class MenuWindow(Panel):
         # print text
         self.putChars(line, self.margin + 1, y, fgcolor=fg, bgcolor=bg)
         
+class InventoryWindow(MenuWindow):
+
+    def __init__(self, player, *args, **kwargs):
+        super(InventoryWindow, self).__init__(*args, title=C.PLAYER_INVENTORY_HEADER,
+                                              shadow=pygcurse.SOUTHEAST, **kwargs)
+
+        inv = player.getInventory()
+        self.height = inv.length()
+
+        options = []
+
+        for item in inv.getItems():
+            text = item.getDescription()
+            options.append(text)
+
+        self.setupOptions(options)
+
+    def setupOptions(self, options):
+        self.options = options
+        self.height = 2*(self.margin + 1)
+
+        # Pad an empty inventory to show something
+        if not options:
+            self.linesToDisplay = {0 : [""]}
+            self.height += 1
+
+        else:
+            # Set up word wrap
+            self.linesToDisplay = {}
+            optNum = 0
+            textWidth = self.width - 2*(self.margin + 1)
+
+            for line in self.options:
+                self.linesToDisplay[optNum] = []
+                wrappedLines = textwrap.wrap(line, textWidth)
+                linesForOption = 0
+
+                for wline in wrappedLines:
+                    if linesForOption > 0:
+                        wline = ' ' * self.multilineIndent + wline.ljust(textWidth - self.multilineIndent)
+                    else:
+                        wline = wline.ljust(textWidth)
+
+                    self.linesToDisplay[optNum].append(wline)
+                    self.height += 1
+                    linesForOption += 1
+
+                optNum += 1
+
+        self.x = (C.SCREEN_WIDTH - self.width)/2
+        self.y = (C.SCREEN_HEIGHT - self.height)/2
+
+        return self.linesToDisplay
+
+    def show(self):
+        self.draw()
+        self.getUserInput()
+
 class GameMenuWindow(MenuWindow):
     
     def __init__(self, *args, **kwargs):

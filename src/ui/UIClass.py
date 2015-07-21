@@ -227,49 +227,14 @@ class UI(object):
         
         menu = MenuWindow(self, options = options, width = width, title = title, shadow = pygcurse.SOUTHEAST)
         return menu.getSingleChoice()
-        
-    def displayTextWindow(self, title, x, y, width, lines):
-#        raise Exception("Deprecated (displayTextWindow)")
-        linesToDisplay = []
-        for line in lines:
-            wrappedLines = textwrap.wrap(line, width - 4)
-            for wline in wrappedLines:
-                wline = wline.ljust(width)
-                linesToDisplay.append(wline)
-                
-        height = len(linesToDisplay) + 2 + 2*C.MENU_MARGIN
-        
-        # Attempt to center
-        x = (C.SCREEN_WIDTH - width)/2
-        y = (C.SCREEN_HEIGHT - height)/2
-        
-        box = pygcurse.PygcurseTextbox(self.window, (x, y, width, height), fgcolor='white', bgcolor='black', #border = '='
-                                       wrap=True, margin=C.MENU_MARGIN, caption=title, shadow = pygcurse.SOUTHEAST)   
-        
-        box.text = "\n".join(linesToDisplay)
-        box.update()
-        self.drawWindow()        
     
     def showPlayerInventory(self):
-        title = C.PLAYER_INVENTORY_HEADER
-        inv = self.player.getInventory()
-        
-        height = inv.length()
-        
-        lines = []
-        
-        for item in inv.getItems():
-            text = item.getDescription()
-            lines.append(text)
-        
-        self.displayTextWindow(title, C.MENU_X, C.MENU_Y, C.MENU_WIDTH, lines)
-        
-        key, keyStr = self.waitForInput()
+        invWindow = InventoryWindow(self.player, self, width = C.MENU_WIDTH)
+        invWindow.show()
         
         # Do nothing... yet
         return None
-        
-    
+
     def wearMenu(self):
         header = C.WEAR_MENU_HEADER
         inv = self.player.getInventory()
