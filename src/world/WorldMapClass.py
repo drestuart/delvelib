@@ -143,21 +143,26 @@ class WorldMap(L.MapBase):
         return U.ChebyshevDistance(xa, xb, ya, yb)
 
     
-    def getTilesInRadius(self, radius, centerX, centerY):
-        
-        assert radius >= 0 and radius == int(radius) #Do better error checking here.
+    def getTilesInRadius(self, radius, centerX, centerY, tileClass=None):
+        assert radius >= 0 and radius == int(radius)
         
         tiles = []
-        
         for rad in range(0, radius + 1):
-            tiles += self.getTilesAtRadius(rad, centerX, centerY)
+            tiles += self.getTilesAtRadius(rad, centerX, centerY, tileClass)
         
         return tiles
-        
     
-    def getTilesAtRadius(self, radius, centerX, centerY):
-               
-        assert radius >= 0 and radius == int(radius) #Do better error checking here.
+    def getTilesInRange(self, rmin, rmax, centerX, centerY, tileClass=None):
+        assert rmin <= rmax and rmin > 0
+        
+        tiles = []
+        for rad in range(rmin, rmax + 1):
+            tiles += self.getTilesAtRadius(rad, centerX, centerY, tileClass)
+        
+        return tiles
+    
+    def getTilesAtRadius(self, radius, centerX, centerY, tileClass=None):
+        assert radius >= 0 and radius == int(radius)
         
         centerTile = self.getTile(centerX, centerY)
         tiles = []
@@ -174,14 +179,14 @@ class WorldMap(L.MapBase):
         for x in range(x1, x2 + 1):
             tile1 = self.getTile(x, y1)
             tile2 = self.getTile(x, y2)
-            if tile1: tiles.append(tile1)
-            if tile2: tiles.append(tile2)
+            if tile1 and (tileClass is None or isinstance(tile1, tileClass)): tiles.append(tile1)
+            if tile2 and (tileClass is None or isinstance(tile2, tileClass)): tiles.append(tile2)
         
         for y in range(y1 + 1, y2):
             tile1 = self.getTile(x1, y)
             tile2 = self.getTile(x2, y)
-            if tile1: tiles.append(tile1)
-            if tile2: tiles.append(tile2)
+            if tile1 and (tileClass is None or isinstance(tile1, tileClass)): tiles.append(tile1)
+            if tile2 and (tileClass is None or isinstance(tile2, tileClass)): tiles.append(tile2)
         
         return tiles
     

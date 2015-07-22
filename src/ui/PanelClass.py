@@ -53,7 +53,6 @@ class Panel(object):
         
 
 class MessagePanel(Panel):
-    # TODO implement multi-color messages
     def __init__(self, *args):
         super(MessagePanel, self).__init__(*args)
         self.messages = []
@@ -499,13 +498,13 @@ class MenuWindow(Panel):
         pass
         # TODO
 
-    def draw(self):
+    def draw(self, highlightSelected=True):
         self.setUpWindow()
 
         # print options
         y = self.margin + 1
         for key in sorted(self.linesToDisplay.keys()):
-            if key in self.selected:
+            if highlightSelected and key in self.selected:
                 bg = self.selectedBGColor
             else:
                 bg = self.defaultBGColor
@@ -610,7 +609,7 @@ class InventoryWindow(MenuWindow):
         return self.linesToDisplay
 
     def show(self):
-        self.draw()
+        self.draw(highlightSelected=False)
         self.getUserInput()
 
 class GameMenuWindow(MenuWindow):

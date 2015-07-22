@@ -65,6 +65,9 @@ class Quest(Base):
         
         self.questStatus = STARTED
 
+    def getRequirements(self):
+        return self.questRequirements
+
     def addRequirement(self, req):
         self.questRequirements.append(req)
 

@@ -144,7 +144,7 @@ class UI(object):
         clock = pygame.time.Clock()
         while True:
             clock.tick(C.MENU_FPS)
-            for event in pygame.event.get([KEYDOWN, QUIT]):  # TODO what do the event types do here?
+            for event in pygame.event.get([KEYDOWN, QUIT]):
                 if event.type == QUIT:
                     return None, None
                 elif event.type == KEYDOWN:
@@ -663,7 +663,6 @@ class UI(object):
                 G.message("You close the door")
                 return True
             G.message("The door is blocked")
-            # TODO: Should trying to close a blocked door take a turn?
             return False
         
         else:
