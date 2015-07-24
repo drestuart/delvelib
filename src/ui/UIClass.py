@@ -234,6 +234,12 @@ class UI(object):
         
         # Do nothing... yet
         return None
+    
+    def showQuestWindow(self):
+        qWindow = QuestWindow(self, width = C.QUEST_WINDOW_WIDTH)
+        qWindow.show()
+        
+        return None
 
     def wearMenu(self):
         header = C.WEAR_MENU_HEADER
@@ -489,6 +495,10 @@ class UI(object):
                             
             elif keyStr == 'i':
                 self.showPlayerInventory()
+                return 'didnt-take-turn'
+            
+            elif keyStr == 'q':
+                self.showQuestWindow()
                 return 'didnt-take-turn'
 
             # Debug menu

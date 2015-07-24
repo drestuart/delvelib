@@ -14,6 +14,7 @@ import pygcurse
 import Game as G
 from OptionClass import OptionType
 import pygame
+from QuestClass import NOT_STARTED, RETURNED
 
 fgdefault = colors.colorMessagePanelFG
 bgdefault = colors.colorMessagePanelBG
@@ -1041,4 +1042,64 @@ class OptionWindow(MenuWindow):
         
         return self.linesToDisplay
 
+class QuestWindow(MenuWindow):
+    def __init__(self, *args, **kwargs):
+        super(QuestWindow, self).__init__(*args, title=C.QUEST_WINDOW_HEADER,
+                                      shadow=pygcurse.SOUTHEAST, **kwargs)
+        self.quests = G.getQuests()
+        self.setup()
 
+    def show(self):
+        self.draw(highlightSelected=False)
+        self.getUserInput()
+        
+    def setup(self):
+        self.height = 2*(self.margin + 1)
+        
+        self.questsToShow = []
+        
+        for q in self.quests:
+            status = q.getStatus()
+            if status == NOT_STARTED or status == RETURNED:
+                continue
+            self.questsToShow.append(q)
+        
+        # Pad an empty quest list to show something
+        if not self.questsToShow:
+            self.linesToDisplay = {0 : ["No quests".center(self.width - 2*self.margin)]}
+            self.height += 1
+        
+        else:
+            # Set up word wrap
+            self.linesToDisplay = {}
+            optNum = 0
+            
+            for q in self.questsToShow:
+                textWidth = C.QUEST_WINDOW_NAME_COLUMN_WIDTH
+
+                self.linesToDisplay[optNum] = []
+                questNameLines = textwrap.wrap(q.getName(), textWidth)
+                linesForOption = 0
+
+                for wline in questNameLines:
+                    if linesForOption > 0:
+                        wline = ' ' * self.multilineIndent + wline.ljust(textWidth - self.multilineIndent)
+                        wline += ' ' * self.margin + '|'
+                    else:
+                        wline = wline.ljust(textWidth)
+                        # Add quest status line
+                        wline += ' ' * self.margin + '|' + ' ' * self.margin + q.getStatusString()
+
+                    self.linesToDisplay[optNum].append(wline)
+                    self.height += 1
+                    linesForOption += 1
+
+                optNum += 1
+        
+        self.x = (C.SCREEN_WIDTH - self.width)/2
+        self.y = (C.SCREEN_HEIGHT - self.height)/2
+        
+        return self.linesToDisplay
+    
+#     def draw(self):
+#         pass

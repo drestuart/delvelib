@@ -38,10 +38,16 @@ def getWorldMap():
 def getPlayer():
     return game.getPlayer()
 
+def getQuests():
+    return game.getQuests()
+
+def addQuest(q):
+    game.addQuest(q)
+
 class Game(object):
     
     fontsize = None
-
+    
     def initialize(self, **kwargs):
         raise NotImplementedError()
         
@@ -79,6 +85,12 @@ class Game(object):
 
     def quit(self):
         self.ui.quit()
+        
+    def getQuests(self):
+        return self.quests
+    
+    def addQuest(self, q):
+        self.quests.append(q)
     
 game = Game()
 

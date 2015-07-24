@@ -4,6 +4,8 @@ Created on Jun 23, 2015
 @author: dstuart
 '''
 
+from __future__ import unicode_literals
+
 from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
 from sqlalchemy.types import Integer, Boolean, Unicode
 from sqlalchemy.orm import relationship, backref
@@ -42,10 +44,13 @@ class Quest(Base):
         self.startConversation = None
         self.progressConversation = None
         self.completedConversation = None
+        
+        Game.addQuest(self)
     
     id = Column(Integer, primary_key=True, unique=True)
     questType = Column(Unicode)
     questStatus = Column(Integer)
+    questName = Column(Unicode)
     
     questGivers = relationship("Creature", backref=backref("quest", uselist = False), primaryjoin="Quest.id==Creature.givingQuestId")
     questRequirements = relationship("QuestRequirement", backref=backref("quest", uselist = False), primaryjoin="Quest.id==QuestRequirement.questId")
@@ -129,6 +134,23 @@ class Quest(Base):
 
     def getCompletedConversation(self):
         pass
+    
+    def getName(self):
+        return self.questName
+    
+    def getStatus(self):
+        return self.questStatus
+    
+    def getStatusString(self):
+        st = self.getStatus()
+        if st == NOT_STARTED:
+            return "Not started"
+        elif st == STARTED:
+            return "Started"
+        elif st == COMPLETED:
+            return "Completed"
+        elif st == RETURNED:
+            return "Returned"
 
 class ItemQuest(Quest):
 
