@@ -1066,7 +1066,7 @@ class QuestWindow(MenuWindow):
         
         # Pad an empty quest list to show something
         if not self.questsToShow:
-            self.linesToDisplay = {0 : ["No quests".center(self.width - 2*self.margin)]}
+            self.linesToDisplay = {0 : ["No quests".center(self.width - 2*self.margin - 2)]}
             self.height += 1
         
         else:
