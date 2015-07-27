@@ -4,8 +4,6 @@ Created on Jun 4, 2015
 @author: dstuart
 '''
 
-import Game
-
 class ConversationTree(object):
     def __init__(self, nodes):
         self.nodes = nodes
@@ -61,9 +59,8 @@ thirdNode = ConversationNode("This is the last node. It's been fun, hasn't it?")
 
 option1 = ConversationOption(firstNode, "Go on...", secondNode)
 option2 = ConversationOption(secondNode, "That's true", thirdNode)
-option3 = ConversationOption(thirdNode, "Yes", None, lambda: Game.message("Yes"))
-option4 = ConversationOption(thirdNode, "No", None, lambda: Game.message("No"))
-option5 = ConversationOption(thirdNode, "Maybe", None, lambda: Game.message("Maybe"))
-
+option3 = ConversationOption(thirdNode, "Yes", None)
+option4 = ConversationOption(thirdNode, "No", None)
+option5 = ConversationOption(thirdNode, "Maybe", None)
 
 testConversationTree = ConversationTree([firstNode, secondNode, thirdNode])

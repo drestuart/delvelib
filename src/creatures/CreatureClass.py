@@ -10,11 +10,9 @@ from sqlalchemy.types import Unicode, Integer, Boolean
 import AIClass as AI
 import colors
 import database as db
-import Game as G
 import InventoryClass as I
 
 Base = db.saveDB.getDeclarativeBase()
-
 
 class Creature(colors.withColor, Base):
     
@@ -100,6 +98,7 @@ class Creature(colors.withColor, Base):
             return self.moveToTile(nextTile)
         
     def openDoor(self, tile):
+        import Game as G
         # Probably redundant error checking
         if not tile.hasClosedDoor():
             raise Exception("Trying to open an open or non-existent door")
@@ -154,6 +153,7 @@ class Creature(colors.withColor, Base):
             self.die()
             
     def die(self):
+        import Game as G
         message = self.The() + " dies!"
         G.message(message)
         print message
@@ -250,6 +250,7 @@ class Creature(colors.withColor, Base):
         return self.level.isTileInFOV(self.getTile(), creature.getTile())
         
     def attack(self, enemy):
+        import Game as G
         damage = self.getAttackDamage()
         
         message = self.The() + " attacks " + enemy.the() + " for " + str(damage)
@@ -290,10 +291,12 @@ class Creature(colors.withColor, Base):
             return "A " + self.getName()
         
     def pickUpItem(self, item):
+        import Game as G
         G.message(self.The() + " picks up " + item.a_an())
         self.getInventory().addItem(item)
     
     def dropItem(self, item):
+        import Game as G
         G.message(self.The() + " drops " + item.a_an())
 #         self.getInventory().removeItem(item)
     

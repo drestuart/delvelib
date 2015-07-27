@@ -8,7 +8,6 @@ Created on Mar 13, 2013
 import random
 import keys
 from pygame.locals import *
-import Game as G
 
 def getAIClassByName(name):
     return AIdict.get(name)
@@ -44,7 +43,7 @@ class PlayerAI(AI):
     
     def takeTurn(self, key):
 #        print "Waiting for player"
-        
+        import Game as G
         key, keyStr = G.game.waitForInput()
         
         if key == keys.K_ESCAPE:

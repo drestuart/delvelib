@@ -7,7 +7,6 @@ Created on Jun 9, 2015
 import AIClass as AI
 import colors
 import CreatureClass as Cr
-import Game
 import ConversationClass
 
 class NPC(Cr.Creature):
@@ -25,13 +24,14 @@ class NPC(Cr.Creature):
     __mapper_args__ = {'polymorphic_identity': u'NPC'}
     
     def handleBump(self, bumper):
+        import Game as G
         # Start a conversation
         if self.quest and not self.quest.isReturned():
             conv = self.quest.getConversation()
             if conv:
-                Game.startConversation(self, conv)
+                G.startConversation(self, conv)
         else:
-            Game.startConversation(self, self.conversationTree)
+            G.startConversation(self, self.conversationTree)
 
         return False
     

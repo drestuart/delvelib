@@ -5,6 +5,8 @@ Created on Mar 10, 2013
 '''
 
 from pubsub import pub
+# from WorldMapClass import WorldMap
+import WorldMapClass
 
 defaultNames = 0
 
@@ -30,10 +32,13 @@ def getCurrentLevel():
     return game.ui.getCurrentLevel()
 
 def getCurrentMapTile():
-    pass
+    level = game.ui.getCurrentLevel()
+    if not isinstance(level, WorldMapClass.WorldMap):
+        return level.getMapTile()
+    return game.getPlayer().getTile()
 
 def getWorldMap():
-    return game.worldMap
+    return game.getWorldMap()
 
 def getPlayer():
     return game.getPlayer()
@@ -91,6 +96,9 @@ class Game(object):
     
     def addQuest(self, q):
         self.quests.append(q)
+        
+    def getWorldMap(self):
+        return self.worldMap
     
 game = Game()
 

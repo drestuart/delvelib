@@ -16,7 +16,6 @@ import Const as C
 from DungeonFeatureClass import upStair, downStair, Door
 import DungeonFeatureClass as F
 import FOVMap as fov
-import Game as G
 import ItemClass as I
 from RoomClass import Room
 import TileClass as T

@@ -60,6 +60,9 @@ class Quest(Base):
     
     def buildRequirements(self):
         raise NotImplementedError("buildRequirements()")
+    
+    def setUpQuest(self):
+        raise NotImplementedError("setUpQuest()")
 
     def startQuest(self):
         for req in self.questRequirements:

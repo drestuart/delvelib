@@ -161,6 +161,18 @@ class WorldMap(L.MapBase):
         
         return tiles
     
+    def getNearestTile(self, fromTile, tileClass):
+        centerX, centerY = fromTile.getXY()
+        radius = 1
+        
+        while True:
+            matches = self.getTilesAtRadius(radius, centerX, centerY, tileClass)
+            if not matches:
+                radius += 1
+                continue
+
+            return random.choice(matches)
+    
     def getTilesAtRadius(self, radius, centerX, centerY, tileClass=None):
         assert radius >= 0 and radius == int(radius)
         
