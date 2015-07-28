@@ -179,12 +179,14 @@ class Creature(colors.withColor, Base):
         return self.damageTaken
 
     def getAIClass(self):
-        return self.AIClass
+        if self.__dict__.get("AIClass"):
+            return self.AIClass
+        self.AIClass = AI.__dict__.get(self.AIClassName)
     
     def getAI(self):
         if self.__dict__.get("AI"):
             return self.AI
-        self.AI = self.AIClass()
+        self.AI = self.getAIClass()()
         return self.AI
 
     def setName(self, value):

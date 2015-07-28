@@ -45,6 +45,9 @@ class Quest(Base):
         self.progressConversation = None
         self.completedConversation = None
         
+        self.questGivers = []
+        self.questRequirements = []
+        
         Game.addQuest(self)
     
     id = Column(Integer, primary_key=True, unique=True)
@@ -52,7 +55,9 @@ class Quest(Base):
     questStatus = Column(Integer)
     questName = Column(Unicode)
     
-    questGivers = relationship("Creature", backref=backref("quest", uselist = False), primaryjoin="Quest.id==Creature.givingQuestId")
+#     questGivers = relationship("Creature", backref=backref("quest", uselist = False), primaryjoin="Quest.id==Creature.givingQuestId")
+    questGivers = relationship("Creature")
+
     questRequirements = relationship("QuestRequirement", backref=backref("quest", uselist = False), primaryjoin="Quest.id==QuestRequirement.questId")
     
     __mapper_args__ = {'polymorphic_on': questType,
