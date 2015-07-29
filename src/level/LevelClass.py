@@ -597,6 +597,9 @@ class Level(MapBase):
     def getArea(self):
         return self.area
     
+    def getMapTile(self):
+        return self.getArea().getMapTile()
+    
     def findDownStairs(self):
         self.downStairs = []
         for tile in self.tiles:
@@ -624,6 +627,12 @@ class Level(MapBase):
             self.placeCreature(creature, stairTiles[0])
             return True
         raise Exception("No downstair found!")
+    
+    def placeItemAtRandom(self, item):
+        tile = self.getRandomOpenTile()
+        if tile:
+            tile.addObject(item)
+            return tile
     
     def setNextLevel(self, other):
         

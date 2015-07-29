@@ -32,10 +32,7 @@ def getCurrentLevel():
     return game.ui.getCurrentLevel()
 
 def getCurrentMapTile():
-    level = game.ui.getCurrentLevel()
-    if not isinstance(level, WorldMapClass.WorldMap):
-        return level.getMapTile()
-    return game.getPlayer().getTile()
+    return game.getCurrentMapTile()
 
 def getWorldMap():
     return game.getWorldMap()
@@ -100,5 +97,11 @@ class Game(object):
     def getWorldMap(self):
         return self.worldMap
     
+    def getCurrentMapTile(self):
+        level = self.ui.getCurrentLevel()
+        if not isinstance(level, WorldMapClass.WorldMap):
+            return level.getMapTile()
+        return self.getPlayer().getTile()
+
 game = Game()
 

@@ -182,6 +182,7 @@ class Creature(colors.withColor, Base):
         if self.__dict__.get("AIClass"):
             return self.AIClass
         self.AIClass = AI.__dict__.get(self.AIClassName)
+        return self.AIClass
     
     def getAI(self):
         if self.__dict__.get("AI"):
