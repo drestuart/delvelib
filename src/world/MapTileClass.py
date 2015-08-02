@@ -103,10 +103,6 @@ class MapTile(TileBase):
         
         return toReturn
     
-    def getConnectedLevel(self):
-        print "Deprecated getConnectedLevel()"
-        return self.getConnectedArea().getStartingLevel()
-    
     def generateConnectedLevel(self):
         raise NotImplementedError("Deprecated generateConnectedLevel()")
         
@@ -118,7 +114,7 @@ class MapTile(TileBase):
     def setConnectedArea(self, area):
         self.connectedArea = area
     
-    def getStartingLevel(self):
+    def getStartingLevel(self): # TODO: Threading flag here?
         return self.getConnectedArea().getStartingLevel()
         
     def getDescription(self):

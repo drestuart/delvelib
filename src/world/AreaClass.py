@@ -8,10 +8,21 @@ from enum import Enum, unique
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import Unicode, Integer
-
+import threading
 import database as db
 
 Base = db.saveDB.getDeclarativeBase()
+
+@unique
+class DungeonStatus(Enum):
+    none = 1
+    closed = 2
+    open = 3
+    
+# TODO: Convert to Enum
+NOT_BUILT = "not_built"
+BUILDING = "building"
+BUILT = "built"
 
 class Area(Base):
     
@@ -23,6 +34,11 @@ class Area(Base):
         self.name = kwargs.get('name', u"")
         
         self.levels = []
+        
+        self.startingLevelStatus = NOT_BUILT
+        self.lowerLevelStatus = NOT_BUILT
+        
+        self.thread = None
     
     id = Column(Integer, primary_key=True)
     name = Column(Unicode)
@@ -32,6 +48,8 @@ class Area(Base):
     
     startingLevel = relationship("Level", uselist = False, primaryjoin="Area.id==Level.startingLevelOfId")
     startingLevelId = Column(Integer, ForeignKey("levels.id", use_alter = True, name="starting_level_fk"))
+    startingLevelStatus = Column(Unicode)
+    lowerLevelStatus = Column(Unicode)
     
     mapTile = relationship("MapTile", uselist=False, backref=backref("connectedArea", uselist=False), 
                           primaryjoin="MapTile.connectedAreaId==Area.id")
@@ -51,9 +69,9 @@ class Area(Base):
     def buildLowerLevels(self, numLevels):
         raise NotImplementedError("buildLowerLevels() not implemented, use a subclass")
     
-    def getStartingLevel(self):
+    def getStartingLevel(self): # TODO: Threading flag here?
         if not self.startingLevel:
-            self.buildStartingLevel()
+            self.buildStartingLevel() # TODO: Threading flag here?
         return self.startingLevel
     
     def getMapTile(self):
@@ -65,6 +83,15 @@ class Area(Base):
     def getTerrainType(self):
         return self.getMapTile().getTerrainType()
     
+    def getThread(self):
+        return self.thread
+    
+    def setThread(self, t):
+        self.thread = t
+        
+    def clearThread(self):
+        self.setThread(None)
+    
     def dungeonStatus(self):
         if not self.hasDungeon:
             return DungeonStatus.none
@@ -72,6 +99,37 @@ class Area(Base):
             return DungeonStatus.open
         else:
             return DungeonStatus.closed
+        
+class StartingLevelBuildingThread(threading.Thread):
+    def __init__(self, area, items=[]):
+        threading.Thread.__init__(self)
+        self.area = area
+        self.area.setThread(self)
+        self.items = items
+    def run(self):
+        self.area.startingLevelStatus = BUILDING
+        self.area.buildStartingLevel()
+        for item in self.items:
+            self.area.getStartingLevel().placeItemAtRandom(item)
+        
+        self.area.startingLevelStatus = BUILT
+        self.area.clearThread()
+
+class LowerLevelsBuildingThread(threading.Thread):
+    def __init__(self, area, items=[]):
+        threading.Thread.__init__(self)
+        self.area = area
+        self.area.setThread(self)
+        self.items = items
+    def run(self):
+        self.area.lowerLevelStatus = BUILDING
+        self.area.buildLowerLevels()
+        for item in self.items:
+            # TODO: Put all the items in the bottom level, or do we need a way to specify where they go?
+            self.area.getLevels()[-1].placeItemAtRandom(item)
+        
+        self.area.lowerLevelStatus = BUILT
+        self.area.clearThread()
 
 class SingleLevelArea(Area):
     __mapper_args__ = {'polymorphic_identity': u'single_level_area'}
@@ -114,11 +172,5 @@ class MultiLevelArea(Area):
         
         newLevel.buildLevel()
         newLevel.placeDungeonEntrance()
-    
-@unique
-class DungeonStatus(Enum):
-    none = 1
-    closed = 2
-    open = 3
     
     
