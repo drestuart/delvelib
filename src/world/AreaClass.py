@@ -20,9 +20,9 @@ class DungeonStatus(Enum):
     open = 3
     
 # TODO: Convert to Enum
-NOT_BUILT = "not_built"
-BUILDING = "building"
-BUILT = "built"
+NOT_BUILT = u"not_built"
+BUILDING = u"building"
+BUILT = u"built"
 
 class Area(Base):
     
@@ -107,6 +107,7 @@ class StartingLevelBuildingThread(threading.Thread):
         self.area.setThread(self)
         self.items = items
     def run(self):
+        print "Level building thread started!"
         self.area.startingLevelStatus = BUILDING
         self.area.buildStartingLevel()
         for item in self.items:
@@ -114,6 +115,7 @@ class StartingLevelBuildingThread(threading.Thread):
         
         self.area.startingLevelStatus = BUILT
         self.area.clearThread()
+        print "Level building thread finished!"
 
 class LowerLevelsBuildingThread(threading.Thread):
     def __init__(self, area, items=[]):
