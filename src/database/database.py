@@ -18,6 +18,7 @@ __all__ = ["Database", "DATA_DIR", "static", "SAVE_DIR", "saveDB"]
 DATA_DIR = os.path.abspath("data")
 SAVE_DIR = os.path.abspath("save")
 DB_STR = 'sqlite+pysqlite:///'
+DB_OPT = ''
 
 class NotInitializedException(Exception):
     def __init__(self, value):
@@ -47,10 +48,13 @@ class Database(object):
             print "Deleted", self.filename
         if not self.__engine or not self.session:
             # Initialize the Database engine
-            self.__engine = create_engine(DB_STR + self.filename, echo=self.echo, convert_unicode=True, encoding="utf-8")
+            self.__engine = create_engine(DB_STR + self.filename + DB_OPT, echo=self.echo, 
+                                          convert_unicode=True, encoding="utf-8", 
+                                          connect_args={'check_same_thread':False})
             Session = sessionmaker(bind=self.__engine)
             self.session = Session()
             print "Gentledwarves, start your engines!"
+            print DB_STR + self.filename + DB_OPT
 
         self.createAll()
         return self

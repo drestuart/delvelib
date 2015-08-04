@@ -52,7 +52,7 @@ class Area(Base):
     lowerLevelStatus = Column(Unicode)
     
     mapTile = relationship("MapTile", uselist=False, backref=backref("connectedArea", uselist=False), 
-                          primaryjoin="MapTile.connectedAreaId==Area.id")
+                          primaryjoin="MapTile.connectedAreaId==Area.id") #, lazy='joined')
     mapTileId = Column(Integer, ForeignKey("map_tiles.id", use_alter = True, name="map_tile_fk"))
     
     areaType = Column(Unicode)
@@ -143,7 +143,7 @@ class SingleLevelArea(Area):
         newLevel = terrainType(area = self, depth = 0, width = self.defaultWidth, height = self.defaultHeight)
         self.startingLevel = newLevel
         newLevel.buildLevel()
-        db.saveDB.save(self)
+#         db.saveDB.save(self)
 
     def convertToMultilevelArea(self):
         newArea = MultiLevelArea(name=self.name)
