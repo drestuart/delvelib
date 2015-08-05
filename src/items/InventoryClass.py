@@ -4,15 +4,8 @@ Created on May 17, 2012
 @author: dstu
 '''
 
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Integer, Unicode
 import ItemClass as I
 import colors
-import database as db
-
-Base = db.saveDB.getDeclarativeBase()
 
 class Inventory(Base):
     '''
@@ -20,27 +13,19 @@ class Inventory(Base):
     Also provides some convenience methods.
     '''
 
-    __tablename__ = "inventories"
-    __table_args__ = {'extend_existing': True}
-    
     def __init__(self, **kwargs):
         
         self.items = []
-    
-    id = Column(Integer, primary_key=True)
-    items = relationship("Item", backref=backref("container", uselist=False), primaryjoin="Inventory.id == Item.containerId")
-    inventoryType = Column(Unicode)
-    
-    # If this inventory belongs to an item
-    containingItemId = Column(Integer, ForeignKey("items.id", use_alter=True, name='containing_item_fk'))
-    containingItem = relationship("Item", uselist=False, backref=backref("myInventory", uselist=False), primaryjoin="Inventory.id == Item.myInventoryId")
 
-    
-    __mapper_args__ = {
-        'polymorphic_on':inventoryType,
-        'polymorphic_identity':u'inventory'
-    }
-    
+# TODO:
+#     id = Column(Integer, primary_key=True)
+#     items = relationship("Item", backref=backref("container", uselist=False), primaryjoin="Inventory.id == Item.containerId")
+#     inventoryType = Column(Unicode)
+#     
+#     # If this inventory belongs to an item
+#     containingItemId = Column(Integer, ForeignKey("items.id", use_alter=True, name='containing_item_fk'))
+#     containingItem = relationship("Item", uselist=False, backref=backref("myInventory", uselist=False), primaryjoin="Inventory.id == Item.myInventoryId")
+
     
     def printContents(self):
         for item in self.items:

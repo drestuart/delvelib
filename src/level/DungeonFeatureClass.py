@@ -5,21 +5,13 @@ Created on Mar 12, 2013
 '''
 
 from pubsub import pub
-from sqlalchemy.schema import Column
-from sqlalchemy.types import Unicode, Integer, Boolean
-
 import colors
-import database as db
 import symbols
 import random
 
-Base = db.saveDB.getDeclarativeBase()
 
-class DungeonFeature(colors.withBackgroundColor, Base):
+class DungeonFeature(colors.withBackgroundColor):
     # Dummy class right now.  Will eventually represent dungeon features like traps, altars and stairs
-    
-    __tablename__ = "dungeon_features"
-    __table_args__ = {'extend_existing': True}
     
     description = u"dungeon feature"
     
@@ -31,18 +23,15 @@ class DungeonFeature(colors.withBackgroundColor, Base):
         
         self.visible = kwargs.get('isVisible', True)
         
-        
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode)
-    symbol = Column(Unicode(length=1))
+# TODO:
+#     id = Column(Integer, primary_key=True)
+#     name = Column(Unicode)
+#     symbol = Column(Unicode(length=1))
+#     
+#     tileId = Column(Integer)
+#     visible = Column(Boolean)
+#     featureType = Column(Unicode)
     
-    tileId = Column(Integer)
-    visible = Column(Boolean)
-    featureType = Column(Unicode)
-    
-    __mapper_args__ = {'polymorphic_on': featureType,
-                       'polymorphic_identity': u'feature'}
-
     def handleBump(self, creature):
         return False
     
@@ -109,11 +98,9 @@ class Door(DungeonFeature):
         super(Door, self).__init__(symbol = u'+', **kwargs)
         self.closed = True
 
-    closed = Column(Boolean)
+# TODO:
+#     closed = Column(Boolean)
     
-    __mapper_args__ = {'polymorphic_identity': u'door'}
-
-
     def open_(self):
         if self.isClosed():
             self.setClosed(False)
@@ -176,8 +163,6 @@ class Stair(DungeonFeature):
         self.blockMove = False
         self.blockSight = False
     
-    __mapper_args__ = {'polymorphic_identity': u'Stair'}
-    
     def getDestination(self):
         return self.destination
     
@@ -196,8 +181,6 @@ class upStair(Stair):
         
         self.destination = kwargs.get('destination', None)
         
-    __mapper_args__ = {'polymorphic_identity': u'upStair'}
- 
     blockMove = False
     blockSight = False
     
@@ -218,8 +201,6 @@ class downStair(Stair):
         
         self.destination = kwargs.get('destination', None)
         
-    __mapper_args__ = {'polymorphic_identity': u'downStair'}
-    
     blockMove = False
     blockSight = False
     
@@ -241,8 +222,6 @@ class Altar(DungeonFeature):
     blockMove = False
     blockSight = False
         
-    __mapper_args__ = {'polymorphic_identity': u'altar'}
-    
 class Statue(DungeonFeature):
     color = colors.colorStone
     backgroundColor = colors.black
@@ -254,8 +233,6 @@ class Statue(DungeonFeature):
     blockMove = True
     blockSight = False
         
-    __mapper_args__ = {'polymorphic_identity': u'statue'}
-
 
 class Tree(DungeonFeature):
     color = colors.colorTree
@@ -267,5 +244,3 @@ class Tree(DungeonFeature):
         
     blockMove = True
     blockSight = True
-        
-    __mapper_args__ = {'polymorphic_identity': u'tree'}

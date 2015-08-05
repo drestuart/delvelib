@@ -5,22 +5,14 @@ Created on Mar 10, 2013
 '''
 
 from pubsub import pub
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Unicode, Integer, Boolean
 import Util as U
 import colors
-import database as db
 import InventoryClass as Inv
 import random
 from DungeonFeatureClass import Door
 
-#from DungeonFeatureClass import *
-
-Base = db.saveDB.getDeclarativeBase()
-
 # A parent class for both level and world map tiles
-class TileBase(colors.withBackgroundColor, Base):
+class TileBase(colors.withBackgroundColor):
     
     __tablename__ = "tiles"
     __table_args__ = {'extend_existing': True}
@@ -36,35 +28,26 @@ class TileBase(colors.withBackgroundColor, Base):
         self.baseSymbol = kwargs.get('baseSymbol', u' ')
         self.creature = kwargs.get('creature', None)
 
+# TODO:
+#     id = Column(Integer, primary_key=True, unique=True)
+#     
+#     x = Column(Integer)
+#     y = Column(Integer)
+#     
+#     creatureId = Column(Integer, ForeignKey('creatures.id'))
+#     creature = relationship("Creature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.creatureId == Creature.id")
+#     
+#     tileType = Column(Unicode)
+# 
+#     blockMove = Column(Boolean)
+# 
+#     baseSymbol = Column(Unicode(length=1))
+#     baseDescription = Column(Unicode)
+# 
+#     tileType = Column(Unicode)
 
-    id = Column(Integer, primary_key=True, unique=True)
-    
-    x = Column(Integer)
-    y = Column(Integer)
-    
-    creatureId = Column(Integer, ForeignKey('creatures.id'))
-    creature = relationship("Creature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.creatureId == Creature.id")
-    
-    tileType = Column(Unicode)
-
-    blockMove = Column(Boolean)
-
-    baseSymbol = Column(Unicode(length=1))
-    baseDescription = Column(Unicode)
-
-    tileType = Column(Unicode)
-
-    __mapper_args__ = {'polymorphic_on': tileType,
-                       'polymorphic_identity': u'tileBase'}
-    
     def blocksMove(self):
         raise NotImplementedError("blocksMove() not implemented, use a subclass")
-    
-#     def placeCreature(self, creature):
-#         raise NotImplementedError("placeCreature() not implemented, use a subclass")
-# 
-#     def removeCreature(self):
-#         raise NotImplementedError("removeCreature() not implemented, use a subclass")
     
     def getSymbol(self):
         return self.baseSymbol
@@ -142,31 +125,29 @@ class Tile(TileBase):
         
         self.load()
     
-    
-    blockSight = Column(Boolean)
-    explored = Column(Boolean)
-    
-    lastSeenSymbol = Column(Unicode(length=1))
-    
-#    level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
-    levelId = Column(Integer, ForeignKey("levels.id"))
-    
-#    room = relationship("Room", primaryjoin = "Room.id==Tile.roomId")
-    roomId = Column(Integer, ForeignKey("rooms.id"))
-    
-    featureId = Column(Integer, ForeignKey('dungeon_features.id'))
-    feature = relationship("DungeonFeature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.featureId == DungeonFeature.id")
-    
-    destinationOfId = Column(Integer, ForeignKey('dungeon_features.id'))
-    destinationOf = relationship("DungeonFeature", backref=backref("destination", uselist=False), uselist = False, primaryjoin = "Tile.destinationOfId == DungeonFeature.id")
-    
-    goalTileOfId = Column(Integer, ForeignKey('creatures.id'))
-    goalTileOf = relationship("Creature", backref=backref("goalTile", uselist=False), uselist = False, primaryjoin = "Tile.goalTileOfId == Creature.id")
-    
-    inventoryId = Column(Integer, ForeignKey("inventories.id"))
-    inventory = relationship("Inventory", backref = backref("tile", uselist = False), uselist = False, primaryjoin = "Tile.inventoryId == Inventory.id")
-    
-    __mapper_args__ = {'polymorphic_identity': u'tile'}
+# TODO:
+#     blockSight = Column(Boolean)
+#     explored = Column(Boolean)
+#     
+#     lastSeenSymbol = Column(Unicode(length=1))
+#     
+# #    level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
+#     levelId = Column(Integer, ForeignKey("levels.id"))
+#     
+# #    room = relationship("Room", primaryjoin = "Room.id==Tile.roomId")
+#     roomId = Column(Integer, ForeignKey("rooms.id"))
+#     
+#     featureId = Column(Integer, ForeignKey('dungeon_features.id'))
+#     feature = relationship("DungeonFeature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.featureId == DungeonFeature.id")
+#     
+#     destinationOfId = Column(Integer, ForeignKey('dungeon_features.id'))
+#     destinationOf = relationship("DungeonFeature", backref=backref("destination", uselist=False), uselist = False, primaryjoin = "Tile.destinationOfId == DungeonFeature.id")
+#     
+#     goalTileOfId = Column(Integer, ForeignKey('creatures.id'))
+#     goalTileOf = relationship("Creature", backref=backref("goalTile", uselist=False), uselist = False, primaryjoin = "Tile.goalTileOfId == Creature.id")
+#     
+#     inventoryId = Column(Integer, ForeignKey("inventories.id"))
+#     inventory = relationship("Inventory", backref = backref("tile", uselist = False), uselist = False, primaryjoin = "Tile.inventoryId == Inventory.id")
     
     def load(self):
         self.visibleTiles = None
@@ -387,8 +368,6 @@ class Wall(Tile):
     
     backgroundColor = colors.black
     
-    __mapper_args__ = {'polymorphic_identity': u'wall'}
-    
 class WoodWall(Wall):
     
     def __init__(self, x, y, **kwargs):
@@ -396,16 +375,12 @@ class WoodWall(Wall):
         
     color = colors.colorWood
     
-    __mapper_args__ = {'polymorphic_identity': u'woodwall'}
-
 class RockWall(Wall):
     
     def __init__(self, x, y, **kwargs):
         super(RockWall, self).__init__(x, y, baseDescription = u"A rock wall", **kwargs)
     
     color = colors.colorRock
-    
-    __mapper_args__ = {'polymorphic_identity': u'rockwall'}
     
 class StoneWall(Wall):
     
@@ -414,9 +389,6 @@ class StoneWall(Wall):
     
     color = colors.colorStone
     
-    __mapper_args__ = {'polymorphic_identity': u'stonewall'}
-
-
 class Floor(Tile):
         
     def __init__(self, x, y, **kwargs):
@@ -425,8 +397,6 @@ class Floor(Tile):
     
     backgroundColor = colors.black
     
-    __mapper_args__ = {'polymorphic_identity': u'floor'}
-
 class StoneFloor(Floor):
         
     def __init__(self, x, y, **kwargs):
@@ -435,8 +405,6 @@ class StoneFloor(Floor):
         
     color =  colors.colorStone
     
-    __mapper_args__ = {'polymorphic_identity': u'stonefloor'}
-
 class GrassFloor(Floor):
             
     def __init__(self, x, y, **kwargs):
@@ -444,8 +412,6 @@ class GrassFloor(Floor):
         
     color = colors.colorGrass
     
-    __mapper_args__ = {'polymorphic_identity': u'grassfloor'}
-
 class WoodFloor(Floor):
             
     def __init__(self, x, y, **kwargs):
@@ -453,8 +419,6 @@ class WoodFloor(Floor):
     
     color = colors.colorWood
     
-    __mapper_args__ = {'polymorphic_identity': u'woodfloor'}
-
 class RockTunnel(Floor):
     
     def __init__(self, x, y, **kwargs):
@@ -462,14 +426,9 @@ class RockTunnel(Floor):
         
     color = colors.colorRock
     
-    __mapper_args__ = {'polymorphic_identity': u'rocktunnel'}
-    
 class RoadFloor(Floor):
     
     def __init__(self, x, y, **kwargs):
         super(RoadFloor, self).__init__(x, y, baseDescription = u"A dirt road", baseSymbol = u'~', **kwargs)
         
     color = colors.brown
-        
-    __mapper_args__ = {'polymorphic_identity': u'roadfloor'}
-

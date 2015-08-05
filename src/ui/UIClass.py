@@ -16,7 +16,6 @@ import sys
 from PanelClass import *
 import textwrap
 from DungeonFeatureClass import downStair, upStair, Stair, Door
-import database as db
 import os.path
 import TileClass as T
 import MapTileClass as MT
@@ -557,7 +556,8 @@ class UI(object):
         if not toLevel:
             return False
         
-        db.saveDB.save(clevel)
+        # TODO:
+#         db.saveDB.save(clevel)
         
         toLevel.load()
         self.setCurrentLevel(toLevel)
@@ -602,8 +602,9 @@ class UI(object):
             
             if not toLevel:
                 return False
-                
-            db.saveDB.save(clevel)
+
+            # TODO:
+#             db.saveDB.save(clevel)
             
             toLevel.load()
             self.setCurrentLevel(toLevel)

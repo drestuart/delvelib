@@ -4,13 +4,7 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Unicode, Integer, Boolean
-import database as db
 import TileClass as T
-
-Base = db.saveDB.getDeclarativeBase()
 
 # The Rectangle class
 class Rect(object):
@@ -90,7 +84,7 @@ class Rect(object):
                 self.y1 <= y and self.y2 >= y)
 
 
-class Room(Base):
+class Room():
     
     __tablename__ = "rooms"
     __table_args__ = {'extend_existing': True}
@@ -98,11 +92,12 @@ class Room(Base):
     def __init__(self, **kwargs):
         self.tiles = []
     
-    id = Column(Integer, primary_key=True)
-    
-#    level = relationship("Level", primaryjoin="Level.id==Room.levelId")
-    levelId = Column(Integer, ForeignKey("levels.id"))
-    tiles = relationship("Tile", backref=backref("room"), primaryjoin="Room.id==Tile.roomId")
+# TODO:
+#     id = Column(Integer, primary_key=True)
+#     
+# #    level = relationship("Level", primaryjoin="Level.id==Room.levelId")
+#     levelId = Column(Integer, ForeignKey("levels.id"))
+#     tiles = relationship("Tile", backref=backref("room"), primaryjoin="Room.id==Tile.roomId")
     
 
     def getLevel(self):
@@ -127,26 +122,3 @@ class Room(Base):
     def setLevelId(self, value):
         self.levelId = value
 
-    
-def main():
-    
-    import LevelClass
-    
-    db.saveDB.start(True)
-
-
-    r1 = Room(x = 10, y = 20, width = 5, height = 5,
-              defaultFloorType = T.WoodFloor, defaultWallType = T.WoodWall)
-    
-    r1.fillWithTiles()
-    db.saveDB.save(r1)
-    db.saveDB.saveAll(r1.tiles)
-
-    
-    
-if __name__ == '__main__':
-    main()
-    
-    
-    
-    

@@ -5,13 +5,7 @@ Created on Jan 28, 2014
 '''
 
 from enum import Enum, unique
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Unicode, Integer
 import threading
-import database as db
-
-Base = db.saveDB.getDeclarativeBase()
 
 @unique
 class DungeonStatus(Enum):
@@ -24,7 +18,7 @@ NOT_BUILT = u"not_built"
 BUILDING = u"building"
 BUILT = u"built"
 
-class Area(Base):
+class Area(object):
     
     __tablename__ = "areas"
     __table_args__ = {'extend_existing': True}
@@ -40,25 +34,23 @@ class Area(Base):
         
         self.thread = None
     
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode)
-    
-    levels = relationship("Level", backref=backref("area", uselist=False), 
-                          primaryjoin="Area.id==Level.areaId")
-    
-    startingLevel = relationship("Level", uselist = False, primaryjoin="Area.id==Level.startingLevelOfId")
-    startingLevelId = Column(Integer, ForeignKey("levels.id", use_alter = True, name="starting_level_fk"))
-    startingLevelStatus = Column(Unicode)
-    lowerLevelStatus = Column(Unicode)
-    
-    mapTile = relationship("MapTile", uselist=False, backref=backref("connectedArea", uselist=False), 
-                          primaryjoin="MapTile.connectedAreaId==Area.id") #, lazy='joined')
-    mapTileId = Column(Integer, ForeignKey("map_tiles.id", use_alter = True, name="map_tile_fk"))
-    
-    areaType = Column(Unicode)
-    
-    __mapper_args__ = {'polymorphic_on': areaType,
-                       'polymorphic_identity': u'area'}
+    # TODO:
+#     id = Column(Integer, primary_key=True)
+#     name = Column(Unicode)
+#     
+#     levels = relationship("Level", backref=backref("area", uselist=False), 
+#                           primaryjoin="Area.id==Level.areaId")
+#     
+#     startingLevel = relationship("Level", uselist = False, primaryjoin="Area.id==Level.startingLevelOfId")
+#     startingLevelId = Column(Integer, ForeignKey("levels.id", use_alter = True, name="starting_level_fk"))
+#     startingLevelStatus = Column(Unicode)
+#     lowerLevelStatus = Column(Unicode)
+#     
+#     mapTile = relationship("MapTile", uselist=False, backref=backref("connectedArea", uselist=False), 
+#                           primaryjoin="MapTile.connectedAreaId==Area.id") #, lazy='joined')
+#     mapTileId = Column(Integer, ForeignKey("map_tiles.id", use_alter = True, name="map_tile_fk"))
+#     
+#     areaType = Column(Unicode)
     
     def getLevels(self):
         return self.levels
@@ -155,7 +147,6 @@ class SingleLevelArea(Area):
         
         mt.setConnectedArea(newArea)
         del self
-        db.saveDB.save(newArea)
         
         return newArea
     

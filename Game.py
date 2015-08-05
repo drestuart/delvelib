@@ -10,6 +10,10 @@ import WorldMapClass
 
 defaultNames = 0
 
+def save():
+    #TODO: shelve
+    pass
+
 def message(msg):
     game.message(msg)
     

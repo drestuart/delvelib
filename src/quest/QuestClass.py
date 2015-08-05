@@ -6,20 +6,13 @@ Created on Jun 23, 2015
 
 from __future__ import unicode_literals
 
-from sqlalchemy.schema import Column, ForeignKey, UniqueConstraint
-from sqlalchemy.types import Integer, Boolean, Unicode
-from sqlalchemy.orm import relationship, backref
-import database as db
 from pubsub import pub
 import ItemClass
-from enum import Enum, unique
 import Game
-
-Base = db.saveDB.getDeclarativeBase()
 
 questEventPrefix = 'event.quest.'
 
-# TODO
+# TODO:
 # @unique
 # class QuestStatus(Enum):
 #     NOT_STARTED = 1
@@ -31,10 +24,8 @@ STARTED = 2
 COMPLETED = 3
 RETURNED = 4
 
-class Quest(Base):
-    __tablename__ = "quests"
-    __table_args__ = {'extend_existing': True}
-    
+class Quest(object):
+
     questRequirementCompleteEventName = questEventPrefix + 'requirement.complete'
     questCompleteEventName = questEventPrefix + 'complete'
     questReturnedEventName = questEventPrefix + 'returned'
@@ -50,18 +41,16 @@ class Quest(Base):
         
         Game.addQuest(self)
     
-    id = Column(Integer, primary_key=True, unique=True)
-    questType = Column(Unicode)
-    questStatus = Column(Integer)
-    questName = Column(Unicode)
-    
-#     questGivers = relationship("Creature", backref=backref("quest", uselist = False), primaryjoin="Quest.id==Creature.givingQuestId")
-    questGivers = relationship("Creature")
-
-    questRequirements = relationship("QuestRequirement", backref=backref("quest", uselist = False), primaryjoin="Quest.id==QuestRequirement.questId")
-    
-    __mapper_args__ = {'polymorphic_on': questType,
-                       'polymorphic_identity': u'quest'}
+# TODO:
+#     id = Column(Integer, primary_key=True, unique=True)
+#     questType = Column(Unicode)
+#     questStatus = Column(Integer)
+#     questName = Column(Unicode)
+#     
+# #     questGivers = relationship("Creature", backref=backref("quest", uselist = False), primaryjoin="Quest.id==Creature.givingQuestId")
+#     questGivers = relationship("Creature")
+# 
+#     questRequirements = relationship("QuestRequirement", backref=backref("quest", uselist = False), primaryjoin="Quest.id==QuestRequirement.questId")
     
     def buildRequirements(self):
         raise NotImplementedError("buildRequirements()")
@@ -196,7 +185,7 @@ class ItemQuest(Quest):
 
     __mapper_args__ = {'polymorphic_identity': u'item_quest'}
 
-class QuestRequirement(Base):
+class QuestRequirement():
     __tablename__ = "quest_requirements"
     __table_args__ = {'extend_existing': True}
 
@@ -208,16 +197,12 @@ class QuestRequirement(Base):
         self.eventsRemaining = eventsRequired
         self.quest = quest
 
-    id = Column(Integer, primary_key=True, unique=True)
-    questId = Column(Integer, ForeignKey("quests.id"))
-    eventsRequired = Column(Integer)
-    eventsRemaining = Column(Integer)
-    requirementType = Column(Unicode)
-    
-    __mapper_args__ = {
-        'polymorphic_on':requirementType,
-        'polymorphic_identity':u'quest_requirement'
-    }
+# TODO:
+#     id = Column(Integer, primary_key=True, unique=True)
+#     questId = Column(Integer, ForeignKey("quests.id"))
+#     eventsRequired = Column(Integer)
+#     eventsRemaining = Column(Integer)
+#     requirementType = Column(Unicode)
     
     def completed(self):
         return self.eventsRemaining <= 0
@@ -239,10 +224,9 @@ class QuestItemRequirement(QuestRequirement):
         self.itemType = itemType
         self.itemTypeStr = unicode(itemType.__name__)
     
-    itemTypeStr = Column(Unicode)
+# TODO:
+#     itemTypeStr = Column(Unicode)
     
-    __mapper_args__ = {'polymorphic_identity':u'quest_item_requirement'}
-        
     def subscribe(self):
         pub.subscribe(self.handlePickupEvent, self.getItemType().getQuestPickupEvent())
         pub.subscribe(self.handleDropEvent, self.getItemType().getQuestDropEvent())

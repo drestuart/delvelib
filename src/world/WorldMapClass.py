@@ -4,37 +4,25 @@ Created on Feb 26, 2014
 @author: dstuart
 '''
 
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Unicode, Integer
-
 import LevelClass as L
 import Util as U
 from VoronoiMap import VMap
-import database as db
 import random
 import Const as C
 
-Base = db.saveDB.getDeclarativeBase()
-
-class Region(Base):
-    __tablename__ = "regions"
-    __table_args__ = {'extend_existing': True}
+class Region(object):
     
     def __init__(self, **kwargs):
         self.mapTiles = []
-        
 
-    id = Column(Integer, primary_key=True)
-
-#     worldMapId = Column(Integer, ForeignKey("world_map.id"))
-    worldMapId = Column(Integer, ForeignKey("levels.id"))
-    name = Column(Unicode)
-    mapTiles = relationship("MapTile", backref=backref("region", uselist=False), primaryjoin="Region.id==MapTile.regionId")
-    regionType = Column(Unicode)
-    
-    __mapper_args__ = {'polymorphic_on': regionType,
-                       'polymorphic_identity': u'region'}
+# TODO:
+#     id = Column(Integer, primary_key=True)
+# 
+# #     worldMapId = Column(Integer, ForeignKey("world_map.id"))
+#     worldMapId = Column(Integer, ForeignKey("levels.id"))
+#     name = Column(Unicode)
+#     mapTiles = relationship("MapTile", backref=backref("region", uselist=False), primaryjoin="Region.id==MapTile.regionId")
+#     regionType = Column(Unicode)
     
     def addTile(self, tile):
         self.mapTiles.append(tile)
@@ -51,9 +39,6 @@ class Region(Base):
 
 class WorldMap(L.MapBase):
     
-#     __tablename__ = 'world_map'
-#     __table_args__ = {'extend_existing': True}
-
     def __init__(self, **kwargs):
         super(WorldMap, self).__init__(**kwargs)
         
@@ -64,17 +49,13 @@ class WorldMap(L.MapBase):
         self.num_regions = kwargs['num_regions']
         
         self.load()
-    
+
+# TODO:
 #     id = Column(Integer, ForeignKey('levels.id'), primary_key=True, autoincrement=True)
 #     name = Column(Unicode)
 #     width = Column(Integer)
 #     height = Column(Integer)
 #     levelType = Column(Unicode)
-    
-    __mapper_args__ = {#'polymorphic_on': levelType,
-                      'polymorphic_identity':u'world_map',
-#                       'concrete':True,
-                      'with_polymorphic':'*'}
     
     def addTile(self, tile):
         self.mapTiles.append(tile)

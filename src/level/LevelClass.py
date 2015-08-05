@@ -7,10 +7,6 @@ Created on Mar 10, 2013
 import random
 
 from pubsub import pub
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Unicode, Integer
-
 import AStar
 import Const as C
 from DungeonFeatureClass import upStair, downStair, Door
@@ -22,17 +18,11 @@ import TileClass as T
 import Util as U
 import ca_cave
 import colors
-import database as db
 from randomChoice import weightedChoice
 import NPCClass
 
-Base = db.saveDB.getDeclarativeBase()
-
-class MapBase(Base):
+class MapBase(object):
     
-    __tablename__ = "levels"
-    __table_args__ = {'extend_existing': True}
-
     def __init__(self, **kwargs):
         self.creatures = []
 
@@ -44,14 +34,12 @@ class MapBase(Base):
         if self.width is None or self.height is None:
             raise ValueError("Map class constructor requires width and height values")
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(Unicode)
-    width = Column(Integer)
-    height = Column(Integer)
-    levelType = Column(Unicode)
-    
-    __mapper_args__ = {'polymorphic_on': levelType,
-                       'polymorphic_identity': u'map_base'}
+# TODO:
+#     id = Column(Integer, primary_key=True, autoincrement=True)
+#     name = Column(Unicode)
+#     width = Column(Integer)
+#     height = Column(Integer)
+#     levelType = Column(Unicode)
     
     def getWidth(self):
         return self.width
@@ -130,21 +118,17 @@ class Level(MapBase):
 ##########################################################################        
 #        self.hasTile = [[False]*C.MAP_HEIGHT]*C.MAP_WIDTH
         
-
-    depth = Column(Integer)
-    
-    areaId = Column(Integer, ForeignKey("areas.id"))
-    startingLevelOfId = Column(Integer, ForeignKey("areas.id"))
-    
-    tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
-    rooms = relationship("Room", backref = "level")
-    
-    entryPointX = Column(Integer)
-    entryPointY = Column(Integer)
-    
-    __mapper_args__ = {'polymorphic_identity': u'level',
-                       'concrete':True}
-
+# TODO:
+#     depth = Column(Integer)
+#     
+#     areaId = Column(Integer, ForeignKey("areas.id"))
+#     startingLevelOfId = Column(Integer, ForeignKey("areas.id"))
+#     
+#     tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
+#     rooms = relationship("Room", backref = "level")
+#     
+#     entryPointX = Column(Integer)
+#     entryPointY = Column(Integer)
     
     def load(self):
         
@@ -696,8 +680,6 @@ def connectLevels(upper, lower):
 class DungeonLevel(Level):
     '''A Level subclass for modeling one dungeon level.  Includes functionality for passing time and level construction.'''
     
-    __mapper_args__ = {'polymorphic_identity': u'dungeon level'}
-
     defaultFloorType = T.StoneFloor
     defaultWallType = T.StoneWall
     defaultTunnelType = T.StoneFloor
@@ -729,7 +711,7 @@ class DungeonLevel(Level):
         self.placeItems()
         
         print "Saving open tiles"
-        db.saveDB.save(self)
+#         db.saveDB.save(self)
         
         print "Setting up pathing"
         self.setupPathing()
@@ -864,8 +846,6 @@ class DungeonLevel(Level):
 
 class CaveLevel(Level):
     
-    __mapper_args__ = {'polymorphic_identity': u'cave level'}
-    
     defaultFloorType = T.RockTunnel
     defaultWallType = T.RockWall
     
@@ -905,7 +885,7 @@ class CaveLevel(Level):
         self.placeItems()
         
         print "Saving open tiles"
-        db.saveDB.save(self)
+#         db.saveDB.save(self)
         
         print "Finding the stairs"
         self.findUpStairs()
@@ -964,8 +944,6 @@ class CaveLevel(Level):
 
 class TownLevel(DungeonLevel):
     
-    __mapper_args__ = {'polymorphic_identity': u'town level'}
-    
     def __init__(self, **kwargs):
         self.tilesWide = kwargs['tilesWide']
         self.tilesHigh = kwargs['tilesHigh']
@@ -1009,7 +987,7 @@ class TownLevel(DungeonLevel):
         self.findEntryPoint()
         
         print "Saving open tiles"
-        db.saveDB.save(self)
+#         db.saveDB.save(self)
         
         print "Setting up pathing"
         self.setupPathing()
@@ -1031,7 +1009,6 @@ class TownLevel(DungeonLevel):
                 self.placeCreature(npc, tile)
 
 class WildernessLevel(Level):
-    __mapper_args__ = {'polymorphic_identity': u'wilderness level'}
     
     defaultFloorType = T.GrassFloor
     buildingWallType = T.StoneWall
@@ -1058,7 +1035,7 @@ class WildernessLevel(Level):
         self.findEntryPoint()
         
         print "Saving open tiles"
-        db.saveDB.save(self)
+#         db.saveDB.save(self)
         
     def placeCreatureAtRandom(self, creature, dummy=True):
         tile = self.getRandomOpenTile()

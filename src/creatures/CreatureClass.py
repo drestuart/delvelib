@@ -4,20 +4,11 @@ Created on Mar 13, 2013
 @author: dstu
 '''
 
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Unicode, Integer, Boolean
 import AIClass as AI
 import colors
-import database as db
 import InventoryClass as I
 
-Base = db.saveDB.getDeclarativeBase()
-
-class Creature(colors.withColor, Base):
-    
-    __tablename__ = "creatures"
-    __table_args__ = {'extend_existing': True}
+class Creature(colors.withColor):
     
     blockSight = False
     description = "creature"
@@ -45,35 +36,32 @@ class Creature(colors.withColor, Base):
         
         self.inventory = I.Inventory()
 
-
-    id = Column(Integer, primary_key=True, unique=True)
-    
-    symbol = Column(Unicode(length=1))
-    
-    name = Column(Unicode)
-    creatureType = Column(Unicode)
-    
-    maxHP = Column(Integer)
-    damageTaken = Column(Integer)
-    dead = Column(Boolean)
-    
-    goalEnemy = relationship("Creature", uselist=False)
-    goalEnemyId = Column(Integer, ForeignKey('creatures.id'))
-    
-    inventoryId = Column(Integer, ForeignKey("inventories.id"))
-    inventory = relationship("Inventory", backref = backref("creature", uselist = False), uselist = False, primaryjoin = "Creature.inventoryId == Inventory.id")
-    
-    levelId = Column(Integer, ForeignKey('levels.id'))
-    level = relationship("Level", backref=backref("creatures"), uselist = False, primaryjoin = "Creature.levelId == Level.id")
-    
-    givingQuestId = Column(Integer, ForeignKey("quests.id"))
-    
-    visible = Column(Boolean)
-    
-    AIClassName = Column(Unicode)
-    
-    __mapper_args__ = {'polymorphic_on': creatureType,
-                       'polymorphic_identity': u'creature'}
+# TODO:
+#     id = Column(Integer, primary_key=True, unique=True)
+#     
+#     symbol = Column(Unicode(length=1))
+#     
+#     name = Column(Unicode)
+#     creatureType = Column(Unicode)
+#     
+#     maxHP = Column(Integer)
+#     damageTaken = Column(Integer)
+#     dead = Column(Boolean)
+#     
+#     goalEnemy = relationship("Creature", uselist=False)
+#     goalEnemyId = Column(Integer, ForeignKey('creatures.id'))
+#     
+#     inventoryId = Column(Integer, ForeignKey("inventories.id"))
+#     inventory = relationship("Inventory", backref = backref("creature", uselist = False), uselist = False, primaryjoin = "Creature.inventoryId == Inventory.id")
+#     
+#     levelId = Column(Integer, ForeignKey('levels.id'))
+#     level = relationship("Level", backref=backref("creatures"), uselist = False, primaryjoin = "Creature.levelId == Level.id")
+#     
+#     givingQuestId = Column(Integer, ForeignKey("quests.id"))
+#     
+#     visible = Column(Boolean)
+#     
+#     AIClassName = Column(Unicode)
     
     def load(self):
         self.hateList = ['player']
@@ -311,16 +299,5 @@ class Orc(Creature):
     
     def __init__(self, **kwargs):
         super(Orc, self).__init__(symbol = u'o', name = u'orc', maxHP = 4, AIClass = AI.AggressiveAI, **kwargs)
-    
-    __mapper_args__ = {'polymorphic_identity': u'orc'}
-
-
-    
-
-
-
-
-
-
 
 

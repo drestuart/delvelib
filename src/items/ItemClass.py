@@ -4,14 +4,9 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
-from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Unicode, Integer, Float, Boolean
 import colors
-import database as db
 from randomChoice import weightedChoice
 from pubsub import pub
-
-Base = db.saveDB.getDeclarativeBase()
 
 pickupEventPrefix = "event.item.pickup."
 dropEventPrefix = "event.item.drop."
@@ -19,12 +14,10 @@ dropEventPrefix = "event.item.drop."
 questPickupEventPrefix = "event.quest.item.pickup."
 questDropEventPrefix = "event.quest.item.drop."
 
-class Item(colors.withColor, Base):
+class Item(colors.withColor):
     '''
     The abstract item (stack) baseclass
     '''
-    __tablename__ = "items"
-    __table_args__ = {'extend_existing': True}
 
     # Default class variables
     drinkable = False
@@ -50,25 +43,20 @@ class Item(colors.withColor, Base):
         
         self.questItem = kwargs.get('questItem', False)
 
-
-    id = Column(Integer, primary_key=True)
-    weight = Column(Float)
-    itemType = Column(Unicode)
-    material = Column(Unicode)
-    questItem = Column(Boolean)
-    symbol = Column(Unicode(length=1))
-    quantity = Column(Integer)
-
-    containerId = Column(Integer, ForeignKey("inventories.id"))
+# TODO:
+#     id = Column(Integer, primary_key=True)
+#     weight = Column(Float)
+#     itemType = Column(Unicode)
+#     material = Column(Unicode)
+#     questItem = Column(Boolean)
+#     symbol = Column(Unicode(length=1))
+#     quantity = Column(Integer)
+# 
+#     containerId = Column(Integer, ForeignKey("inventories.id"))
     
     # For items that have an inventory of their own
-    myInventoryId = Column(Integer, ForeignKey("inventories.id", use_alter=True, name='my_inventory_fk'))
+#     myInventoryId = Column(Integer, ForeignKey("inventories.id", use_alter=True, name='my_inventory_fk'))
 #    inventory = relationship("Inventory", uselist=False, backref=backref("containingItem", uselist=False), primaryjoin="Inventory.id==Item.inventoryId")
-    
-    __mapper_args__ = {
-        'polymorphic_on':itemType,
-        'polymorphic_identity':u'item'
-    }
     
     def pickupEvent(self):
         pub.sendMessage(self.getPickupEvent(), item=self)
@@ -215,15 +203,11 @@ class Item(colors.withColor, Base):
 class Amulet(Item):
     wearable = True
     
-    __mapper_args__ = {'polymorphic_identity':u'amulet'}
-    
     def __init__(self, **kwargs):
         super(Amulet, self).__init__(symbol = u'"', **kwargs)
 
 class Armor(Item):
     wearable = True
-    
-    __mapper_args__ = {'polymorphic_identity':u'armor'}
     
     def __init__(self, **kwargs):
         super(Armor, self).__init__(symbol = u'[', **kwargs)
@@ -232,7 +216,6 @@ class Coins(Item):
     stackable = True
     color = colors.colorGold
     
-    __mapper_args__ = {'polymorphic_identity':u'coins'}
     description = "gold coin"
     
     def __init__(self, **kwargs):
@@ -242,14 +225,10 @@ class Coins(Item):
 class Food(Item):
     edible = True
     
-    __mapper_args__ = {'polymorphic_identity':u'food'}
-    
     def __init__(self, **kwargs):
         super(Food, self).__init__(symbol = u'%', **kwargs)
 
 class Gem(Item):
-    
-    __mapper_args__ = {'polymorphic_identity':u'gem'}
     
     def __init__(self, **kwargs):
         super(Gem, self).__init__(symbol = u'*', **kwargs)
@@ -257,15 +236,11 @@ class Gem(Item):
 class Potion(Item):
     drinkable = True
     
-    __mapper_args__ = {'polymorphic_identity':u'potion'}
-    
     def __init__(self, **kwargs):
         super(Potion, self).__init__(symbol = u'!', **kwargs)
 
 class Ring(Item):
     wearable = True
-    
-    __mapper_args__ = {'polymorphic_identity':u'ring'}
     
     def __init__(self, **kwargs):
         super(Ring, self).__init__(symbol = u'=', **kwargs)
@@ -273,7 +248,6 @@ class Ring(Item):
 class Scroll(Item):
     readable = True
     color = colors.white
-    __mapper_args__ = {'polymorphic_identity':u'scroll'}
     
     def __init__(self, **kwargs):
         super(Scroll, self).__init__(symbol = u'?', **kwargs)
@@ -281,15 +255,11 @@ class Scroll(Item):
 class Spellbook(Item):
     readable = True
     
-    __mapper_args__ = {'polymorphic_identity':u'spellbook'}
-    
     def __init__(self, **kwargs):
         super(Spellbook, self).__init__(symbol = u'+', **kwargs)
         
 class Wand(Item):
     zappable = True
-    
-    __mapper_args__ = {'polymorphic_identity':u'wand'}
     
     def __init__(self, **kwargs):
         super(Wand, self).__init__(symbol = u'/', **kwargs)
@@ -297,14 +267,10 @@ class Wand(Item):
 class Weapon(Item):
     wieldable = True
     
-    __mapper_args__ = {'polymorphic_identity':u'weapon'}
-    
     def __init__(self, **kwargs):
         super(Weapon, self).__init__(symbol = u')', **kwargs)
 
 class MacGuffin(Item):
-    __mapper_args__ = {'polymorphic_identity':u'macguffin'}
-    
     color = colors.colorSteel
     description = u"Mystic MacGuffin"
     
@@ -341,35 +307,3 @@ def getRandomItem():
     item = itemFunc()
     return item
 
-
-
-
-    
-def main():
-#    import InventoryClass as I
-#    
-#    db.saveDB.start(True)
-#    
-#    
-#    item1 = Item(symbol = u'!', color = colors.white)
-#    item2 = Item(symbol = u'!', color = colors.red)
-#    
-#    db.saveDB.save(item1)
-#    db.saveDB.save(item2)
-
-    coins1 = Coins(quantity = 5)
-    coins2 = Coins(quantity = 10)
-    
-    print coins1.canStackWith(coins2)
-    coins1.stackWith(coins2)
-    print coins1.quantity
-
-    
-if __name__ == '__main__':
-    main()
-    
-    
-    
-    
-    
-    

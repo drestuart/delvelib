@@ -4,26 +4,17 @@ Created on Feb 25, 2014
 @author: dstuart
 '''
 
-from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Unicode, Integer
 from symbols import dungeonSymbol
 from AreaClass import DungeonStatus
 
 import LevelClass as L
 from TileClass import TileBase
 from colors import blankBackground, colorClosedDungeon, colorOpenDungeon
-import database as db
 from AreaClass import Area, MultiLevelArea
-
-Base = db.saveDB.getDeclarativeBase()
 
 class MapTile(TileBase):
     
-    __tablename__ = "map_tiles"
-    __table_args__ = {'extend_existing': True}
-    
     backgroundColor = blankBackground
-    
     description = "tile"
     
     def __init__(self, x, y, **kwargs):
@@ -31,22 +22,21 @@ class MapTile(TileBase):
         
         self.worldMap = kwargs.get('worldMap')
         self.generateArea()
-        
-    id = Column(Integer, ForeignKey('tiles.id'), primary_key=True)
-    
-    connectedAreaId = Column(Integer, ForeignKey("areas.id"))
-    
-    regionId = Column(Integer, ForeignKey("regions.id"))
-    worldMapId = Column(Integer, ForeignKey("levels.id", use_alter = True, name="world_map_fk"))
-    name = Column(Unicode)
+
+# TODO:        
+#     id = Column(Integer, ForeignKey('tiles.id'), primary_key=True)
+#     
+#     connectedAreaId = Column(Integer, ForeignKey("areas.id"))
+#     
+#     regionId = Column(Integer, ForeignKey("regions.id"))
+#     worldMapId = Column(Integer, ForeignKey("levels.id", use_alter = True, name="world_map_fk"))
+#     name = Column(Unicode)
     
     waterTile = False
     terrainType = L.WildernessLevel
     areaType = Area
     
-    tileType = Column(Unicode)
-    
-    __mapper_args__ = {'polymorphic_identity': u'maptile'}
+#     tileType = Column(Unicode)
     
     def remove(self):
         self.worldMap = None
