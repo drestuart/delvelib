@@ -18,19 +18,12 @@ class DungeonFeature(colors.withBackgroundColor):
     def __init__(self, symbol, **kwargs):
         super(DungeonFeature, self).__init__(**kwargs)
         self.symbol = symbol
-        
+        self.name = kwargs.get('name', None)
         self.tile = kwargs.get('tile', None)
-        
         self.visible = kwargs.get('isVisible', True)
         
 # TODO:
-#     id = Column(Integer, primary_key=True)
-#     name = Column(Unicode)
-#     symbol = Column(Unicode(length=1))
-#     
 #     tileId = Column(Integer)
-#     visible = Column(Boolean)
-#     featureType = Column(Unicode)
     
     def handleBump(self, creature):
         return False
@@ -98,9 +91,6 @@ class Door(DungeonFeature):
         super(Door, self).__init__(symbol = u'+', **kwargs)
         self.closed = True
 
-# TODO:
-#     closed = Column(Boolean)
-    
     def open_(self):
         if self.isClosed():
             self.setClosed(False)
@@ -179,7 +169,7 @@ class upStair(Stair):
         
         super(upStair, self).__init__(symbol = u'<', **kwargs)
         
-        self.destination = kwargs.get('destination', None)
+        self.destination = kwargs.get('destination', None) # TODO:
         
     blockMove = False
     blockSight = False
@@ -199,7 +189,7 @@ class downStair(Stair):
     def __init__(self, **kwargs):
         super(downStair, self).__init__(symbol = u'>', **kwargs)
         
-        self.destination = kwargs.get('destination', None)
+        self.destination = kwargs.get('destination', None) # TODO:
         
     blockMove = False
     blockSight = False

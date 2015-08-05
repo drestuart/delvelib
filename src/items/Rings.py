@@ -8,14 +8,12 @@ import ItemClass as I
 import colors
 from randomChoice import weightedChoice
 
-
 def getRandomRing():
     ringClass = weightedChoice(weights)
     return ringClass()
 
 class ProtectionRing(I.Ring):
     
-    __mapper_args__ = {'polymorphic_identity':u'protection_ring'}
     color = colors.darkMagenta
     description = "ring of protection"
     

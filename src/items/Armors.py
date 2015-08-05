@@ -8,14 +8,12 @@ import ItemClass as I
 import colors
 from randomChoice import weightedChoice
 
-
 def getRandomArmor():
     armClass = weightedChoice(weights)
     return armClass()
 
 class Breastplate(I.Armor):
     
-    __mapper_args__ = {'polymorphic_identity':u'breastplate'}
     color = colors.colorSteel
     description = "breastplate"
     

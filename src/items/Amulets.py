@@ -8,14 +8,12 @@ import ItemClass as I
 import colors
 from randomChoice import weightedChoice
 
-
 def getRandomAmulet():
     amClass = weightedChoice(weights)
     return amClass()
 
 class LuckAmulet(I.Amulet):
     
-    __mapper_args__ = {'polymorphic_identity':u'luck_amulet'}
     color = colors.red
     description = "amulet of luck"
     

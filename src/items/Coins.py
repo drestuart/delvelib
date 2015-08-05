@@ -5,9 +5,6 @@ Created on Mar 23, 2013
 '''
 
 import ItemClass as I
-import colors
-from randomChoice import weightedChoice
-#import random
 
 def getRandomCoins():
 #    q = random.randint(1, 100)

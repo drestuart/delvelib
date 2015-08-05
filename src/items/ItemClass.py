@@ -42,22 +42,12 @@ class Item(colors.withColor):
         self.quantity = kwargs.get('quantity', 1)
         
         self.questItem = kwargs.get('questItem', False)
-
+        self.container = None
+        self.inventory = None
+        
 # TODO:
-#     id = Column(Integer, primary_key=True)
-#     weight = Column(Float)
-#     itemType = Column(Unicode)
-#     material = Column(Unicode)
-#     questItem = Column(Boolean)
-#     symbol = Column(Unicode(length=1))
-#     quantity = Column(Integer)
-# 
-#     containerId = Column(Integer, ForeignKey("inventories.id"))
-    
-    # For items that have an inventory of their own
-#     myInventoryId = Column(Integer, ForeignKey("inventories.id", use_alter=True, name='my_inventory_fk'))
 #    inventory = relationship("Inventory", uselist=False, backref=backref("containingItem", uselist=False), primaryjoin="Inventory.id==Item.inventoryId")
-    
+
     def pickupEvent(self):
         pub.sendMessage(self.getPickupEvent(), item=self)
         if self.isQuestItem():

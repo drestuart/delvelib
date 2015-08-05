@@ -7,7 +7,6 @@ Created on Jul 18, 2014
 from sys import maxint
 from Util import ManhattanDistance
 import random
-import os
 
 class WangTileMap(object):
     def __init__(self, tilesWide, tilesHigh):

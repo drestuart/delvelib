@@ -14,9 +14,6 @@ from DungeonFeatureClass import Door
 # A parent class for both level and world map tiles
 class TileBase(colors.withBackgroundColor):
     
-    __tablename__ = "tiles"
-    __table_args__ = {'extend_existing': True}
-    
     def __init__(self, x, y, **kwargs):
         super(TileBase, self).__init__(**kwargs)
         
@@ -29,22 +26,7 @@ class TileBase(colors.withBackgroundColor):
         self.creature = kwargs.get('creature', None)
 
 # TODO:
-#     id = Column(Integer, primary_key=True, unique=True)
-#     
-#     x = Column(Integer)
-#     y = Column(Integer)
-#     
-#     creatureId = Column(Integer, ForeignKey('creatures.id'))
 #     creature = relationship("Creature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.creatureId == Creature.id")
-#     
-#     tileType = Column(Unicode)
-# 
-#     blockMove = Column(Boolean)
-# 
-#     baseSymbol = Column(Unicode(length=1))
-#     baseDescription = Column(Unicode)
-# 
-#     tileType = Column(Unicode)
 
     def blocksMove(self):
         raise NotImplementedError("blocksMove() not implemented, use a subclass")
@@ -123,30 +105,19 @@ class Tile(TileBase):
         self.explored = False
         self.inventory = None
         
+        self.destination = None
+        self.destinationOf = None
+        
+        self.goalTileOf = None #?
+        
         self.load()
     
 # TODO:
-#     blockSight = Column(Boolean)
-#     explored = Column(Boolean)
-#     
-#     lastSeenSymbol = Column(Unicode(length=1))
-#     
-# #    level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
-#     levelId = Column(Integer, ForeignKey("levels.id"))
-#     
-# #    room = relationship("Room", primaryjoin = "Room.id==Tile.roomId")
-#     roomId = Column(Integer, ForeignKey("rooms.id"))
-#     
-#     featureId = Column(Integer, ForeignKey('dungeon_features.id'))
+#     level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
+#     room = relationship("Room", primaryjoin = "Room.id==Tile.roomId")
 #     feature = relationship("DungeonFeature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.featureId == DungeonFeature.id")
-#     
-#     destinationOfId = Column(Integer, ForeignKey('dungeon_features.id'))
 #     destinationOf = relationship("DungeonFeature", backref=backref("destination", uselist=False), uselist = False, primaryjoin = "Tile.destinationOfId == DungeonFeature.id")
-#     
-#     goalTileOfId = Column(Integer, ForeignKey('creatures.id'))
 #     goalTileOf = relationship("Creature", backref=backref("goalTile", uselist=False), uselist = False, primaryjoin = "Tile.goalTileOfId == Creature.id")
-#     
-#     inventoryId = Column(Integer, ForeignKey("inventories.id"))
 #     inventory = relationship("Inventory", backref = backref("tile", uselist = False), uselist = False, primaryjoin = "Tile.inventoryId == Inventory.id")
     
     def load(self):
@@ -392,7 +363,6 @@ class StoneWall(Wall):
 class Floor(Tile):
         
     def __init__(self, x, y, **kwargs):
-        #print "Floor.__init__"
         super(Floor, self).__init__(x, y, blockMove = False, blockSight = False, **kwargs)
     
     backgroundColor = colors.black
@@ -400,7 +370,6 @@ class Floor(Tile):
 class StoneFloor(Floor):
         
     def __init__(self, x, y, **kwargs):
-        #print "StoneFloor.__init__"
         super(StoneFloor, self).__init__(x, y, baseDescription = u"A stone floor", baseSymbol = u'.', **kwargs)
         
     color =  colors.colorStone

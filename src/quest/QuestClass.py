@@ -32,6 +32,7 @@ class Quest(object):
 
     def __init__(self, **kwargs):
         self.questStatus = NOT_STARTED
+        self.questName = None
         self.startConversation = None
         self.progressConversation = None
         self.completedConversation = None
@@ -42,14 +43,7 @@ class Quest(object):
         Game.addQuest(self)
     
 # TODO:
-#     id = Column(Integer, primary_key=True, unique=True)
-#     questType = Column(Unicode)
-#     questStatus = Column(Integer)
-#     questName = Column(Unicode)
-#     
-# #     questGivers = relationship("Creature", backref=backref("quest", uselist = False), primaryjoin="Quest.id==Creature.givingQuestId")
 #     questGivers = relationship("Creature")
-# 
 #     questRequirements = relationship("QuestRequirement", backref=backref("quest", uselist = False), primaryjoin="Quest.id==QuestRequirement.questId")
     
     def buildRequirements(self):
@@ -198,11 +192,7 @@ class QuestRequirement():
         self.quest = quest
 
 # TODO:
-#     id = Column(Integer, primary_key=True, unique=True)
 #     questId = Column(Integer, ForeignKey("quests.id"))
-#     eventsRequired = Column(Integer)
-#     eventsRemaining = Column(Integer)
-#     requirementType = Column(Unicode)
     
     def completed(self):
         return self.eventsRemaining <= 0
@@ -223,9 +213,6 @@ class QuestItemRequirement(QuestRequirement):
         super(QuestItemRequirement, self).__init__(eventsRemaining, quest)
         self.itemType = itemType
         self.itemTypeStr = unicode(itemType.__name__)
-    
-# TODO:
-#     itemTypeStr = Column(Unicode)
     
     def subscribe(self):
         pub.subscribe(self.handlePickupEvent, self.getItemType().getQuestPickupEvent())

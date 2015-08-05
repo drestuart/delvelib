@@ -7,7 +7,7 @@ Created on May 17, 2012
 import ItemClass as I
 import colors
 
-class Inventory(Base):
+class Inventory():
     '''
     The inventory class.  Represents a collection of items, either on a tile, in a container or held by a person.
     Also provides some convenience methods.
@@ -16,14 +16,9 @@ class Inventory(Base):
     def __init__(self, **kwargs):
         
         self.items = []
+        self.containingItem = None
 
 # TODO:
-#     id = Column(Integer, primary_key=True)
-#     items = relationship("Item", backref=backref("container", uselist=False), primaryjoin="Inventory.id == Item.containerId")
-#     inventoryType = Column(Unicode)
-#     
-#     # If this inventory belongs to an item
-#     containingItemId = Column(Integer, ForeignKey("items.id", use_alter=True, name='containing_item_fk'))
 #     containingItem = relationship("Item", uselist=False, backref=backref("myInventory", uselist=False), primaryjoin="Inventory.id == Item.myInventoryId")
 
     

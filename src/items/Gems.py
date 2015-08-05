@@ -8,7 +8,6 @@ import ItemClass as I
 import colors
 from randomChoice import weightedChoice
 
-
 def getRandomGem():
     gemClass = weightedChoice(weights)
     return gemClass()
@@ -16,7 +15,6 @@ def getRandomGem():
 class Ruby(I.Gem):
     color = colors.red
     description = "ruby"
-    __mapper_args__ = {'polymorphic_identity':u'ruby'}
 
     def __init__(self, **kwargs):
         super(Ruby, self).__init__(**kwargs)
@@ -24,7 +22,6 @@ class Ruby(I.Gem):
 class Emerald(I.Gem):
     color = colors.green
     description = "emerald"
-    __mapper_args__ = {'polymorphic_identity':u'emerald'}
 
     def __init__(self, **kwargs):
         super(Emerald, self).__init__(**kwargs)
@@ -33,7 +30,6 @@ class Emerald(I.Gem):
 class Diamond(I.Gem):
     color = colors.white
     description = "diamond"
-    __mapper_args__ = {'polymorphic_identity':u'diamond'}
 
     def __init__(self, **kwargs):
         super(Diamond, self).__init__(**kwargs)

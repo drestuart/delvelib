@@ -13,7 +13,6 @@ import Game as G
 
 class Player(Cr.Creature):
     
-    __tablename__ = "player"
     color = colors.white
     description = 'player'
     species = 'player'
@@ -22,9 +21,6 @@ class Player(Cr.Creature):
         super(Player, self).__init__(symbol = u'@', name=u"player",
                                      AIClass = AI.PlayerAI, maxHP=10, **kwargs)
         
-        
-    __mapper_args__ = {'polymorphic_identity': u'player'}
-    
     id = Column(Integer, ForeignKey('creatures.id'), primary_key=True)
     
     def move(self, dx, dy):

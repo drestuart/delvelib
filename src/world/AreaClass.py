@@ -28,29 +28,20 @@ class Area(object):
         self.name = kwargs.get('name', u"")
         
         self.levels = []
-        
+        self.startingLevel = None
         self.startingLevelStatus = NOT_BUILT
         self.lowerLevelStatus = NOT_BUILT
         
         self.thread = None
+        
+        self.mapTile = None
     
-    # TODO:
-#     id = Column(Integer, primary_key=True)
-#     name = Column(Unicode)
-#     
+# TODO:
 #     levels = relationship("Level", backref=backref("area", uselist=False), 
 #                           primaryjoin="Area.id==Level.areaId")
-#     
 #     startingLevel = relationship("Level", uselist = False, primaryjoin="Area.id==Level.startingLevelOfId")
-#     startingLevelId = Column(Integer, ForeignKey("levels.id", use_alter = True, name="starting_level_fk"))
-#     startingLevelStatus = Column(Unicode)
-#     lowerLevelStatus = Column(Unicode)
-#     
 #     mapTile = relationship("MapTile", uselist=False, backref=backref("connectedArea", uselist=False), 
 #                           primaryjoin="MapTile.connectedAreaId==Area.id") #, lazy='joined')
-#     mapTileId = Column(Integer, ForeignKey("map_tiles.id", use_alter = True, name="map_tile_fk"))
-#     
-#     areaType = Column(Unicode)
     
     def getLevels(self):
         return self.levels

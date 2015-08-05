@@ -8,14 +8,11 @@ import ItemClass as I
 import colors
 from randomChoice import weightedChoice
 
-
 def getRandomWeapon():
     weaponClass = weightedChoice(weights)
     return weaponClass()
 
 class Longsword(I.Weapon):
-    
-    __mapper_args__ = {'polymorphic_identity':u'longsword'}
     
     color = colors.colorSteel
     description = "longsword"

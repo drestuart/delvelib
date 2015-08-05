@@ -4,11 +4,8 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
-import TileClass as T
-
 # The Rectangle class
 class Rect(object):
-    #a rectangle on the map. used to characterize a room.
     def __init__(self, x, y, width, height):
         self.x1 = x
         self.y1 = y
@@ -91,15 +88,11 @@ class Room():
 
     def __init__(self, **kwargs):
         self.tiles = []
+        self.level = None
     
 # TODO:
-#     id = Column(Integer, primary_key=True)
-#     
-# #    level = relationship("Level", primaryjoin="Level.id==Room.levelId")
-#     levelId = Column(Integer, ForeignKey("levels.id"))
-#     tiles = relationship("Tile", backref=backref("room"), primaryjoin="Room.id==Tile.roomId")
+#     level = relationship("Level", primaryjoin="Level.id==Room.levelId")
     
-
     def getLevel(self):
         return self.level
 

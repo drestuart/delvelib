@@ -31,38 +31,21 @@ class Creature(colors.withColor):
         
         self.AI = self.AIClass()
         self.AI.setOwner(self)
+        
+        self.goalEnemy = None
 
         self.load()
         
         self.inventory = I.Inventory()
+        self.level = None
+        
+        self.quest = None
 
 # TODO:
-#     id = Column(Integer, primary_key=True, unique=True)
-#     
-#     symbol = Column(Unicode(length=1))
-#     
-#     name = Column(Unicode)
-#     creatureType = Column(Unicode)
-#     
-#     maxHP = Column(Integer)
-#     damageTaken = Column(Integer)
-#     dead = Column(Boolean)
-#     
-#     goalEnemy = relationship("Creature", uselist=False)
-#     goalEnemyId = Column(Integer, ForeignKey('creatures.id'))
-#     
-#     inventoryId = Column(Integer, ForeignKey("inventories.id"))
 #     inventory = relationship("Inventory", backref = backref("creature", uselist = False), uselist = False, primaryjoin = "Creature.inventoryId == Inventory.id")
-#     
-#     levelId = Column(Integer, ForeignKey('levels.id'))
+#     goalEnemy = relationship("Creature", uselist=False)
 #     level = relationship("Level", backref=backref("creatures"), uselist = False, primaryjoin = "Creature.levelId == Level.id")
-#     
-#     givingQuestId = Column(Integer, ForeignKey("quests.id"))
-#     
-#     visible = Column(Boolean)
-#     
-#     AIClassName = Column(Unicode)
-    
+
     def load(self):
         self.hateList = ['player']
         

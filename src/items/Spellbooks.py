@@ -8,14 +8,12 @@ import ItemClass as I
 import colors
 from randomChoice import weightedChoice
 
-
 def getRandomSpellbook():
     bookClass = weightedChoice(weights)
     return bookClass()
 
 class ObligatoryFireballSpellbook(I.Spellbook):
     
-    __mapper_args__ = {'polymorphic_identity':u'obligatory_fireball_spellbook'}
     color = colors.colorLeather
     description = "spellbook of Obligatory Fireball"
     

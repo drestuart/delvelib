@@ -8,14 +8,12 @@ import ItemClass as I
 import colors
 from randomChoice import weightedChoice
 
-
 def getRandomWand():
     wandClass = weightedChoice(weights)
     return wandClass()
 
 class LightningWand(I.Wand):
     
-    __mapper_args__ = {'polymorphic_identity':u'lightning_wand'}
     color = colors.colorSteel
     description = "wand of lightning"
     

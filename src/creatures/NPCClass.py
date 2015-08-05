@@ -21,8 +21,6 @@ class NPC(Cr.Creature):
         self.conversationTree = ConversationClass.testConversationTree
         self.quest = None
     
-    __mapper_args__ = {'polymorphic_identity': u'NPC'}
-    
     def handleBump(self, bumper):
         import Game as G
         # Start a conversation

@@ -22,21 +22,17 @@ class MapTile(TileBase):
         
         self.worldMap = kwargs.get('worldMap')
         self.generateArea()
+        self.region = None
+        self.area = None
 
 # TODO:        
-#     id = Column(Integer, ForeignKey('tiles.id'), primary_key=True)
-#     
 #     connectedAreaId = Column(Integer, ForeignKey("areas.id"))
-#     
 #     regionId = Column(Integer, ForeignKey("regions.id"))
 #     worldMapId = Column(Integer, ForeignKey("levels.id", use_alter = True, name="world_map_fk"))
-#     name = Column(Unicode)
     
     waterTile = False
     terrainType = L.WildernessLevel
     areaType = Area
-    
-#     tileType = Column(Unicode)
     
     def remove(self):
         self.worldMap = None

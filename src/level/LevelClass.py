@@ -34,13 +34,6 @@ class MapBase(object):
         if self.width is None or self.height is None:
             raise ValueError("Map class constructor requires width and height values")
 
-# TODO:
-#     id = Column(Integer, primary_key=True, autoincrement=True)
-#     name = Column(Unicode)
-#     width = Column(Integer)
-#     height = Column(Integer)
-#     levelType = Column(Unicode)
-    
     def getWidth(self):
         return self.width
     
@@ -99,6 +92,7 @@ class Level(MapBase):
         
         self.depth = kwargs.get('depth', 0)
         self.area = kwargs['area']
+        self.startingLevelOf = None #?
                 
         self.tiles = []
         self.rooms = []
@@ -108,6 +102,9 @@ class Level(MapBase):
         self.upStairs = []
         self.downStairs = []
         self.tileArray = []
+        
+        self.entryPointX = None
+        self.entryPointY = None
         
 ##########################################################################
 #
@@ -119,16 +116,10 @@ class Level(MapBase):
 #        self.hasTile = [[False]*C.MAP_HEIGHT]*C.MAP_WIDTH
         
 # TODO:
-#     depth = Column(Integer)
-#     
 #     areaId = Column(Integer, ForeignKey("areas.id"))
 #     startingLevelOfId = Column(Integer, ForeignKey("areas.id"))
-#     
 #     tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
 #     rooms = relationship("Room", backref = "level")
-#     
-#     entryPointX = Column(Integer)
-#     entryPointY = Column(Integer)
     
     def load(self):
         

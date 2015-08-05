@@ -6,23 +6,17 @@ Created on Feb 26, 2014
 
 import LevelClass as L
 import Util as U
-from VoronoiMap import VMap
 import random
-import Const as C
 
 class Region(object):
     
     def __init__(self, **kwargs):
         self.mapTiles = []
+        self.name = None
+        self.worldMap = None
 
 # TODO:
-#     id = Column(Integer, primary_key=True)
-# 
-# #     worldMapId = Column(Integer, ForeignKey("world_map.id"))
 #     worldMapId = Column(Integer, ForeignKey("levels.id"))
-#     name = Column(Unicode)
-#     mapTiles = relationship("MapTile", backref=backref("region", uselist=False), primaryjoin="Region.id==MapTile.regionId")
-#     regionType = Column(Unicode)
     
     def addTile(self, tile):
         self.mapTiles.append(tile)
@@ -41,22 +35,13 @@ class WorldMap(L.MapBase):
     
     def __init__(self, **kwargs):
         super(WorldMap, self).__init__(**kwargs)
-        
-#         self.id = 1
-        
+        self.name = None
         self.mapTiles = []
         self.regions = []
         self.num_regions = kwargs['num_regions']
         
         self.load()
 
-# TODO:
-#     id = Column(Integer, ForeignKey('levels.id'), primary_key=True, autoincrement=True)
-#     name = Column(Unicode)
-#     width = Column(Integer)
-#     height = Column(Integer)
-#     levelType = Column(Unicode)
-    
     def addTile(self, tile):
         self.mapTiles.append(tile)
         self.hasTile[tile.getX()][tile.getY()] = True
@@ -232,11 +217,3 @@ class WorldMap(L.MapBase):
         
     def buildMap(self):
         raise NotImplementedError("buildMap() not implemented, use a subclass")
-
-
-
-
-
-
-
-        
