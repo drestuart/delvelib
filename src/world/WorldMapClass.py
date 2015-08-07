@@ -11,7 +11,7 @@ import random
 class Region(object):
     
     def __init__(self, **kwargs):
-        self.mapTiles = []
+        self.mapTiles = {}
         self.name = None
         self.worldMap = None
 
@@ -19,7 +19,7 @@ class Region(object):
 #     worldMapId = Column(Integer, ForeignKey("levels.id"))
     
     def addTile(self, tile):
-        self.mapTiles.append(tile)
+        self.mapTiles.add(tile)
         tile.setRegion(self)
         
     def replaceTile(self, oldtile, newtile):
@@ -36,14 +36,23 @@ class WorldMap(L.MapBase):
     def __init__(self, **kwargs):
         super(WorldMap, self).__init__(**kwargs)
         self.name = None
-        self.mapTiles = []
-        self.regions = []
+        self.mapTiles = {}
+        self.regions = {}
         self.num_regions = kwargs['num_regions']
         
-        self.load()
+        self.creatures = {}
+
+        # Initialize self.hasTile
+        self.hasTile = []
+        
+        for dummyx in range(self.width):
+            newCol = []
+            for dummyy in range(self.height):
+                newCol.append(False)
+            self.hasTile.append(newCol)
 
     def addTile(self, tile):
-        self.mapTiles.append(tile)
+        self.mapTiles.add(tile)
         self.hasTile[tile.getX()][tile.getY()] = True
         
     def replaceTile(self, newtile):
@@ -64,19 +73,6 @@ class WorldMap(L.MapBase):
         newnumtiles = len(self.mapTiles)
         assert newnumtiles == oldnumtiles
     
-    def load(self):
-        self.creatures = []
-
-        # Initialize self.hasTile
-        self.hasTile = []
-        
-        for dummyx in range(self.width):
-            newCol = []
-            for dummyy in range(self.height):
-                newCol.append(False)
-            self.hasTile.append(newCol)
-            
-
     def buildTileArray(self):
         self.tileArray = []
         

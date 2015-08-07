@@ -24,7 +24,7 @@ import NPCClass
 class MapBase(object):
     
     def __init__(self, **kwargs):
-        self.creatures = []
+        self.creatures = {}
 
         self.name = kwargs.get('name', u"")
 
@@ -532,12 +532,12 @@ class Level(MapBase):
         self.creatures = []
         for tile in self.tiles:
             if tile.creature:
-                self.creatures.append(tile.creature)
+                self.creatures.add(tile.creature)
         
     def placeCreature(self, creature, tile):
         success = tile.placeCreature(creature)
         if success and not creature in self.creatures:
-            self.creatures.append(creature)
+            self.creatures.add(creature)
         return success
     
     def placeCreatureAtRandom(self, creature, dummy=True):

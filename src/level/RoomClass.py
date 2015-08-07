@@ -87,7 +87,7 @@ class Room():
     __table_args__ = {'extend_existing': True}
 
     def __init__(self, **kwargs):
-        self.tiles = []
+        self.tiles = {}
         self.level = None
     
 # TODO:
@@ -103,7 +103,7 @@ class Room():
         return self.tiles
     
     def addTile(self, tile):
-        self.tiles.append(tile)
+        self.tiles.add(tile)
 
     def setLevel(self, value):
         self.level = value

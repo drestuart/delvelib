@@ -37,8 +37,8 @@ class Quest(object):
         self.progressConversation = None
         self.completedConversation = None
         
-        self.questGivers = []
-        self.questRequirements = []
+        self.questGivers = {}
+        self.questRequirements = {}
         
         Game.addQuest(self)
     
@@ -65,7 +65,7 @@ class Quest(object):
         return self.questRequirements
 
     def addRequirement(self, req):
-        self.questRequirements.append(req)
+        self.questRequirements.add(req)
 
     def handleQuestProgress(self, req):
         self.checkQuestRequirements()
@@ -106,7 +106,7 @@ class Quest(object):
         pass
 
     def addQuestGiver(self, cr):
-        self.questGivers.append(cr)
+        self.questGivers.add(cr)
         cr.quest = self
 
     def getConversation(self):
