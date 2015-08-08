@@ -44,9 +44,6 @@ class Item(colors.withColor):
         self.questItem = kwargs.get('questItem', False)
         self.container = None
         self.inventory = None
-        
-# TODO:
-#    inventory = relationship("Inventory", uselist=False, backref=backref("containingItem", uselist=False), primaryjoin="Inventory.id==Item.inventoryId")
 
     def pickupEvent(self):
         pub.sendMessage(self.getPickupEvent(), item=self)
@@ -77,6 +74,14 @@ class Item(colors.withColor):
     def getQuestDropEvent(cls):
         return questDropEventPrefix + cls.__mapper_args__['polymorphic_identity']
 #         return questDropEventPrefix + cls.itemType
+    
+    def getInventory(self):
+        return self.inventory
+    
+    def setInventory(self, inv):
+        self.inventory = inv
+        if self.inventory.getContainingItem() is not self:
+            self.inventory.setContainingItem(self)
         
     def use(self):
         self.onUse()

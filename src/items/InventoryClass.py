@@ -17,11 +17,9 @@ class Inventory():
         
         self.items = []
         self.containingItem = None
+        self.creature = None
+        self.tile = None
 
-# TODO:
-#     containingItem = relationship("Item", uselist=False, backref=backref("myInventory", uselist=False), primaryjoin="Inventory.id == Item.myInventoryId")
-
-    
     def printContents(self):
         for item in self.items:
             print item.getDescription()
@@ -74,6 +72,14 @@ class Inventory():
 
     def getItems(self):
         return self.items
+    
+    def getCreature(self):
+        return self.creature
+    
+    def setCreature(self, cr):
+        self.creature = cr
+        if cr.getInventory() is not self:
+            cr.setInventory(self)
 
     def getItemOfType(self, itemType, questItem = False):
         for item in self.items:
@@ -92,37 +98,22 @@ class Inventory():
 
     def getContainingItem(self):
         return self.containingItem
+    
+    def setContainingItem(self, it):
+        self.containingItem = it
+        if self.containingItem.getInventory() is not self:
+            self.containingItem.setInventory(self)
 
     def setItems(self, value):
         self.items = value
 
-    def setContainingItem(self, value):
-        self.containingItem = value
-
     def length(self):
         return len(self.items)
-
-
-
-def main():
     
-    coins1 = I.Coins(quantity = 5)
-    coins2 = I.Coins(quantity = 10)
+    def getTile(self):
+        return self.tile
     
-    print coins1.canStackWith(coins2)
-    coins1.stackWith(coins2)
-    print coins1.quantity
-
-    coins2 = I.Coins(quantity = 10)
-
-    inv = Inventory()
-    inv.addItem(coins1)
-    inv.addItem(coins2)
-    
-    inv.printContents()
-
-
-    
-if __name__ == '__main__':
-    main()
-    
+    def setTile(self, tile):
+        self.tile = tile
+        if tile.getInventory() is not self:
+            tile.setInventory(self)

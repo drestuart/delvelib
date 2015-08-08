@@ -33,24 +33,25 @@ class Creature(colors.withColor):
         self.AI.setOwner(self)
         
         self.goalEnemy = None
+        self.tile = None
 
         self.load()
         
-        self.inventory = I.Inventory()
+        self.setInventory(I.Inventory())
         self.level = None
         
         self.quest = None
-
-# TODO:
-#     inventory = relationship("Inventory", backref = backref("creature", uselist = False), uselist = False, primaryjoin = "Creature.inventoryId == Inventory.id")
-#     goalEnemy = relationship("Creature", uselist=False)
-#     level = relationship("Level", backref=backref("creatures"), uselist = False, primaryjoin = "Creature.levelId == Level.id")
 
     def load(self):
         self.hateList = ['player']
         
     def getInventory(self):
         return self.inventory
+    
+    def setInventory(self, inv):
+        self.inventory = inv
+        if self.inventory.getCreature() is not self:
+            self.inventory.setCreature(self)
     
     def handleBump(self, bumper):
         # Decide whether to handle an attack, start a dialog, or whatever
@@ -95,6 +96,8 @@ class Creature(colors.withColor):
     
     def setTile(self, tile):
         self.tile = tile
+        if tile.getCreature() is not self:
+            tile.setCreature(self)
         
     def getX(self):
         return self.tile.getX()
@@ -106,7 +109,12 @@ class Creature(colors.withColor):
         return self.tile.getXY()
         
     def getLevel(self):
-        return self.getTile().getLevel()
+        return self.level
+    
+    def setLevel(self, lvl):
+        self.level = lvl
+        if self not in self.level.getCreatures():
+            self.level.addCreature(self)
     
     def calcHP(self):
         self.hp = self.maxHP - self.damageTaken

@@ -94,8 +94,8 @@ class Level(MapBase):
         self.area = kwargs['area']
         self.startingLevelOf = None #?
                 
-        self.tiles = []
-        self.rooms = []
+        self.tiles = {}
+        self.rooms = {}
         
         self.FOVMap = None
         self.astar = None
@@ -118,8 +118,6 @@ class Level(MapBase):
 # TODO:
 #     areaId = Column(Integer, ForeignKey("areas.id"))
 #     startingLevelOfId = Column(Integer, ForeignKey("areas.id"))
-#     tiles = relationship("Tile", backref=backref("level"), primaryjoin="Level.id==Tile.levelId")
-#     rooms = relationship("Room", backref = "level")
     
     def load(self):
         
@@ -187,6 +185,9 @@ class Level(MapBase):
         print "Bad coordinates: ", (x, y)
         return None
     
+    def getTiles(self):
+        return self.tiles
+    
     def replaceTile(self, oldtile, newtile):
         assert oldtile.getXY() == newtile.getXY()
         
@@ -204,8 +205,18 @@ class Level(MapBase):
         
         del oldtile
         
+    def addTile(self, tile):
+        self.tiles.add(tile)
+        if tile.getLevel() is not self:
+            tile.setLevel(self)
+            
+    def getRooms(self):
+        return self.rooms
+        
     def addRoom(self, room):
-        self.rooms.append(room)
+        self.rooms.add(room)
+        if room.getLevel() is not self:
+            room.setLevel(self)
     
     def getEntryPoint(self):
         return self.getTile(self.entryPointX, self.entryPointY)
@@ -532,12 +543,17 @@ class Level(MapBase):
         self.creatures = []
         for tile in self.tiles:
             if tile.creature:
-                self.creatures.add(tile.creature)
+                self.addCreature(tile.creature)
+
+    def addCreature(self, cr):
+        self.creatures.add(cr)
+        if cr.getLevel() is not self:
+            cr.setLevel(self)
         
     def placeCreature(self, creature, tile):
         success = tile.placeCreature(creature)
         if success and not creature in self.creatures:
-            self.creatures.add(creature)
+            self.addCreature(creature)
         return success
     
     def placeCreatureAtRandom(self, creature, dummy=True):

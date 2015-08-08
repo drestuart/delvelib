@@ -43,9 +43,6 @@ class DungeonFeature(colors.withBackgroundColor):
     def getSymbol(self):
         return self.symbol
 
-    def getTile(self):
-        return self.tile
-
     def getDescription(self):
         return self.description
 
@@ -68,10 +65,13 @@ class DungeonFeature(colors.withBackgroundColor):
     def setSymbol(self, value):
         self.symbol = value
 
-
-    def setTile(self, value):
-        self.tile = value
-
+    def getTile(self):
+        return self.tile
+    
+    def setTile(self, tile):
+        self.tile = tile
+        if tile.getFeature() is not self:
+            tile.setFeature(self)
 
     def setName(self, value):
         self.name = value
@@ -152,6 +152,7 @@ class Stair(DungeonFeature):
         super(Stair, self).__init__(**kwargs)
         self.blockMove = False
         self.blockSight = False
+        self.destination = kwargs.get('destination', None)
     
     def getDestination(self):
         return self.destination
@@ -159,28 +160,17 @@ class Stair(DungeonFeature):
     def setDestination(self, d):
         self.destination = d
 
-        
 class upStair(Stair):
     color = colors.colorStone
     backgroundColor = colors.black
     description = u'a stairway leading up'
     
     def __init__(self, **kwargs):
-        
         super(upStair, self).__init__(symbol = u'<', **kwargs)
-        
-        self.destination = kwargs.get('destination', None) # TODO:
         
     blockMove = False
     blockSight = False
     
-    def getDestination(self):
-        return self.destination
-    
-    def setDestination(self, dest):
-        self.destination = dest
-    
-
 class downStair(Stair):
     color = colors.colorStone
     backgroundColor = colors.black
@@ -189,18 +179,9 @@ class downStair(Stair):
     def __init__(self, **kwargs):
         super(downStair, self).__init__(symbol = u'>', **kwargs)
         
-        self.destination = kwargs.get('destination', None) # TODO:
-        
     blockMove = False
     blockSight = False
     
-    def getDestination(self):
-        return self.destination
-    
-    def setDestination(self, dest):
-        self.destination = dest
-
-
 class Altar(DungeonFeature):
     color = colors.colorStone
     backgroundColor = colors.black

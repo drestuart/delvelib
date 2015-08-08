@@ -83,35 +83,23 @@ class Rect(object):
 
 class Room():
     
-    __tablename__ = "rooms"
-    __table_args__ = {'extend_existing': True}
-
     def __init__(self, **kwargs):
         self.tiles = {}
         self.level = None
     
-# TODO:
-#     level = relationship("Level", primaryjoin="Level.id==Room.levelId")
-    
     def getLevel(self):
         return self.level
-
-    def getLevelId(self):
-        return self.levelId
     
+    def setLevel(self, value):
+        self.level = value
+        if self not in self.level.getRooms():
+            self.level.addRoom(self)
+
     def getTiles(self):
         return self.tiles
     
     def addTile(self, tile):
         self.tiles.add(tile)
-
-    def setLevel(self, value):
-        self.level = value
-        if value:
-            self.setLevelId(value.id)
-        else:
-            self.setLevelId(None)
-
-    def setLevelId(self, value):
-        self.levelId = value
+        if tile.getRoom() is not self:
+            tile.setRoom(self)
 

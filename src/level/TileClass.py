@@ -25,9 +25,6 @@ class TileBase(colors.withBackgroundColor):
         self.baseSymbol = kwargs.get('baseSymbol', u' ')
         self.creature = kwargs.get('creature', None)
 
-# TODO:
-#     creature = relationship("Creature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.creatureId == Creature.id")
-
     def blocksMove(self):
         raise NotImplementedError("blocksMove() not implemented, use a subclass")
     
@@ -63,11 +60,15 @@ class TileBase(colors.withBackgroundColor):
         if oldTile:
             oldTile.removeCreature()
         
-        self.creature = creature
-        self.creature.setTile(self)
-        pub.sendMessage("event.addedCreature", tile = self, creature = creature)
+        self.setCreature(creature)
         return True
-        
+
+    def setCreature(self, creature):
+        self.creature = creature
+        if creature.getTile() is not self:
+            creature.setTile(self)
+
+        pub.sendMessage("event.addedCreature", tile = self, creature = creature)
         
     def removeCreature(self):
         if self.creature:
@@ -112,14 +113,6 @@ class Tile(TileBase):
         
         self.load()
     
-# TODO:
-#     level = relationship("Level", primaryjoin="Level.id==Tile.levelId")
-#     room = relationship("Room", primaryjoin = "Room.id==Tile.roomId")
-#     feature = relationship("DungeonFeature", backref=backref("tile", uselist=False), uselist = False, primaryjoin = "Tile.featureId == DungeonFeature.id")
-#     destinationOf = relationship("DungeonFeature", backref=backref("destination", uselist=False), uselist = False, primaryjoin = "Tile.destinationOfId == DungeonFeature.id")
-#     goalTileOf = relationship("Creature", backref=backref("goalTile", uselist=False), uselist = False, primaryjoin = "Tile.goalTileOfId == Creature.id")
-#     inventory = relationship("Inventory", backref = backref("tile", uselist = False), uselist = False, primaryjoin = "Tile.inventoryId == Inventory.id")
-    
     def load(self):
         self.visibleTiles = None
         
@@ -135,10 +128,6 @@ class Tile(TileBase):
     def handleBump(self, bumper):
         return False
     
-    def initializeInventory(self):
-        if not self.inventory:
-            self.inventory = Inv.Inventory()
-            
     def toDraw(self):
         # Returns a tuple of the tile's symbol, color, and background for the
         # drawing functionality
@@ -226,8 +215,10 @@ class Tile(TileBase):
     def getFeature(self):
         return self.feature
 
-    def setFeature(self, value):
-        self.feature = value    
+    def setFeature(self, feat):
+        self.feature = feat
+        if feat.getTile() is not self:
+            feat.setTile(self)
         
     def getSymbol(self):
         # Determine which symbol to use to draw this tile
@@ -288,19 +279,25 @@ class Tile(TileBase):
         
         else:
             return self.baseDescription 
-        
-    def getLevel(self):  
-        return self.level
-        
+    
     def __str__(self):
         return self.baseDescription
     
+    def getRoom(self):
+        return self.room
+    
+    def setRoom(self, room):
+        self.room = room
+        if self not in room.getTiles():
+            room.addTile(self)
+    
+    def getLevel(self):  
+        return self.level
+    
     def setLevel(self, level):
         self.level = level
-        if level:
-            self.levelId = level.id
-        else:
-            self.levelId = None
+        if self not in self.level.getTiles():
+            self.level.addTile(self)
             
     def getExplored(self):
         return self.explored
@@ -329,6 +326,15 @@ class Tile(TileBase):
     def getInventory(self):
         self.initializeInventory()
         return self.inventory
+    
+    def setInventory(self, inv):
+        self.inventory = inv
+        if inv.getTile is not self:
+            inv.setTile(self)
+    
+    def initializeInventory(self):
+        if not self.inventory:
+            self.setInventory(Inv.Inventory())
 
 # Some classes representing different kinds of tiles
 
