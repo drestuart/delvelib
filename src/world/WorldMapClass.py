@@ -51,6 +51,9 @@ class WorldMap(L.MapBase):
                 newCol.append(False)
             self.hasTile.append(newCol)
 
+    def getMapTiles(self):
+        return self.mapTiles
+
     def addTile(self, tile):
         self.mapTiles.add(tile)
         self.hasTile[tile.getX()][tile.getY()] = True
@@ -97,6 +100,12 @@ class WorldMap(L.MapBase):
             return self.tileArray[x][y]
         
         return None
+
+    def getRegions(self):
+        return self.regions
+
+    def addRegion(self, reg):
+        self.regions.add(reg)
     
     def distance(self, tilea, tileb):
         return self.coordinateDistance(tilea.getX(), tileb.getX(), tilea.getY(), tileb.getY())

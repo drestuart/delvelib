@@ -587,7 +587,12 @@ class Level(MapBase):
     
     def getArea(self):
         return self.area
-    
+
+    def setArea(self, area):
+        self.area = area
+        if self not in area.getLevels():
+            area.addLevel(self)
+
     def getMapTile(self):
         return self.getArea().getMapTile()
     

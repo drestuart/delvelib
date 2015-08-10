@@ -42,10 +42,6 @@ class Quest(object):
         
         Game.addQuest(self)
     
-# TODO:
-#     questGivers = relationship("Creature")
-#     questRequirements = relationship("QuestRequirement", backref=backref("quest", uselist = False), primaryjoin="Quest.id==QuestRequirement.questId")
-    
     def buildRequirements(self):
         raise NotImplementedError("buildRequirements()")
     
@@ -66,6 +62,8 @@ class Quest(object):
 
     def addRequirement(self, req):
         self.questRequirements.add(req)
+        if req.getQuest is not self:
+            req.setQuest(self)
 
     def handleQuestProgress(self, req):
         self.checkQuestRequirements()
@@ -105,9 +103,13 @@ class Quest(object):
     def placeQuestCreatures(self):
         pass
 
+    def getQuestGivers(self):
+        return self.questGivers
+
     def addQuestGiver(self, cr):
         self.questGivers.add(cr)
-        cr.quest = self
+        if self is not cr.getQuest():
+            cr.setQuest(self)
 
     def getConversation(self):
         if self.questStatus == NOT_STARTED:
@@ -206,6 +208,14 @@ class QuestRequirement():
 
     def getEventsRemaining(self):
         return self.eventsRemaining
+
+    def getQuest(self):
+        return self.quest
+
+    def setQuest(self, quest):
+        self.quest = quest
+        if self not in quest.getRequirements():
+            quest.addRequirement(self)
 
 class QuestItemRequirement(QuestRequirement):
     

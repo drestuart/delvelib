@@ -99,6 +99,8 @@ class MapTile(TileBase):
     
     def setConnectedArea(self, area):
         self.connectedArea = area
+        if self is not area.getMapTile():
+            area.setMapTile(self)
     
     def getStartingLevel(self): # TODO: Threading flag here?
         return self.getConnectedArea().getStartingLevel()

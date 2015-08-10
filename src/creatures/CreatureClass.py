@@ -227,6 +227,14 @@ class Creature(colors.withColor):
 
     def setHateList(self, value):
         self.hateList = value
+
+    def getQuest(self):
+        return self.quest
+    
+    def setQuest(self, quest):
+        self.quest = quest
+        if self not in quest.getQuestGivers():
+            quest.addQuestGiver(self)
         
     def canSeeCreature(self, creature):
         return self.level.isTileInFOV(self.getTile(), creature.getTile())

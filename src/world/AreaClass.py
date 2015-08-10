@@ -36,16 +36,14 @@ class Area(object):
         
         self.mapTile = None
     
-# TODO:
-#     levels = relationship("Level", backref=backref("area", uselist=False), 
-#                           primaryjoin="Area.id==Level.areaId")
-#     startingLevel = relationship("Level", uselist = False, primaryjoin="Area.id==Level.startingLevelOfId")
-#     mapTile = relationship("MapTile", uselist=False, backref=backref("connectedArea", uselist=False), 
-#                           primaryjoin="MapTile.connectedAreaId==Area.id") #, lazy='joined')
-    
     def getLevels(self):
         return self.levels
-    
+
+    def addLevel(self, lvl):
+        self.levels.append(lvl)
+        if self is not lvl.getArea():
+            lvl.setArea(self)
+
     def buildStartingLevel(self):
         raise NotImplementedError("buildStartingLevel() not implemented, use a subclass")
     
@@ -56,12 +54,17 @@ class Area(object):
         if not self.startingLevel:
             self.buildStartingLevel() # TODO: Threading flag here?
         return self.startingLevel
+
+    def setStartingLevel(self, lvl):
+        self.startingLevel = lvl
     
     def getMapTile(self):
         return self.mapTile
     
     def setMapTile(self, mt):
         self.mapTile = mt
+        if self is not mt.getConnectedArea():
+            mt.setConnectedArea(self)
     
     def getTerrainType(self):
         return self.getMapTile().getTerrainType()
