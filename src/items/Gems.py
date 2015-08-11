@@ -14,6 +14,7 @@ def getRandomGem():
 
 class Ruby(I.Gem):
     color = colors.red
+    itemType = "gem_ruby"
     description = "ruby"
 
     def __init__(self, **kwargs):
@@ -21,6 +22,7 @@ class Ruby(I.Gem):
         
 class Emerald(I.Gem):
     color = colors.green
+    itemType = "gem_emerald"
     description = "emerald"
 
     def __init__(self, **kwargs):
@@ -29,6 +31,7 @@ class Emerald(I.Gem):
         
 class Diamond(I.Gem):
     color = colors.white
+    itemType = "gem_diamond"
     description = "diamond"
 
     def __init__(self, **kwargs):

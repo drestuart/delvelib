@@ -13,8 +13,8 @@ def getRandomSpellbook():
     return bookClass()
 
 class ObligatoryFireballSpellbook(I.Spellbook):
-    
     color = colors.colorLeather
+    itemType = "spellbook_obligatory_fireball"
     description = "spellbook of Obligatory Fireball"
     
     def __init__(self, **kwargs):

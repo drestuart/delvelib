@@ -13,8 +13,8 @@ def getRandomPotion():
     return potClass()
     
 class PettyHealingPotion(I.Potion):
-    
     color = colors.lightBlue
+    itemType = "potion_petty_healing"
     description = "potion of petty healing"
     
     def __init__(self, **kwargs):
@@ -22,8 +22,8 @@ class PettyHealingPotion(I.Potion):
         
         
 class ModerateHealingPotion(I.Potion):
-    
     color = colors.blue
+    itemType = "potion_moderate_healing"
     description = "potion of moderate healing"
     
     def __init__(self, **kwargs):
@@ -31,8 +31,8 @@ class ModerateHealingPotion(I.Potion):
         
 
 class ColossalHealingPotion(I.Potion):
-    
     color = colors.darkBlue
+    itemType = "potion_colossal_healing"
     description = "potion of colossal healing"
     
     def __init__(self, **kwargs):
@@ -40,8 +40,8 @@ class ColossalHealingPotion(I.Potion):
         
         
 class PoisonPotion(I.Potion):
-    
     color = colors.red
+    itemType = "potion_poison"
     description = "potion of poison"
     
     def __init__(self, **kwargs):

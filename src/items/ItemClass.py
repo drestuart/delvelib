@@ -52,13 +52,11 @@ class Item(colors.withColor):
     
     @classmethod
     def getPickupEvent(cls):
-        return pickupEventPrefix + cls.__mapper_args__['polymorphic_identity']
-#         return pickupEventPrefix + cls.itemType
+        return pickupEventPrefix + cls.itemType
     
     @classmethod
     def getQuestPickupEvent(cls):
-        return questPickupEventPrefix + cls.__mapper_args__['polymorphic_identity']
-#         return questPickupEventPrefix + cls.itemType
+        return questPickupEventPrefix + cls.itemType
     
     def dropEvent(self):
         pub.sendMessage(self.getDropEvent(), item=self)
@@ -67,13 +65,11 @@ class Item(colors.withColor):
     
     @classmethod
     def getDropEvent(cls):
-        return dropEventPrefix + cls.__mapper_args__['polymorphic_identity']
-#         return dropEventPrefix + cls.itemType
+        return dropEventPrefix + cls.itemType
     
     @classmethod
     def getQuestDropEvent(cls):
-        return questDropEventPrefix + cls.__mapper_args__['polymorphic_identity']
-#         return questDropEventPrefix + cls.itemType
+        return questDropEventPrefix + cls.itemType
     
     def getInventory(self):
         return self.inventory
@@ -197,12 +193,14 @@ class Item(colors.withColor):
 
 class Amulet(Item):
     wearable = True
+    itemType = "amulet"
     
     def __init__(self, **kwargs):
         super(Amulet, self).__init__(symbol = u'"', **kwargs)
 
 class Armor(Item):
     wearable = True
+    itemType = "armor"
     
     def __init__(self, **kwargs):
         super(Armor, self).__init__(symbol = u'[', **kwargs)
@@ -210,6 +208,7 @@ class Armor(Item):
 class Coins(Item):
     stackable = True
     color = colors.colorGold
+    itemType = "coin"
     
     description = "gold coin"
     
@@ -219,23 +218,27 @@ class Coins(Item):
 
 class Food(Item):
     edible = True
+    itemType = "food"
     
     def __init__(self, **kwargs):
         super(Food, self).__init__(symbol = u'%', **kwargs)
 
 class Gem(Item):
+    itemType = "gem"
     
     def __init__(self, **kwargs):
         super(Gem, self).__init__(symbol = u'*', **kwargs)
 
 class Potion(Item):
     drinkable = True
+    itemType = "potion"
     
     def __init__(self, **kwargs):
         super(Potion, self).__init__(symbol = u'!', **kwargs)
 
 class Ring(Item):
     wearable = True
+    itemType = "ring"
     
     def __init__(self, **kwargs):
         super(Ring, self).__init__(symbol = u'=', **kwargs)
@@ -243,24 +246,28 @@ class Ring(Item):
 class Scroll(Item):
     readable = True
     color = colors.white
+    itemType = "scroll"
     
     def __init__(self, **kwargs):
         super(Scroll, self).__init__(symbol = u'?', **kwargs)
         
 class Spellbook(Item):
     readable = True
+    itemType = "spellbook"
     
     def __init__(self, **kwargs):
         super(Spellbook, self).__init__(symbol = u'+', **kwargs)
         
 class Wand(Item):
     zappable = True
+    itemType = "wand"
     
     def __init__(self, **kwargs):
         super(Wand, self).__init__(symbol = u'/', **kwargs)
 
 class Weapon(Item):
     wieldable = True
+    itemType = "weapon"
     
     def __init__(self, **kwargs):
         super(Weapon, self).__init__(symbol = u')', **kwargs)
@@ -268,6 +275,7 @@ class Weapon(Item):
 class MacGuffin(Item):
     color = colors.colorSteel
     description = u"Mystic MacGuffin"
+    itemType = "macguffin"
     
     def __init__(self, **kwargs):
         super(MacGuffin, self).__init__(symbol = u'^', **kwargs)

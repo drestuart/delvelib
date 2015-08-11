@@ -13,8 +13,8 @@ def getRandomWand():
     return wandClass()
 
 class LightningWand(I.Wand):
-    
     color = colors.colorSteel
+    itemType = "wand_lightning"
     description = "wand of lightning"
     
     def __init__(self, **kwargs):

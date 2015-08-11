@@ -13,8 +13,8 @@ def getRandomFood():
     return foodClass()
 
 class Kebab(I.Food):
-    
     color = colors.colorMeat
+    itemType = "food_kebab"
     description = "kebab"
     
     def __init__(self, **kwargs):

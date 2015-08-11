@@ -13,8 +13,8 @@ def getRandomWeapon():
     return weaponClass()
 
 class Longsword(I.Weapon):
-    
     color = colors.colorSteel
+    itemType = "weapon_longsword"
     description = "longsword"
     
     def __init__(self, **kwargs):

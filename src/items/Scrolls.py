@@ -12,7 +12,7 @@ def getRandomScroll():
     return scrollClass()
 
 class TeleportationScroll(I.Scroll):
-    
+    itemType = "scroll_teleportation"
     description = "scroll of teleportation"
     
     def __init__(self, **kwargs):

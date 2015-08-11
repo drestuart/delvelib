@@ -13,8 +13,8 @@ def getRandomRing():
     return ringClass()
 
 class ProtectionRing(I.Ring):
-    
     color = colors.darkMagenta
+    itemType = "ring_protection"
     description = "ring of protection"
     
     def __init__(self, **kwargs):

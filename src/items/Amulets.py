@@ -13,8 +13,8 @@ def getRandomAmulet():
     return amClass()
 
 class LuckAmulet(I.Amulet):
-    
     color = colors.red
+    itemType = "amulet_luck"
     description = "amulet of luck"
     
     def __init__(self, **kwargs):

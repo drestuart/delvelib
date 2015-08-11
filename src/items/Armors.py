@@ -13,8 +13,8 @@ def getRandomArmor():
     return armClass()
 
 class Breastplate(I.Armor):
-    
     color = colors.colorSteel
+    itemType = "armor_breastplate"
     description = "breastplate"
     
     def __init__(self, **kwargs):
