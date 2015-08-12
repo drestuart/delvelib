@@ -24,7 +24,7 @@ import NPCClass
 class MapBase(object):
     
     def __init__(self, **kwargs):
-        self.creatures = {}
+        self.creatures = set()
 
         self.name = kwargs.get('name', u"")
 
@@ -39,6 +39,9 @@ class MapBase(object):
     
     def getHeight(self):
         return self.height
+
+    def getCreatures(self):
+        return self.creatures
     
     def setupEventListeners(self):
         pass
@@ -94,8 +97,8 @@ class Level(MapBase):
         self.area = kwargs['area']
         self.startingLevelOf = None #?
                 
-        self.tiles = {}
-        self.rooms = {}
+        self.tiles = set()
+        self.rooms = set()
         
         self.FOVMap = None
         self.astar = None
@@ -540,7 +543,7 @@ class Level(MapBase):
     
         
     def findCreatures(self):
-        self.creatures = []
+        self.creatures = set()
         for tile in self.tiles:
             if tile.creature:
                 self.addCreature(tile.creature)

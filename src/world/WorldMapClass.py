@@ -11,7 +11,7 @@ import random
 class Region(object):
     
     def __init__(self, **kwargs):
-        self.mapTiles = {}
+        self.mapTiles = set()
         self.name = None
         self.worldMap = None
 
@@ -36,11 +36,11 @@ class WorldMap(L.MapBase):
     def __init__(self, **kwargs):
         super(WorldMap, self).__init__(**kwargs)
         self.name = None
-        self.mapTiles = {}
-        self.regions = {}
+        self.mapTiles = set()
+        self.regions = set()
         self.num_regions = kwargs['num_regions']
         
-        self.creatures = {}
+        self.creatures = set()
 
         # Initialize self.hasTile
         self.hasTile = []

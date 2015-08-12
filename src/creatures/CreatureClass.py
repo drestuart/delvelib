@@ -32,8 +32,9 @@ class Creature(colors.withColor):
         self.AI = self.AIClass()
         self.AI.setOwner(self)
         
-        self.goalEnemy = None
         self.tile = None
+        self.goalEnemy = None
+        self.goalTile = None
 
         self.load()
         
@@ -85,7 +86,6 @@ class Creature(colors.withColor):
         level = self.getLevel()
         
         if newTile is not None and level.placeCreature(self, newTile):
-#            print self.name + " moves to", self.getX(), self.getY()
             return True
         
         else:
@@ -96,7 +96,7 @@ class Creature(colors.withColor):
     
     def setTile(self, tile):
         self.tile = tile
-        if tile.getCreature() is not self:
+        if tile and tile.getCreature() is not self:
             tile.setCreature(self)
         
     def getX(self):

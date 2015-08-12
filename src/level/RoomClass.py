@@ -84,7 +84,7 @@ class Rect(object):
 class Room():
     
     def __init__(self, **kwargs):
-        self.tiles = {}
+        self.tiles = set()
         self.level = None
     
     def getLevel(self):

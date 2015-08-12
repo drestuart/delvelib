@@ -37,8 +37,8 @@ class Quest(object):
         self.progressConversation = None
         self.completedConversation = None
         
-        self.questGivers = {}
-        self.questRequirements = {}
+        self.questGivers = set()
+        self.questRequirements = set()
         
         Game.addQuest(self)
     

@@ -41,7 +41,7 @@ class TileBase(colors.withBackgroundColor):
         return self.__str__()
     
     def __str__(self):
-        return self.baseDescription
+        return self.baseDescription + " " + str(self.getXY())
     
     def getX(self):
         return self.x
@@ -51,7 +51,10 @@ class TileBase(colors.withBackgroundColor):
     
     def getXY(self):
         return self.x, self.y
-    
+
+    def getCreature(self):
+        return self.creature
+
     def placeCreature(self, creature):
         if self.blocksMove():
             return False
@@ -280,9 +283,6 @@ class Tile(TileBase):
         else:
             return self.baseDescription 
     
-    def __str__(self):
-        return self.baseDescription
-    
     def getRoom(self):
         return self.room
     
@@ -317,12 +317,6 @@ class Tile(TileBase):
     def setGoalTileOf(self, value):
         self.goalTileOf = value
 
-    def getCreature(self):
-        return self.creature
-
-    def setCreature(self, value):
-        self.creature = value
-        
     def getInventory(self):
         self.initializeInventory()
         return self.inventory
