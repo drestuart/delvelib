@@ -841,14 +841,15 @@ class DungeonLevel(Level):
     
     def placeCreatureAtRandom(self, creature, inRoom = True):
         # Place in a room
-        
+        from dlrandom import setChoice
+
         # Sanity check: if the level doesn't *have* any rooms, don't be stupid
         if not self.rooms:
             inRoom = False
         
         while True:
             if inRoom: 
-                room = random.choice(self.rooms)
+                room = setChoice(self.rooms)
                 tile = self.getRandomOpenTileInRoom(room)
             else: tile = self.getRandomOpenTile()
             if tile:

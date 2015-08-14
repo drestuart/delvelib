@@ -12,6 +12,7 @@ class Creature(colors.withColor):
     
     blockSight = False
     description = "creature"
+    creatureType = "creature"
     
     def __init__(self, **kwargs):
         super(Creature, self).__init__(**kwargs)
@@ -295,6 +296,7 @@ class Orc(Creature):
     color = colors.red
     species = 'orc'
     description = 'a hideous orc'
+    creatureType = 'orc'
     
     def __init__(self, **kwargs):
         super(Orc, self).__init__(symbol = u'o', name = u'orc', maxHP = 4, AIClass = AI.AggressiveAI, **kwargs)

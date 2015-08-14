@@ -16,6 +16,7 @@ class Player(Cr.Creature):
     color = colors.white
     description = 'player'
     species = 'player'
+    creatureType = 'player'
 
     def __init__(self, **kwargs):
         super(Player, self).__init__(symbol = u'@', name=u"player",
