@@ -51,6 +51,9 @@ class WorldMap(L.MapBase):
                 newCol.append(False)
             self.hasTile.append(newCol)
 
+    def load(self):
+        pass
+
     def getMapTiles(self):
         return self.mapTiles
 
@@ -214,11 +217,5 @@ class WorldMap(L.MapBase):
     def handleAddedCreature(self, tile, creature):
         pass
     
-    def placeCreature(self, creature, tile):
-        success = tile.placeCreature(creature)
-        if success and not creature in self.creatures:
-            self.creatures.append(creature)
-        return success
-        
     def buildMap(self):
         raise NotImplementedError("buildMap() not implemented, use a subclass")

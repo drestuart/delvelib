@@ -24,9 +24,16 @@ class TileBase(colors.withBackgroundColor):
         self.baseDescription = kwargs.get('baseDescription', u'')
         self.baseSymbol = kwargs.get('baseSymbol', u' ')
         self.creature = kwargs.get('creature', None)
+        self.feature = kwargs.get('feature', None)
 
     def blocksMove(self):
         raise NotImplementedError("blocksMove() not implemented, use a subclass")
+
+    def blocksPathing(self):
+        return self.blocksMove() and not self.hasClosedDoor()
+
+    def hasClosedDoor(self):
+        return self.feature is not None and isinstance(self.feature, Door) and self.feature.isClosed()
     
     def getSymbol(self):
         return self.baseSymbol
@@ -90,8 +97,6 @@ class TileBase(colors.withBackgroundColor):
     def distance(self, other):
         return U.ChebyshevDistance(self.getX(), other.getX(), self.getY(), other.getY())
 
-
-
 class Tile(TileBase):
     # A tile of the map and its properties
     
@@ -105,7 +110,6 @@ class Tile(TileBase):
         self.level = kwargs.get('level', None)
         self.room = kwargs.get('room', None)
         
-        self.feature = kwargs.get('feature', None)
         self.explored = False
         self.inventory = None
         
@@ -169,12 +173,6 @@ class Tile(TileBase):
             blocks = blocks or self.feature.getBlockSight()
                 
         return blocks
-    
-    def blocksPathing(self):
-        return self.blocksMove() and not self.hasClosedDoor()
-    
-    def hasClosedDoor(self):
-        return self.feature is not None and isinstance(self.feature, Door) and self.feature.isClosed()
     
     def addObject(self, obj):
         if not self.inventory:

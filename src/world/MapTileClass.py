@@ -16,6 +16,7 @@ class MapTile(TileBase):
     
     backgroundColor = blankBackground
     description = "tile"
+    name = '' # TODO: Get name from region?
     
     def __init__(self, x, y, **kwargs):
         super(MapTile, self).__init__(x, y, **kwargs)

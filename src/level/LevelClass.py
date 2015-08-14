@@ -43,6 +43,20 @@ class MapBase(object):
     def getCreatures(self):
         return self.creatures
     
+    def addCreature(self, cr):
+        self.creatures.add(cr)
+        if cr.getLevel() is not self:
+            cr.setLevel(self)
+        
+    def placeCreature(self, creature, tile):
+        success = tile.placeCreature(creature)
+        if success and not creature in self.creatures:
+            self.addCreature(creature)
+        return success
+    
+    def placeCreatureAtRandom(self, creature, dummy=True):
+        raise NotImplementedError("placeCreatureAtRandom() not implemented, use a subclass")
+    
     def setupEventListeners(self):
         pass
     
@@ -548,20 +562,6 @@ class Level(MapBase):
             if tile.creature:
                 self.addCreature(tile.creature)
 
-    def addCreature(self, cr):
-        self.creatures.add(cr)
-        if cr.getLevel() is not self:
-            cr.setLevel(self)
-        
-    def placeCreature(self, creature, tile):
-        success = tile.placeCreature(creature)
-        if success and not creature in self.creatures:
-            self.addCreature(creature)
-        return success
-    
-    def placeCreatureAtRandom(self, creature, dummy=True):
-        raise NotImplementedError("placeCreatureAtRandom() not implemented, use a subclass")
-        
     def buildLevel(self):
         raise NotImplementedError("buildLevel() not implemented, use a subclass")
     
@@ -770,7 +770,7 @@ class DungeonLevel(Level):
                     feature = featureType()
                     newTile.setFeature(feature)
                 
-                self.tiles.append(newTile)
+                self.tiles.add(newTile)
                 self.hasTile[x][y] = True
                 
         print "Building tile array"    
