@@ -113,7 +113,7 @@ class MapTile(TileBase):
         return self.terrainType
     
     def generateArea(self):
-        self.connectedArea = self.areaType()
+        self.setConnectedArea(self.areaType())
     
     def hasDungeon(self):
         return self.getConnectedArea().dungeonStatus() is not DungeonStatus.none

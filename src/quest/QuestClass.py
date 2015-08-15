@@ -181,7 +181,7 @@ class ItemQuest(Quest):
 
     __mapper_args__ = {'polymorphic_identity': u'item_quest'}
 
-class QuestRequirement():
+class QuestRequirement(object):
     __tablename__ = "quest_requirements"
     __table_args__ = {'extend_existing': True}
 
