@@ -47,9 +47,6 @@ class TileBase(colors.withBackgroundColor):
     def getDescription(self):
         return self.__str__()
     
-    def __str__(self):
-        return self.baseDescription + " " + str(self.getXY())
-    
     def getX(self):
         return self.x
     

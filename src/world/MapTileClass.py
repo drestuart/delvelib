@@ -51,6 +51,11 @@ class MapTile(TileBase):
     def getLevel(self):  
         return self.worldMap
     
+    def setLevel(self, level):
+        self.worldMap = level
+        if self not in self.worldMap.getMapTiles():
+            self.level.addTile(self)
+    
     def getRegion(self):
         return self.region
     

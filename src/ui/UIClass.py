@@ -435,6 +435,7 @@ class UI(object):
                     self.mapPanel.resetCameraOffset()
                     return 'took-turn'
                 elif isinstance(moveres, MT.MapTile):
+                    print "Entering new level"
                     self.enterNewLevel(self.player, moveres)
  
             elif keyStr == '.': # Wait
@@ -550,16 +551,16 @@ class UI(object):
         return self.mapPanel.getTileDescription(x, y)
     
     def enterNewLevel(self, creature, tile):
-        clevel = self.currentLevel
+#         clevel = self.currentLevel
         toLevel = tile.getLevel()
         
         if not toLevel:
+            print "Bad level!"
             return False
         
         # TODO:
 #         db.saveDB.save(clevel)
         
-        toLevel.load()
         self.setCurrentLevel(toLevel)
         toLevel.placeCreature(self.player, tile)
         toLevel.computeFOVProperties(True)

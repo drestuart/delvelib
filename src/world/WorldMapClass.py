@@ -60,6 +60,8 @@ class WorldMap(L.MapBase):
     def addTile(self, tile):
         self.mapTiles.add(tile)
         self.hasTile[tile.getX()][tile.getY()] = True
+        if tile.getLevel() is not self:
+            tile.setLevel(self)
         
     def replaceTile(self, newtile):
         oldtile = self.getTile(newtile.getX(), newtile.getY())

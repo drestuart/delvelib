@@ -34,6 +34,9 @@ class MapBase(object):
         if self.width is None or self.height is None:
             raise ValueError("Map class constructor requires width and height values")
 
+    def load(self):
+        pass
+
     def getWidth(self):
         return self.width
     
@@ -132,10 +135,6 @@ class Level(MapBase):
 ##########################################################################        
 #        self.hasTile = [[False]*C.MAP_HEIGHT]*C.MAP_WIDTH
         
-# TODO:
-#     areaId = Column(Integer, ForeignKey("areas.id"))
-#     startingLevelOfId = Column(Integer, ForeignKey("areas.id"))
-    
     def load(self):
         
         # Initialize self.hasTile
