@@ -10,7 +10,7 @@ from AreaClass import DungeonStatus
 import LevelClass as L
 from TileClass import TileBase
 from colors import blankBackground, colorClosedDungeon, colorOpenDungeon
-from AreaClass import Area, MultiLevelArea
+from AreaClass import SingleLevelArea, MultiLevelArea
 
 class MapTile(TileBase):
     
@@ -26,14 +26,9 @@ class MapTile(TileBase):
         self.region = None
         self.area = None
 
-# TODO:        
-#     connectedAreaId = Column(Integer, ForeignKey("areas.id"))
-#     regionId = Column(Integer, ForeignKey("regions.id"))
-#     worldMapId = Column(Integer, ForeignKey("levels.id", use_alter = True, name="world_map_fk"))
-    
     waterTile = False
     terrainType = L.WildernessLevel
-    areaType = Area
+    areaType = SingleLevelArea
     
     def remove(self):
         self.worldMap = None
