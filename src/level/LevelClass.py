@@ -50,6 +50,9 @@ class MapBase(object):
         self.creatures.add(cr)
         if cr.getLevel() is not self:
             cr.setLevel(self)
+
+    def removeCreature(self, cr):
+        self.creatures.remove(cr)
         
     def placeCreature(self, creature, tile):
         success = tile.placeCreature(creature)
@@ -209,7 +212,7 @@ class Level(MapBase):
         
         # Replace in tile list
         self.tiles.remove(oldtile)
-        self.tiles.append(newtile)
+        self.tiles.add(newtile)
         
         # Replace in tile array
         if self.__dict__.get('tileArray'):
@@ -342,13 +345,11 @@ class Level(MapBase):
                 # Determine visibility
                 if visibility:
                     if self.isInFOV(playerx, playery, x, y):
-                        
                         tile.setExplored(True)
                         
                         symbol, color, background = tile.toDraw()
                         background = colors.colorLightWall
                         tile.setLastSeenSymbol(symbol)
-                        
                     
                     else:
                         if tile.getExplored():
@@ -364,9 +365,8 @@ class Level(MapBase):
                     symbol, color, background = tile.toDraw()
                     background = colors.colorLightWall
                     
-#                 symbol = symbol.encode('ascii', 'ignore')
                 retArray.append((x, y, symbol, color, background))
-#                UI.putChar(x, y, symbol, color, background)
+
         return retArray
                 
     def getTilesInRadius(self, radius, centerX, centerY):
@@ -888,7 +888,7 @@ class CaveLevel(Level):
                 else:
                     print "Bad tile type:'", shape, "'"
                 
-                self.tiles.append(newTile)
+                self.tiles.add(newTile)
                 self.hasTile[x][y] = True
         
         
@@ -1040,7 +1040,7 @@ class WildernessLevel(Level):
             for x in range(self.width):
                 newTile = self.defaultFloorType(x, y)
                     
-                self.tiles.append(newTile)
+                self.tiles.add(newTile)
                 self.hasTile[x][y] = True
         
         print "Building tile array"    

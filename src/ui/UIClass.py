@@ -100,9 +100,6 @@ class UI(object):
                         self.quit()
                     
                     elif player_action == 'took-turn':
-                        # MessagePanel paging test
-                        # self.messagePanel.crapBomb()
-
                         for cr in self.currentLevel.getLivingCreatures():
                             if cr is not self.player:
                                 cr.takeTurn() 
@@ -435,8 +432,7 @@ class UI(object):
                     self.mapPanel.resetCameraOffset()
                     return 'took-turn'
                 elif isinstance(moveres, MT.MapTile):
-                    print "Entering new level"
-                    self.enterNewLevel(self.player, moveres)
+                    self.enterLevel(moveres)
  
             elif keyStr == '.': # Wait
                 if (KMOD_SHIFT & key_mods): # '>' key
@@ -550,23 +546,6 @@ class UI(object):
         
         return self.mapPanel.getTileDescription(x, y)
     
-    def enterNewLevel(self, creature, tile):
-#         clevel = self.currentLevel
-        toLevel = tile.getLevel()
-        
-        if not toLevel:
-            print "Bad level!"
-            return False
-        
-        # TODO:
-#         db.saveDB.save(clevel)
-        
-        self.setCurrentLevel(toLevel)
-        toLevel.placeCreature(self.player, tile)
-        toLevel.computeFOVProperties(True)
-        
-        return True
-        
     def takeStairs(self):
         tile = self.player.getTile()
         
@@ -580,43 +559,50 @@ class UI(object):
                     G.message("Heading down the stairs!")
                 
                 destination = feature.getDestination()
-                return self.enterNewLevel(self.player, destination)
-#                 if not destination:
-#                     return False
-#                 
-#                 toLevel = destination.getLevel()
-#                 
-#                 if not toLevel:
-#                     return False
-#                 
-#                 db.saveDB.save(clevel)
-#                 
-#                 toLevel.load()
-#                 self.setCurrentLevel(toLevel)
-#                 toLevel.placeCreature(self.player, destination)
-#                 
-#                 return True
+                return self.enterLevel(destination)
         
         elif isinstance(tile, MT.MapTile):
-            clevel = self.currentLevel
             toLevel = tile.getStartingLevel()
-            
-            if not toLevel:
-                return False
-
-            # TODO:
-#             db.saveDB.save(clevel)
-            
-            toLevel.load()
-            self.setCurrentLevel(toLevel)
-            toLevel.placeCreatureAtEntrance(self.player)
-            return True
-            
+            return self.enterLevelFromWorldMap(toLevel)
         
         G.message("No stairs here!")
         return False
     
+    def enterLevel(self, tile):
+#         clevel = self.currentLevel
+        toLevel = tile.getLevel()
+
+        if not toLevel:
+            print "Bad level!"
+            return False
+
+        # TODO:
+#         db.saveDB.save(clevel)
+
+        toLevel.load()
+        self.setCurrentLevel(toLevel)
+        toLevel.placeCreature(self.player, tile)
+        toLevel.computeFOVProperties(True)
+
+        return True
     
+    def enterLevelFromWorldMap(self, toLevel):
+#         clevel = self.currentLevel
+
+        if not toLevel:
+            print "Bad level!"
+            return False
+
+        # TODO:
+#         db.saveDB.save(clevel)
+
+        toLevel.load()
+        self.setCurrentLevel(toLevel)
+        toLevel.placeCreatureAtEntrance(self.player)
+        toLevel.computeFOVProperties(True)
+
+        return True
+
     def openAdjacentDoor(self, player):
         adjTiles = self.getCurrentLevel().getAdjacentTiles(player.getTile())
         doors = []

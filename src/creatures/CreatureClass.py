@@ -113,6 +113,10 @@ class Creature(colors.withColor):
         return self.level
     
     def setLevel(self, lvl):
+        oldLevel = self.level
+        if oldLevel:
+            oldLevel.removeCreature(self)
+
         self.level = lvl
         if self not in self.level.getCreatures():
             self.level.addCreature(self)
