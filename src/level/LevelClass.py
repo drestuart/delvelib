@@ -37,6 +37,9 @@ class MapBase(object):
     def load(self):
         pass
 
+    def unload(self):
+        pass
+
     def getWidth(self):
         return self.width
     
@@ -64,6 +67,9 @@ class MapBase(object):
         raise NotImplementedError("placeCreatureAtRandom() not implemented, use a subclass")
     
     def setupEventListeners(self):
+        pass
+
+    def tearDownEventListeners(self):
         pass
     
     def computeFOV(self, x, y):
@@ -139,7 +145,6 @@ class Level(MapBase):
 #        self.hasTile = [[False]*C.MAP_HEIGHT]*C.MAP_WIDTH
         
     def load(self):
-        
         # Initialize self.hasTile
         self.hasTile = U.twoDArray(self.width, self.height, False)
         
@@ -154,6 +159,9 @@ class Level(MapBase):
             t.load()
         
         self.setupEventListeners()
+
+    def unload(self):
+        self.tearDownEventListeners()
         
     def setupEventListeners(self):
         
@@ -175,6 +183,16 @@ class Level(MapBase):
             pub.subscribe(self.handleDoorOpen, "event.doorOpen")
             pub.subscribe(self.handleDoorClose, "event.doorClose")
             pub.subscribe(self.handleDoorBlocked, "event.doorBlocked")
+
+    def tearDownEventListeners(self):
+        if pub.isSubscribed(self.handleAddedCreature, "event.addedCreature"):
+            pub.unsubscribe(self.handleAddedCreature, "event.addedCreature")
+            pub.unsubscribe(self.handleRemovedCreature, "event.removedCreature")
+
+        if pub.isSubscribed(self.handleDoorOpen, "event.doorOpen"):
+            pub.unsubscribe(self.handleDoorOpen, "event.doorOpen")
+            pub.unsubscribe(self.handleDoorClose, "event.doorClose")
+            pub.unsubscribe(self.handleDoorBlocked, "event.doorBlocked")
 
     def buildTileArray(self):
         self.tileArray = []
@@ -500,24 +518,34 @@ class Level(MapBase):
         
     def handleRemovedCreature(self, tile, creature):
         x, y = tile.getXY()
-        if self.__dict__.get('astar'): self.astar.setMovable(x, y, not tile.blocksPathing())
-#         print "Creature removed from tile", tile.getXY(), self.astar.getMovable(x, y)
+        if not self.astar:
+            self.setupPathing()
+        
+        self.astar.setMovable(x, y, not tile.blocksPathing())
         
     def handleAddedCreature(self, tile, creature):
         x, y = tile.getXY()
-        if self.__dict__.get('astar'): self.astar.setMovable(x, y, not tile.blocksPathing())
-#         print "Creature added to tile", tile.getXY(), self.astar.getMovable(x, y)
+        if not self.astar:
+            self.setupPathing()
+        
+        self.astar.setMovable(x, y, not tile.blocksPathing())
         
     def handleDoorOpen(self, tile):
         x, y = tile.getXY()
-#         G.message("Door opened " + str(x) + ", " + str(y))
-        if self.__dict__.get('astar'): self.astar.setMovable(x, y, not tile.blocksPathing())
+
+        if not self.astar:
+            self.setupPathing()
+        
+        self.astar.setMovable(x, y, not tile.blocksPathing())
         self.computeFOVProperties(force = True)
     
     def handleDoorClose(self, tile):
         x, y = tile.getXY()
 #         G.message("Door closed " + str(x) + ", " + str(y))
-        if self.__dict__.get('astar'): self.astar.setMovable(x, y, not tile.blocksPathing())
+        if not self.astar:
+            self.setupPathing()
+        
+        self.astar.setMovable(x, y, not tile.blocksPathing())
         self.computeFOVProperties(force = True)
     
     def handleDoorBlocked(self, tile):
@@ -526,7 +554,7 @@ class Level(MapBase):
     
     def getPathToTile(self, fromTile, toTile):
         
-        if self.__dict__.get('astar') is None:
+        if not self.astar:
             self.setupPathing()
 
         startpoint = fromTile.getXY()
@@ -534,13 +562,15 @@ class Level(MapBase):
         
         # Hack to fix issue with starting and ending tiles being blocked
         self.astar.setMovable(fromTile.getX(), fromTile.getY(), True)
-        if toTile.blocksMove() and toTile.getCreature(): self.astar.setMovable(toTile.getX(), toTile.getY(), True)
+        if toTile.blocksMove() and toTile.getCreature():
+            self.astar.setMovable(toTile.getX(), toTile.getY(), True)
         
         pathObj = AStar.findPath(startpoint, endpoint, self.astar)
         
         # Disenhack
         self.astar.setMovable(fromTile.getX(), fromTile.getY(), False)
-        if toTile.blocksMove() and toTile.getCreature(): self.astar.setMovable(toTile.getX(), toTile.getY(), False)
+        if toTile.blocksMove() and toTile.getCreature():
+            self.astar.setMovable(toTile.getX(), toTile.getY(), False)
         
         if pathObj:
             path = [(node.location.x, node.location.y) for node in pathObj.getNodes()]
@@ -659,21 +689,20 @@ class Level(MapBase):
         x, y = self.width/2, self.height - 1 # Bottom center
         if not self.getTile(x, y).blocksMove():
             self.entryPointX, self.entryPointY = x, y
-            return
+        else:
+            for i in range(1, self.width/2):
+                x = x + i
+                if not self.getTile(x, y).blocksMove():
+                    self.entryPointX, self.entryPointY = x, y
+                    break
+                
+                x = x - i
+                if not self.getTile(x, y).blocksMove():
+                    self.entryPointX, self.entryPointY = x, y
+                    break
         
-        for i in range(1, self.width/2):
-            x = x + i
-            if not self.getTile(x, y).blocksMove():
-                self.entryPointX, self.entryPointY = x, y
-                return
-            
-            x = x - i
-            if not self.getTile(x, y).blocksMove():
-                self.entryPointX, self.entryPointY = x, y
-                return
-        
-        raise Exception("Couldn't find valid entry point")
-
+        if (self.entryPointX, self.entryPointY) == (None, None):
+            raise Exception("Couldn't find valid entry point")
         
 def connectLevels(upper, lower):
     

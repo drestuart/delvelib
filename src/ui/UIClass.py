@@ -4,23 +4,15 @@ Created on Mar 12, 2013
 @author: dstu
 '''
 
-import Const as C
 import delvelibConst as DC
-import colors
-import Game as G
 import keys
-import pygcurse
-import pygame
 from pygame.locals import *
 import sys
 from PanelClass import *
-import textwrap
 from DungeonFeatureClass import downStair, upStair, Stair, Door
 import os.path
 import TileClass as T
 import MapTileClass as MT
-import ConversationClass as Con
-
 
 fontpath = os.path.join("modules", "delvelib", "fonts", "FreeMono.ttf")
 
@@ -569,7 +561,7 @@ class UI(object):
         return False
     
     def enterLevel(self, tile):
-#         clevel = self.currentLevel
+        clevel = self.currentLevel
         toLevel = tile.getLevel()
 
         if not toLevel:
@@ -579,6 +571,7 @@ class UI(object):
         # TODO:
 #         db.saveDB.save(clevel)
 
+        clevel.unload()
         toLevel.load()
         self.setCurrentLevel(toLevel)
         toLevel.placeCreature(self.player, tile)
@@ -587,7 +580,7 @@ class UI(object):
         return True
     
     def enterLevelFromWorldMap(self, toLevel):
-#         clevel = self.currentLevel
+        clevel = self.currentLevel
 
         if not toLevel:
             print "Bad level!"
@@ -596,6 +589,7 @@ class UI(object):
         # TODO:
 #         db.saveDB.save(clevel)
 
+        clevel.unload()
         toLevel.load()
         self.setCurrentLevel(toLevel)
         toLevel.placeCreatureAtEntrance(self.player)

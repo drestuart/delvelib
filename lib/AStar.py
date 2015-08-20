@@ -11,7 +11,7 @@ Modified by Dan Stuart:
 #
 # Changes in 1.1: 
 # In order to optimize the list handling I implemented the location id (lid) attribute.
-# This will make the all list serahces to become extremely more optimized.
+# This will make the all list searches to become extremely more optimized.
 
 class Path:
     def __init__(self,nodes, totalCost):
@@ -40,7 +40,7 @@ class Node:
 
 class AStar:
 
-    def __init__(self,maphandler):
+    def __init__(self, maphandler):
         self.mh = maphandler
                 
     def _getBestOpenNode(self):
@@ -157,10 +157,7 @@ class SQ_MapHandler:
             return None
         d = self.m[(y*self.w)+x]
         if d == -1:
-#            print "Tile is not movable:", x, y, d
             return None
-#        else:
-#            print "Tile is movable:", x, y, d
         
         return Node(location,d,((y*self.w)+x));                
 
@@ -170,15 +167,6 @@ class SQ_MapHandler:
        
         cl = curnode.location
         dl = dest
-        
-#         n = self._handleNode(cl.x+1,cl.y,curnode,dl.x,dl.y)
-#         if n: result.append(n)
-#         n = self._handleNode(cl.x-1,cl.y,curnode,dl.x,dl.y)
-#         if n: result.append(n)
-#         n = self._handleNode(cl.x,cl.y+1,curnode,dl.x,dl.y)
-#         if n: result.append(n)
-#         n = self._handleNode(cl.x,cl.y-1,curnode,dl.x,dl.y)
-#         if n: result.append(n)
         
         # Diagonal movement handling
         for i in (-1, 0, 1):
@@ -202,7 +190,7 @@ class SQ_MapHandler:
 
         return None    
 
-maphandler = None
+# maphandler = None
 
 def setUpMap(mapdata, width, height):
     maphandler = SQ_MapHandler(mapdata, width, height)
@@ -229,7 +217,6 @@ def dumpMap(astar):
                 print '.',
             
         print
-    
 
     
     
