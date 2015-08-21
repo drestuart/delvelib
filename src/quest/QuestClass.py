@@ -182,16 +182,13 @@ class ItemQuest(Quest):
     __mapper_args__ = {'polymorphic_identity': u'item_quest'}
 
 class QuestRequirement(object):
-    __tablename__ = "quest_requirements"
-    __table_args__ = {'extend_existing': True}
-
     updatedEventName = questEventPrefix + 'requirement.updated'
     satisfiedEventName = questEventPrefix + 'requirement.satisfied'
 
     def __init__(self, eventsRequired, quest):
         self.eventsRequired = eventsRequired
         self.eventsRemaining = eventsRequired
-        self.quest = quest
+        self.setQuest(quest)
 
 # TODO:
 #     questId = Column(Integer, ForeignKey("quests.id"))
