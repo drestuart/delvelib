@@ -659,6 +659,8 @@ class Level(MapBase):
     def placeItemAtRandom(self, item):
         tile = self.getRandomOpenTile()
         if tile:
+            if item.isQuestItem():
+                print "Placing quest item", item, "at", tile.getXY()
             tile.addObject(item)
             return tile
     

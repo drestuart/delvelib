@@ -41,8 +41,9 @@ class Creature(colors.withColor):
         
         self.setInventory(I.Inventory())
         self.level = None
-        
-        self.quest = None
+
+        self.givingQuest = None
+        self.returnQuest = None
 
     def load(self):
         self.hateList = ['player']
@@ -233,13 +234,21 @@ class Creature(colors.withColor):
     def setHateList(self, value):
         self.hateList = value
 
-    def getQuest(self):
-        return self.quest
+    def getGivingQuest(self):
+        return self.givingQuest
+
+    def setGivingQuest(self, quest):
+        self.givingQuest = quest
+        if self is not quest.getQuestGivingNPC():
+            quest.setQuestGivingNPC(self)
+
+    def getReturnQuest(self):
+        return self.returnQuest
     
-    def setQuest(self, quest):
-        self.quest = quest
-        if self not in quest.getQuestGivers():
-            quest.addQuestGiver(self)
+    def setReturnQuest(self, quest):
+        self.returnQuest = quest
+        if self is not quest.getQuestReturnNPC():
+            quest.setQuestReturnNPC(self)
         
     def canSeeCreature(self, creature):
         return self.level.isTileInFOV(self.getTile(), creature.getTile())

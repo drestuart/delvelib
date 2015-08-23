@@ -36,8 +36,9 @@ class Quest(object):
         self.startConversation = None
         self.progressConversation = None
         self.completedConversation = None
-        
-        self.questGivers = set()
+
+        self.questGivingNPC = None
+        self.questReturnNPC = None
         self.questRequirements = set()
         
         Game.addQuest(self)
@@ -103,13 +104,21 @@ class Quest(object):
     def placeQuestCreatures(self):
         pass
 
-    def getQuestGivers(self):
-        return self.questGivers
+    def getQuestGivingNPC(self):
+        return self.questGivingNPC
 
-    def addQuestGiver(self, cr):
-        self.questGivers.add(cr)
-        if self is not cr.getQuest():
-            cr.setQuest(self)
+    def setQuestGivingNPC(self, npc):
+        self.questGivingNPC = npc
+        if self is not npc.getGivingQuest():
+            npc.setGivingQuest(self)
+
+    def getQuestReturnNPC(self):
+        return self.questReturnNPC
+
+    def setQuestReturnNPC(self, npc):
+        self.questReturnNPC = npc
+        if self is not npc.getReturnQuest(): # TODO: Wipe out existing quest?
+            npc.setReturnQuest(self)
 
     def getConversation(self):
         if self.questStatus == NOT_STARTED:
@@ -165,15 +174,15 @@ class ItemQuest(Quest):
     def setReturned(self):
         player = Game.getPlayer()
 
-        # Move item from player's inventory to quest giver's
+        # Move item from player's inventory to quest NPC's
         for req in self.questRequirements:
             itemType = req.getItemType()
             if itemType:
                 for dummy in range(req.getEventsRequired()):
                     item = player.getQuestItemOfType(itemType)
                     if item:
-                        questGiver = self.questGivers[0]            # TODO!!!!!!
-                        player.giveItemToCreature(item, questGiver) # TODO!!!!!!
+                        npc = self.getQuestReturnNPC()
+                        player.giveItemToCreature(item, npc)
                     else:
                         print "Couldn't find a", req.itemTypeStr, "for some reason"
 

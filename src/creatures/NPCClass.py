@@ -23,12 +23,18 @@ class NPC(Cr.Creature):
     
     def handleBump(self, bumper):
         import Game as G
-        # Start a conversation
-        if self.quest and not self.quest.isReturned():
-            conv = self.quest.getConversation()
+
+        # Run a quest-related conversation if this NPC is attached to a quest
+        if self.getGivingQuest() and not self.getGivingQuest().isReturned():
+            conv = self.getGivingQuest().getConversation()
+            if conv:
+                G.startConversation(self, conv)
+        elif self.getReturnQuest() and not self.getReturnQuest().isReturned():
+            conv = self.getReturnQuest().getConversation()
             if conv:
                 G.startConversation(self, conv)
         else:
+            # Run default conversation
             G.startConversation(self, self.conversationTree)
 
         return False
