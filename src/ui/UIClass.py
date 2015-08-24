@@ -13,6 +13,7 @@ from DungeonFeatureClass import downStair, upStair, Stair, Door
 import os.path
 import TileClass as T
 import MapTileClass as MT
+from Game import game
 
 fontpath = os.path.join("modules", "delvelib", "fonts", "FreeMono.ttf")
 
@@ -111,6 +112,7 @@ class UI(object):
                 
     
     def quit(self):
+        game.closeShelf()
         pygame.quit()
         sys.exit()
     

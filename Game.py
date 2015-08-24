@@ -5,14 +5,15 @@ Created on Mar 10, 2013
 '''
 
 from pubsub import pub
-# from WorldMapClass import WorldMap
 import WorldMapClass
+import shelve
 
 defaultNames = 0
+shelf = None
+ui = None
 
 def save():
-    #TODO: shelve
-    pass
+    game.save()
 
 def message(msg):
     game.message(msg)
@@ -33,7 +34,7 @@ def getDebugValue(name):
     return game.getDebugValue(name)
 
 def getCurrentLevel():
-    return game.ui.getCurrentLevel()
+    return ui.getCurrentLevel()
 
 def getCurrentMapTile():
     return game.getCurrentMapTile()
@@ -51,7 +52,7 @@ def addQuest(q):
     game.addQuest(q)
 
 class Game(object):
-    
+
     fontsize = None
     
     def initialize(self, **kwargs):
@@ -65,14 +66,17 @@ class Game(object):
         print '  with data: ' + str(args)
         
     def message(self, msg):
+        global ui
         if self.debug: print msg
-        self.ui.message(msg)
+        ui.message(msg)
         
     def startConversation(self, cr, conv):
-        self.ui.conversationMenu(cr, conv)
+        global ui
+        ui.conversationMenu(cr, conv)
 
     def waitForInput(self):
-        return self.ui.waitForInput()
+        global ui
+        return ui.waitForInput()
         
     def getPlayer(self):
         return self.player
@@ -89,8 +93,37 @@ class Game(object):
                 return opt.value
         return None
 
-    def quit(self):
-        self.ui.quit()
+    def openShelf(self, filename = 'save/save.eru'):
+        global shelf
+        if shelf is not None:
+            self.closeShelf()
+
+        shelf = shelve.open(filename, writeback=True)
+        shelf['game'] = self
+        return True
+
+    def loadShelf(self, filename = 'save/save.eru'):
+        global shelf
+        if shelf is not None:
+            self.closeShelf()
+
+        shelf = shelve.open(filename, writeback=True)
+        self = shelf['game']
+        return True
+    
+    def closeShelf(self):
+        global shelf
+        if shelf is not None:
+            shelf.close()
+            return True
+        return False
+
+    def save(self):
+        global shelf
+        if shelf is not None:
+            shelf.sync()
+            return True
+        return False
         
     def getQuests(self):
         return self.quests
@@ -102,7 +135,8 @@ class Game(object):
         return self.worldMap
     
     def getCurrentMapTile(self):
-        level = self.ui.getCurrentLevel()
+        global ui
+        level = ui.getCurrentLevel()
         if not isinstance(level, WorldMapClass.WorldMap):
             return level.getMapTile()
         return self.getPlayer().getTile()
