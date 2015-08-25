@@ -34,7 +34,10 @@ def getDebugValue(name):
     return game.getDebugValue(name)
 
 def getCurrentLevel():
-    return ui.getCurrentLevel()
+    return game.getCurrentLevel()
+
+def setCurrentLevel(lvl):
+    game.setCurrentLevel(lvl)
 
 def getCurrentMapTile():
     return game.getCurrentMapTile()
@@ -133,7 +136,13 @@ class Game(object):
         
     def getWorldMap(self):
         return self.worldMap
-    
+
+    def getCurrentLevel(self):
+        return self.currentLevel
+
+    def setCurrentLevel(self, lvl):
+        self.currentLevel = lvl
+
     def getCurrentMapTile(self):
         global ui
         level = ui.getCurrentLevel()

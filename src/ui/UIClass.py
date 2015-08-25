@@ -20,7 +20,6 @@ fontpath = os.path.join("modules", "delvelib", "fonts", "FreeMono.ttf")
 class UI(object):
 
     def __init__(self, **kwargs):
-        self.currentLevel = kwargs.get('level', None)
         self.player = kwargs.get('player', None)
         self.fullscreen = kwargs.get('fullscreen', False)
         self.conversationCreature = None
@@ -42,28 +41,27 @@ class UI(object):
         self.window.autoupdate = False
         self.window.autodisplayupdate = False
         
-        # Set up UI panels
-        self.mapPanel = MapPanel(self.currentLevel, C.MAP_PANEL_DIMS, self)
-        self.messagePanel = MessagePanel(C.MESSAGE_PANEL_DIMS, self)
-        self.charPanel = CharacterPanel(C.CHAR_PANEL_DIMS, self)
-
         pygame.key.set_repeat(300, 150)
         
     def gameLoop(self):
-        
         self.clock = pygame.time.Clock()
         
+        # Set up UI panels
+        self.mapPanel = MapPanel(C.MAP_PANEL_DIMS, self)
+        self.messagePanel = MessagePanel(C.MESSAGE_PANEL_DIMS, self)
+        self.charPanel = CharacterPanel(C.CHAR_PANEL_DIMS, self)
+
         # Draw UI panels
         self.clearScreen()
         self.charPanel.draw()
         self.messagePanel.displayMessages()
         
-        self.currentLevel.setupEventListeners()
+        self.getCurrentLevel().setupEventListeners()
         
-        self.currentLevel.computeFOV(self.player.getX(), self.player.getY())
+        self.getCurrentLevel().computeFOV(self.player.getX(), self.player.getY())
         self.drawLevel()
         self.drawWindow()
-        
+
         # Set up a DRAWSCREEN heartbeat
         pygame.time.set_timer(DC.CHECKTILEDESC, DC.CHECKTILEDESCDELAY)
         
@@ -93,7 +91,7 @@ class UI(object):
                         self.quit()
                     
                     elif player_action == 'took-turn':
-                        for cr in self.currentLevel.getLivingCreatures():
+                        for cr in self.getCurrentLevel().getLivingCreatures():
                             if cr is not self.player:
                                 cr.takeTurn() 
                                 
@@ -505,11 +503,10 @@ class UI(object):
         self.drawWindow()
         
     def getCurrentLevel(self):
-        return self.currentLevel
+        return G.game.getCurrentLevel()
     
     def setCurrentLevel(self, lvl):
-        self.currentLevel = lvl
-        self.mapPanel.setLevel(lvl)
+        G.game.setCurrentLevel(lvl)
         lvl.load()
         
     def getPlayer(self):
@@ -519,10 +516,8 @@ class UI(object):
         self.player = c
         
     def clearScreen(self):
-        self.mapPanel.clear()
-        self.messagePanel.clear()
-        self.charPanel.clear()
-        
+        self.window.erase()
+
     def drawLevel(self):
         # Get all tiles to draw from level class
         playerx, playery = self.player.getX(), self.player.getY()
@@ -563,7 +558,7 @@ class UI(object):
         return False
     
     def enterLevel(self, tile):
-        clevel = self.currentLevel
+        clevel = self.getCurrentLevel()
         toLevel = tile.getLevel()
 
         if not toLevel:
@@ -582,7 +577,7 @@ class UI(object):
         return True
     
     def enterLevelFromWorldMap(self, toLevel):
-        clevel = self.currentLevel
+        clevel = self.getCurrentLevel()
 
         if not toLevel:
             print "Bad level!"

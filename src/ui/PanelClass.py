@@ -44,14 +44,10 @@ class Panel(object):
                 (y >= self.y) and (y < self.y + self.height)
     
     def clear(self):
-        # Clear tint
-        self.ui.window.settint(0, 0, 0, (self.x, self.y, self.width, self.height))
-        
-        # Clear characters
-        for y in range(self.height):
-            self.putChars(" " * self.width, 0, y, colors.black, colors.black)
-        
-        
+        self.ui.window.erase((self.x, self.y, self.width, self.height))
+
+    def getLevel(self):
+        return self.ui.getCurrentLevel()
 
 class MessagePanel(Panel):
     def __init__(self, *args):
@@ -228,7 +224,7 @@ class CharacterPanel(Panel):
         currentHP = self.ui.player.getHP()
                 
         playerx, playery = self.ui.player.getXY()
-        depth = self.ui.currentLevel.getDepth()
+        depth = self.getLevel().getDepth()
         
         self.render_bar(1, 1, 18, "HP", currentHP, maxHP, colors.darkBlue, colors.darkRed)
         if (G.getDebugValue("showCoords")):
@@ -262,21 +258,14 @@ class CharacterPanel(Panel):
 
 
 class MapPanel(Panel):
-    def __init__(self, level, *args):
+    def __init__(self, *args):
         super(MapPanel, self).__init__(*args)
-        self.level = level
         self.camx = 0
         self.camy = 0
         
         self.xoffset = 0
         self.yoffset = 0
-        
-    def setLevel(self, lvl):
-        self.level = lvl
-        
-    def getLevel(self):
-        return self.level
-    
+
     def moveCamera(self, dx, dy):
         self.xoffset += dx
         self.yoffset += dy
@@ -290,8 +279,8 @@ class MapPanel(Panel):
     
     def positionCamera(self, playerx, playery):
         
-        lwidth = self.level.getWidth()
-        lheight = self.level.getHeight()
+        lwidth = self.getLevel().getWidth()
+        lheight = self.getLevel().getHeight()
         
         lcenterx = int(lwidth/2)
         lcentery = int(lheight/2)
@@ -333,12 +322,12 @@ class MapPanel(Panel):
         self.positionCamera(playerx, playery)
         
         # Get tiles
-        tilesToDraw = self.level.getTilesToDraw(playerx, playery, self.cameraDims())
+        tilesToDraw = self.getLevel().getTilesToDraw(playerx, playery, self.cameraDims())
         
         # Draw monster paths
         if debug:
             creaturePathTiles = []
-            for cr in self.level.getLivingCreatures():
+            for cr in self.getLevel().getLivingCreatures():
                 path = cr.getPath()
                 if path:
                     creaturePathTiles += path
@@ -356,14 +345,14 @@ class MapPanel(Panel):
             mapx, mapy = x + self.camx, y + self.camy
             player = G.game.getPlayer()
             
-            if mapx < 0 or mapy < 0 or mapx >= self.level.getWidth() or mapy >= self.level.getHeight():
+            if mapx < 0 or mapy < 0 or mapx >= self.getLevel().getWidth() or mapy >= self.getLevel().getHeight():
                 return ''
             
-            tile = self.level.getTile(mapx, mapy)
+            tile = self.getLevel().getTile(mapx, mapy)
             if tile is None:
                 return ''
-            elif self.level.isInFOV(player.getX(), player.getY(), mapx, mapy):
-                return tile.getDescription()# + " " + str((tile.getXY()))+ " " + str(self.level.astar.getMovable(*tile.getXY()))
+            elif self.getLevel().isInFOV(player.getX(), player.getY(), mapx, mapy):
+                return tile.getDescription()# + " " + str((tile.getXY()))+ " " + str(self.getLevel().astar.getMovable(*tile.getXY()))
             else:
                 return ''
         else:
