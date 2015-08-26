@@ -4,8 +4,6 @@ Created on Mar 10, 2013
 @author: dstu
 '''
 
-import random
-
 from pubsub import pub
 import AStar
 import Const as C
@@ -100,6 +98,9 @@ class MapBase(object):
         return self.creatures
     
     def getRandomNPC(self):
+        import Game as G
+        random = G.getRandom()
+
         npcs = []
         for cr in self.getLivingCreatures():
             if isinstance(cr, NPCClass.NPC):
@@ -259,6 +260,9 @@ class Level(MapBase):
         return self.getTile(self.entryPointX, self.entryPointY)
     
     def getRandomTile(self):
+        import Game as G
+        random = G.getRandom()
+
         randX = random.randint(0, self.width)
         randY = random.randint(0, self.height)
         return self.getTile(randX, randY)
@@ -270,7 +274,9 @@ class Level(MapBase):
                 return randTile
             
     def getRandomTileInArea(self, x1, x2, y1, y2):
-        
+        import Game as G
+        random = G.getRandom()
+
         x1 = max(0, x1)
         x1 = min(x1, self.width)
         
@@ -283,18 +289,14 @@ class Level(MapBase):
         y2 = max(0, y2)
         y2 = min(y2, self.height)
         
-        
-#        randX = random.randint(x1, x2)
         randX = random.randint(min(x1, x2), max(x1, x2))
-        
-#        randY = random.randint(y1, y2)
-
         randY = random.randint(min(y1, y2), max(y1, y2))
 
         return self.getTile(randX, randY)
     
     def getRandomOpenTileInArea(self, x1, x2, y1, y2):
-#        print "Looking for tile in x=[", x1, x2, "], y=[", y1, y2, "]"
+        import Game as G
+        random = G.getRandom()
         
         openTiles = []
         
@@ -312,11 +314,15 @@ class Level(MapBase):
                 
             
     def getRandomTileInRoom(self, room):
-#         return self.getRandomTileInArea(room.x1, room.x2, room.y1, room.y2)
+        import Game as G
+        random = G.getRandom()
+
         return random.choice(room.getTiles())
     
     def getRandomOpenTileInRoom(self, room):
-#         return self.getRandomOpenTileInArea(room.x1, room.x2, room.y1, room.y2)
+        import Game as G
+        random = G.getRandom()
+
         openTiles = []
         for tile in room.getTiles():
             if tile and not tile.blocksMove() and not self.adjacentToDoor(tile):
@@ -325,6 +331,9 @@ class Level(MapBase):
         return random.choice(openTiles)
     
     def getRandomRoom(self):
+        import Game as G
+        random = G.getRandom()
+
         return random.choice(self.rooms)
     
     def adjacentToBlocked(self, tile):
@@ -834,6 +843,9 @@ class DungeonLevel(Level):
                 tile.addObject(item)
 
     def placeUpStair(self):
+        import Game as G
+        random = G.getRandom()
+
         if not self.__dict__.get('upStairs'):
             self.upStairs = []
         
@@ -852,6 +864,9 @@ class DungeonLevel(Level):
         return upTile
         
     def placeDownStair(self):
+        import Game as G
+        random = G.getRandom()
+
         if not self.__dict__.get('downStairs'):
             self.downStairs = []
         
@@ -1092,6 +1107,9 @@ class WildernessLevel(Level):
         self.placeCreature(creature, tile)
         
     def placeDownStair(self):
+        import Game as G
+        random = G.getRandom()
+
         if not self.__dict__.get('downStairs'):
             self.downStairs = []
         

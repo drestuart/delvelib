@@ -9,7 +9,6 @@ import colors
 import symbols
 import random
 
-
 class DungeonFeature(colors.withBackgroundColor):
     # Dummy class right now.  Will eventually represent dungeon features like traps, altars and stairs
     

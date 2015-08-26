@@ -6,7 +6,9 @@ Created on Jul 18, 2014
 
 from sys import maxint
 from Util import ManhattanDistance
-import random
+import Game as G
+
+random = G.getRandom()
 
 class WangTileMap(object):
     def __init__(self, tilesWide, tilesHigh):

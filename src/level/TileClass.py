@@ -8,8 +8,8 @@ from pubsub import pub
 import Util as U
 import colors
 import InventoryClass as Inv
-import random
 from DungeonFeatureClass import Door
+import random
 
 # A parent class for both level and world map tiles
 class TileBase(colors.withBackgroundColor):

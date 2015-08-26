@@ -6,7 +6,6 @@ Created on Feb 26, 2014
 
 import LevelClass as L
 import Util as U
-import random
 
 class Region(object):
     
@@ -138,6 +137,9 @@ class WorldMap(L.MapBase):
         return tiles
     
     def getNearestTile(self, fromTile, tileClass):
+        import Game as G
+        random = G.getRandom()
+
         centerX, centerY = fromTile.getXY()
         radius = 1
         

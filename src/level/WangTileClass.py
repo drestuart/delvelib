@@ -14,8 +14,10 @@
 
 from copy import deepcopy
 import re
-import random
 from Util import rotateCW, rotateCCW
+import Game as G
+
+random = G.getRandom()
 
 class WangTile(object):
     

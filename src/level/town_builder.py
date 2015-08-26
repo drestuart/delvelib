@@ -1,10 +1,12 @@
 
 import os.path
 import Const as C
-import random
 import RoomClass as R
 import DungeonFeatureClass as F
 from randomChoice import weightedChoice
+import Game as G
+
+random = G.getRandom()
 
 # Some constants
 room_width = 7

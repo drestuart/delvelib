@@ -7,10 +7,14 @@ Created on Mar 10, 2013
 from pubsub import pub
 import WorldMapClass
 import shelve
+import random
 
 defaultNames = 0
 shelf = None
 ui = None
+
+def getRandom():
+    return game.getRandom()
 
 def save():
     game.save()
@@ -58,9 +62,23 @@ class Game(object):
 
     fontsize = None
     
+    def __init__(self):
+        self.random = random.Random()
+        self.randomSeed = None
+    
     def initialize(self, **kwargs):
         raise NotImplementedError()
-        
+
+    def getRandomSeed(self):
+        return self.randomSeed
+
+    def setRandomSeed(self, seed):
+        self.randomSeed = seed
+        self.random.seed(seed)
+
+    def getRandom(self):
+        return self.random
+
     def start(self):
         raise NotImplementedError()
         

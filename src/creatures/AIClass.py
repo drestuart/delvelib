@@ -4,10 +4,9 @@ Created on Mar 13, 2013
 @author: dstu
 '''
 
-
-import random
 import keys
 from pygame.locals import *
+import random
 
 def getAIClassByName(name):
     return AIdict.get(name)
