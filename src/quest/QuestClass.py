@@ -7,22 +7,17 @@ Created on Jun 23, 2015
 from __future__ import unicode_literals
 
 from pubsub import pub
+from enum import Enum, unique
 import ItemClass
 import Game
 
 questEventPrefix = 'event.quest.'
 
-# TODO:
-# @unique
-# class QuestStatus(Enum):
-#     NOT_STARTED = 1
-#     STARTED = 2
-#     COMPLETED = 3
-
-NOT_STARTED = 1
-STARTED = 2
-COMPLETED = 3
-RETURNED = 4
+@unique
+class QuestStatus(Enum):
+    NOT_STARTED = 1
+    STARTED = 2
+    COMPLETED = 3
 
 class Quest(object):
 
@@ -31,7 +26,7 @@ class Quest(object):
     questReturnedEventName = questEventPrefix + 'returned'
 
     def __init__(self, **kwargs):
-        self.questStatus = NOT_STARTED
+        self.questStatus = QuestStatus.NOT_STARTED
         self.questName = None
         self.startConversation = None
         self.progressConversation = None
@@ -56,7 +51,7 @@ class Quest(object):
         pub.subscribe(self.handleQuestProgress, QuestRequirement.updatedEventName)
         pub.subscribe(self.handleRequirementCompletion, QuestRequirement.satisfiedEventName)
         
-        self.questStatus = STARTED
+        self.questStatus = QuestStatus.STARTED
 
     def getRequirements(self):
         return self.questRequirements
@@ -79,21 +74,21 @@ class Quest(object):
         return True
 
     def setUncompleted(self):
-        if self.questStatus != NOT_STARTED:
-            self.questStatus = STARTED
+        if self.questStatus != QuestStatus.NOT_STARTED:
+            self.questStatus = QuestStatus.STARTED
 
     def setCompleted(self):
-        if self.questStatus != NOT_STARTED:
-            self.questStatus = COMPLETED
+        if self.questStatus != QuestStatus.NOT_STARTED:
+            self.questStatus = QuestStatus.COMPLETED
             pub.sendMessage(self.questCompleteEventName, quest=self)
         
     def setReturned(self):
-        if self.questStatus != NOT_STARTED:
-            self.questStatus = RETURNED
+        if self.questStatus != QuestStatus.NOT_STARTED:
+            self.questStatus = QuestStatus.RETURNED
             pub.sendMessage(self.questReturnedEventName, quest=self)
         
     def isReturned(self):
-        return self.questStatus == RETURNED
+        return self.questStatus == QuestStatus.RETURNED
 
     def handleRequirementCompletion(self, req):
         pub.sendMessage(self.questRequirementCompleteEventName, quest=self)
@@ -121,11 +116,11 @@ class Quest(object):
             npc.setReturnQuest(self)
 
     def getConversation(self):
-        if self.questStatus == NOT_STARTED:
+        if self.questStatus == QuestStatus.NOT_STARTED:
             return self.getStartConversation()
-        elif self.questStatus == STARTED:
+        elif self.questStatus == QuestStatus.STARTED:
             return self.getProgressConversation()
-        elif self.questStatus == COMPLETED:
+        elif self.questStatus == QuestStatus.COMPLETED:
             return self.getCompletedConversation()
 
     def getStartConversation(self):
@@ -145,13 +140,13 @@ class Quest(object):
     
     def getStatusString(self):
         st = self.getStatus()
-        if st == NOT_STARTED:
+        if st == QuestStatus.NOT_STARTED:
             return "Not started"
-        elif st == STARTED:
+        elif st == QuestStatus.STARTED:
             return "Started"
-        elif st == COMPLETED:
+        elif st == QuestStatus.COMPLETED:
             return "Completed"
-        elif st == RETURNED:
+        elif st == QuestStatus.RETURNED:
             return "Returned"
 
 class ItemQuest(Quest):
@@ -199,9 +194,6 @@ class QuestRequirement(object):
         self.eventsRemaining = eventsRequired
         self.setQuest(quest)
 
-# TODO:
-#     questId = Column(Integer, ForeignKey("quests.id"))
-    
     def completed(self):
         return self.eventsRemaining <= 0
 

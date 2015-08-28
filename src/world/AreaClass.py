@@ -12,12 +12,13 @@ class DungeonStatus(Enum):
     none = 1
     closed = 2
     open = 3
-    
-# TODO: Convert to Enum
-NOT_BUILT = u"not_built"
-BUILDING = u"building"
-BUILT = u"built"
 
+@unique
+class BuildStatus(Enum):
+    NOT_BUILT = 1
+    BUILDING = 2
+    BUILT = 3
+    
 class Area(object):
     
     __tablename__ = "areas"
@@ -29,8 +30,8 @@ class Area(object):
         
         self.levels = []
         self.startingLevel = None
-        self.startingLevelStatus = NOT_BUILT
-        self.lowerLevelStatus = NOT_BUILT
+        self.startingLevelStatus = BuildStatus.NOT_BUILT
+        self.lowerLevelStatus = BuildStatus.NOT_BUILT
         
         self.thread = None
         
@@ -93,13 +94,14 @@ class StartingLevelBuildingThread(threading.Thread):
         self.area.setThread(self)
         self.items = items
     def run(self):
+        # TODO: Check build flag
         print "Level building thread started!"
-        self.area.startingLevelStatus = BUILDING
+        self.area.startingLevelStatus = BuildStatus.BUILDING
         self.area.buildStartingLevel()
         for item in self.items:
             self.area.getStartingLevel().placeItemAtRandom(item)
         
-        self.area.startingLevelStatus = BUILT
+        self.area.startingLevelStatus = BuildStatus.BUILT
         self.area.clearThread()
         print "Level building thread finished!"
 
@@ -110,13 +112,14 @@ class LowerLevelsBuildingThread(threading.Thread):
         self.area.setThread(self)
         self.items = items
     def run(self):
-        self.area.lowerLevelStatus = BUILDING
+        # TODO: Check build flag
+        self.area.lowerLevelStatus = BuildStatus.BUILDING
         self.area.buildLowerLevels()
         for item in self.items:
             # TODO: Put all the items in the bottom level, or do we need a way to specify where they go?
             self.area.getLevels()[-1].placeItemAtRandom(item)
         
-        self.area.lowerLevelStatus = BUILT
+        self.area.lowerLevelStatus = BuildStatus.BUILT
         self.area.clearThread()
 
 class SingleLevelArea(Area):
