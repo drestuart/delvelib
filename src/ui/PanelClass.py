@@ -14,7 +14,7 @@ import pygcurse
 import Game as G
 from OptionClass import OptionType
 import pygame
-from QuestClass import NOT_STARTED, RETURNED
+from QuestClass import QuestStatus
 
 fgdefault = colors.colorMessagePanelFG
 bgdefault = colors.colorMessagePanelBG
@@ -507,6 +507,7 @@ class MenuWindow(Panel):
         # Draw shadow
         if self.shadow is not None:
             self.ui.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
+            self.shadow = None # Only draw once
         
         self.ui.drawWindow()
         
@@ -534,6 +535,7 @@ class MenuWindow(Panel):
         # Draw shadow
         if self.shadow is not None:
             self.ui.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
+            self.shadow = None # Only draw once
 
         
     def putLine(self, line, y, fg, bg):
@@ -685,6 +687,7 @@ class GameMenuWindow(MenuWindow):
         # Draw shadow
         if self.shadow is not None:
             self.ui.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
+            self.shadow = None # Only draw once
         
         self.ui.drawWindow()
         
@@ -966,6 +969,7 @@ class OptionWindow(MenuWindow):
         # Draw shadow
         if self.shadow is not None:
             self.ui.window.addshadow(amount=self.shadowamount, region=(self.x, self.y, self.width, self.height), offset=None, direction=self.shadow, xoffset=self.shadowx, yoffset=self.shadowy)
+            self.shadow = None # Only draw once
         
         self.ui.drawWindow()
         
@@ -1049,7 +1053,7 @@ class QuestWindow(MenuWindow):
         
         for q in self.quests:
             status = q.getStatus()
-            if status == NOT_STARTED or status == RETURNED:
+            if status == QuestStatus.NOT_STARTED or status == QuestStatus.RETURNED:
                 continue
             self.questsToShow.append(q)
         

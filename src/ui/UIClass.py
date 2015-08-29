@@ -517,6 +517,7 @@ class UI(object):
         
     def clearScreen(self):
         self.window.erase()
+        self.window.settint(0, 0, 0)
 
     def drawLevel(self):
         # Get all tiles to draw from level class
