@@ -183,7 +183,21 @@ class ItemQuest(Quest):
 
         super(ItemQuest, self).setReturned()
 
-    __mapper_args__ = {'polymorphic_identity': u'item_quest'}
+class KillQuest(Quest):
+    def __init__(self, creatureTypes):
+        super(KillQuest, self).__init__()
+        self.creatureTypes = creatureTypes
+
+    def buildRequirements(self):
+        for (type_, quantity) in self.itemTypes:
+            QuestKillRequirement(type_, quantity, self)
+
+    def placeQuestCreatures(self):
+        pass
+
+    def startQuest(self):
+        self.placeQuestCreatures()
+        super(ItemQuest, self).startQuest()
 
 class QuestRequirement(object):
     updatedEventName = questEventPrefix + 'requirement.updated'
@@ -220,7 +234,7 @@ class QuestItemRequirement(QuestRequirement):
     def __init__(self, itemType, eventsRemaining, quest):
         super(QuestItemRequirement, self).__init__(eventsRemaining, quest)
         self.itemType = itemType
-        self.itemTypeStr = unicode(itemType.__name__)
+        self.itemTypeStr = itemType.__name__
     
     def subscribe(self):
         pub.subscribe(self.handlePickupEvent, self.getItemType().getQuestPickupEvent())
@@ -240,9 +254,25 @@ class QuestItemRequirement(QuestRequirement):
             pub.sendMessage(self.satisfiedEventName, req = self)
             
     def getItemType(self):
-        if self.__dict__.get("itemType"):
-            return self.itemType
-        
-        self.itemType = ItemClass.__dict__.get(self.itemTypeStr)
         return self.itemType
     
+class QuestKillRequirement(QuestRequirement):
+    def __init__(self, creatureType, eventsRemaining, quest):
+        super(QuestKillRequirement, self).__init__(eventsRemaining, quest)
+        self.creatureType = creatureType
+        self.creatureTypeStr = unicode(creatureType.__name__)
+        
+    def subscribe(self):
+        pub.subscribe(self.handleKillEvent, self.getCreatureType().getQuestKillEvent())
+
+    def handleKillEvent(self, creature):
+        self.eventsRemaining -= 1
+        self.updateEvents()
+
+    def updateEvents(self):
+        pub.sendMessage(self.updatedEventName, req = self)
+        if self.completed():
+            pub.sendMessage(self.satisfiedEventName, req = self)
+
+    def getCreatureType(self):
+        return self.creatureType

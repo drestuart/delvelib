@@ -123,7 +123,6 @@ class LowerLevelsBuildingThread(threading.Thread):
         self.area.clearThread()
 
 class SingleLevelArea(Area):
-    __mapper_args__ = {'polymorphic_identity': u'single_level_area'}
     defaultWidth = 100
     defaultHeight = 80
     
@@ -148,7 +147,6 @@ class SingleLevelArea(Area):
         return newArea
     
 class MultiLevelArea(Area):
-    __mapper_args__ = {'polymorphic_identity': u'multi_level_area'}
     defaultWidth = 100
     defaultHeight = 80
     hasDungeon = True
