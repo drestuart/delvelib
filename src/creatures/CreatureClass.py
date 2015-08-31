@@ -44,6 +44,7 @@ class Creature(colors.withColor):
 
         self.givingQuest = None
         self.returnQuest = None
+        self.questTarget = kwargs.get('questTarget', False)
 
     def load(self):
         self.hateList = ['player']
@@ -189,7 +190,10 @@ class Creature(colors.withColor):
 
     def isVisible(self):
         return self.visible
-    
+
+    def isQuestTarget(self):
+        return self.questTarget
+
     def isDead(self):
         return self.dead
 

@@ -88,39 +88,61 @@ class Area(object):
             return DungeonStatus.closed
         
 class StartingLevelBuildingThread(threading.Thread):
-    def __init__(self, area, items=[]):
+    def __init__(self, area, items=[], creatures = []):
         threading.Thread.__init__(self)
         self.area = area
         self.area.setThread(self)
         self.items = items
+        self.creatures = creatures
     def run(self):
-        # TODO: Check build flag
+        if self.area.startingLevelStatus != BuildStatus.NOT_BUILT:
+            self.area.clearThread()
+            raise BuildingThreadError("Area starting level building already started", self.area)
+
         print "Level building thread started!"
         self.area.startingLevelStatus = BuildStatus.BUILDING
         self.area.buildStartingLevel()
+
         for item in self.items:
             self.area.getStartingLevel().placeItemAtRandom(item)
-        
+
+        for creature in self.creatures:
+            self.area.getStartingLevel().placeCreatureAtRandom(creature)
+
         self.area.startingLevelStatus = BuildStatus.BUILT
         self.area.clearThread()
         print "Level building thread finished!"
 
 class LowerLevelsBuildingThread(threading.Thread):
-    def __init__(self, area, items=[]):
+    def __init__(self, area, items=[], creatures = []):
         threading.Thread.__init__(self)
         self.area = area
         self.area.setThread(self)
         self.items = items
+        self.creatures = creatures
     def run(self):
-        # TODO: Check build flag
+        if self.area.startingLevelStatus != BuildStatus.NOT_BUILT:
+            self.area.clearThread()
+            raise BuildingThreadError("Area lower level building already started", self.area)
+
         self.area.lowerLevelStatus = BuildStatus.BUILDING
         self.area.buildLowerLevels()
         for item in self.items:
             # TODO: Put all the items in the bottom level, or do we need a way to specify where they go?
             self.area.getLevels()[-1].placeItemAtRandom(item)
         
+        for creature in self.creatures:
+            self.area.getLevels()[-1].placeCreatureAtRandom(creature)
+        
         self.area.lowerLevelStatus = BuildStatus.BUILT
         self.area.clearThread()
+        
+class BuildingThreadError(Exception):
+    def __init__(self, message, area):
+        self.message = message
+        self.area = area
+    def __str__(self):
+        return repr(self.message) + " " + repr(self.area)
 
 class SingleLevelArea(Area):
     defaultWidth = 100
