@@ -88,7 +88,7 @@ class Area(object):
             return DungeonStatus.closed
         
 class StartingLevelBuildingThread(threading.Thread):
-    def __init__(self, area, items=[], creatures = []):
+    def __init__(self, area, items=[], creatures=[]):
         threading.Thread.__init__(self)
         self.area = area
         self.area.setThread(self)

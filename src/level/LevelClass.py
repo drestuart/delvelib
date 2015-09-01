@@ -1101,6 +1101,8 @@ class WildernessLevel(Level):
     def placeCreatureAtRandom(self, creature, dummy=True):
         tile = self.getRandomOpenTile()
         self.placeCreature(creature, tile)
+        if creature.isQuestTarget():
+            print "Placing quest creature", creature, "at", tile.getXY()
         
     def placeCreatureAtEntrance(self, creature):
         tile = self.getTile(self.entryPointX, self.entryPointY)

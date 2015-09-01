@@ -18,6 +18,7 @@ class QuestStatus(Enum):
     NOT_STARTED = 1
     STARTED = 2
     COMPLETED = 3
+    RETURNED = 4
 
 class Quest(object):
 
@@ -189,7 +190,7 @@ class KillQuest(Quest):
         self.creatureTypes = creatureTypes
 
     def buildRequirements(self):
-        for (type_, quantity) in self.itemTypes:
+        for (type_, quantity) in self.creatureTypes:
             QuestKillRequirement(type_, quantity, self)
 
     def placeQuestCreatures(self):

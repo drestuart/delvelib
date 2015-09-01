@@ -52,7 +52,7 @@ class UI(object):
         self.charPanel = CharacterPanel(C.CHAR_PANEL_DIMS, self)
 
         # Draw UI panels
-        self.clearScreen()
+        self.clearWindow()
         self.charPanel.draw()
         self.messagePanel.displayMessages()
         
@@ -116,7 +116,7 @@ class UI(object):
     
     def drawWindow(self, redraw = False):
         if redraw:
-            self.clearScreen()
+            self.clearWindow()
             self.charPanel.draw()
             self.messagePanel.displayMessages()
             self.drawLevel()
@@ -125,8 +125,8 @@ class UI(object):
         self.window.blittowindow()
         
     def clearWindow(self):
-        self.window.surface.fill((0,0,0))
-        self.drawWindow()
+        self.window.settint(0, 0, 0)
+        self.window.fill(' ', (0,0,0))
         
     def waitForInput(self):
         clock = pygame.time.Clock()
@@ -515,10 +515,6 @@ class UI(object):
     def setPlayer(self, c):
         self.player = c
         
-    def clearScreen(self):
-        self.window.erase()
-        self.window.settint(0, 0, 0)
-
     def drawLevel(self):
         # Get all tiles to draw from level class
         playerx, playery = self.player.getX(), self.player.getY()
