@@ -198,7 +198,7 @@ class KillQuest(Quest):
 
     def startQuest(self):
         self.placeQuestCreatures()
-        super(ItemQuest, self).startQuest()
+        super(KillQuest, self).startQuest()
 
 class QuestRequirement(object):
     updatedEventName = questEventPrefix + 'requirement.updated'

@@ -7,6 +7,10 @@ Created on Mar 13, 2013
 import AIClass as AI
 import colors
 import InventoryClass as I
+from pubsub import pub
+
+killEventPrefix = "event.creature.kill."
+questKillEventPrefix = "event.quest.creature.kill."
 
 class Creature(colors.withColor):
     
@@ -48,6 +52,19 @@ class Creature(colors.withColor):
 
     def load(self):
         self.hateList = ['player']
+    
+    def killEvent(self):
+        pub.sendMessage(self.getKillEvent(), creature=self)
+        if self.isQuestTarget():
+            pub.sendMessage(self.getQuestKillEvent(), creature=self)
+    
+    @classmethod
+    def getKillEvent(cls):
+        return killEventPrefix + cls.creatureType
+    
+    @classmethod
+    def getQuestKillEvent(cls):
+        return questKillEventPrefix + cls.creatureType
         
     def getInventory(self):
         return self.inventory
@@ -140,6 +157,7 @@ class Creature(colors.withColor):
             
     def die(self):
         import Game as G
+        self.killEvent()
         message = self.The() + " dies!"
         G.message(message)
         print message
