@@ -25,6 +25,7 @@ class TileBase(colors.withBackgroundColor):
         self.baseSymbol = kwargs.get('baseSymbol', u' ')
         self.creature = kwargs.get('creature', None)
         self.feature = kwargs.get('feature', None)
+        self.level = kwargs.get('level', None)
 
     def blocksMove(self):
         raise NotImplementedError("blocksMove() not implemented, use a subclass")
@@ -71,23 +72,35 @@ class TileBase(colors.withBackgroundColor):
         return True
 
     def setCreature(self, creature):
+        import Game
         self.creature = creature
         if creature.getTile() is not self:
             creature.setTile(self)
-
-        pub.sendMessage("event.addedCreature", tile = self, creature = creature)
+        
+        if self.getLevel() is Game.getCurrentLevel():
+            pub.sendMessage("event.addedCreature", tile = self, creature = creature)
         
     def removeCreature(self):
+        import Game
         if self.creature:
             creature = self.creature
             creature.setTile(None)
             self.creature = None
-            pub.sendMessage("event.removedCreature", tile = self, creature = creature)
+            if self.getLevel() is Game.getCurrentLevel():
+                pub.sendMessage("event.removedCreature", tile = self, creature = creature)
             return True
         
         else:
             return False
-        
+
+    def getLevel(self):  
+        return self.level
+
+    def setLevel(self, level):
+        self.level = level
+        if self not in self.level.getTiles():
+            self.level.addTile(self)
+
     def getLastSeenSymbol(self):
         return self.baseSymbol
     
@@ -104,7 +117,6 @@ class Tile(TileBase):
 
         self.lastSeenSymbol = kwargs.get('lastSeenSymbol', u' ')
         
-        self.level = kwargs.get('level', None)
         self.room = kwargs.get('room', None)
         
         self.explored = False
@@ -286,14 +298,6 @@ class Tile(TileBase):
         if self not in room.getTiles():
             room.addTile(self)
     
-    def getLevel(self):  
-        return self.level
-    
-    def setLevel(self, level):
-        self.level = level
-        if self not in self.level.getTiles():
-            self.level.addTile(self)
-            
     def getExplored(self):
         return self.explored
 
